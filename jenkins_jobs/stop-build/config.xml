@@ -1,0 +1,78 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>停止编译任务</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>job_name_extra</name>
+          <description></description>
+          <defaultValue>build-line</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>job_id</name>
+          <description></description>
+          <defaultValue>1</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.PasswordParameterDefinition>
+          <name>admin_token</name>
+          <description>do not edit</description>
+          <defaultValue>{AQAAABAAAAAwTcintIr9II/EFnQPZCT3L2jFWCpgQGh/b3MNqjguRa6My5UIoq4WIErVDngFN4EJGVft42BO+KUsIpvFpsIuQA==}</defaultValue>
+        </hudson.model.PasswordParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/usr/bin/env bash
+
+if [ -z &quot;$job_id&quot; ] ; then
+	# get last number
+	api_url=&quot;http://admin:$admin_token@192.168.151.14:8080/job/$job_name_extra/api/json&quot;
+
+	all_job=`curl -X GET $api_url`
+	last_number=$(echo &quot;${all_job}&quot; | python -c &quot;import json, sys; obj=json.load(sys.stdin); print obj[&apos;lastBuild&apos;][&apos;number&apos;]&quot;)
+	echo -e &quot;\n\nlast number: $last_number\n\n&quot;
+
+	job_id=$last_number
+fi
+
+term_url=&quot;http://admin:$admin_token@192.168.151.14:8080/job/$job_name_extra/$job_id/term&quot;
+check_url=&quot;http://admin:$admin_token@192.168.151.14:8080/job/$job_name_extra/$job_id/api/json&quot;
+
+
+# terminate
+time=0
+while [ $time -lt 3 ]; do
+	let &quot;time++&quot;
+
+	# check status first
+	rst=$(curl -X GET $check_url | python -c &quot;import json, sys; obj=json.load(sys.stdin); print obj[&apos;result&apos;]&quot;)
+    echo -e &quot;\ntime: $time, result=$rst\n&quot;
+
+	# None means ongoing
+	if [ &quot;$rst&quot; != &quot;None&quot; ]; then
+		exit 0
+	fi
+
+	curl -X POST $term_url &gt; /dev/null
+    sleep 5s
+done
+</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

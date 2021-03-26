@@ -1,0 +1,176 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.40">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.8.4"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.8.4">
+      <jobProperties/>
+      <triggers/>
+      <parameters/>
+      <options/>
+    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+  </actions>
+  <description>编译线</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>project_name</name>
+          <description>编译项目名</description>
+          <defaultValue>g1930epq_v10a_hl</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>code_dir</name>
+          <description>编译服务器上，项目所属仓库的位置</description>
+          <defaultValue>/mnt/repos/58N/</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>server_ip_address</name>
+          <description>编译服务器IP地址</description>
+          <defaultValue>192.168.151.14</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>server_hostname</name>
+          <description>编译服务器，SSH用户名</description>
+          <defaultValue>server</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>server_passwd</name>
+          <description>编译服务器，SSH密码</description>
+          <defaultValue>tyd1111</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>build_variant</name>
+          <description>软件类型</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>u</string>
+              <string>d</string>
+              <string>e</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>build_sign</name>
+          <description>是否签名</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>build_action</name>
+          <description>编译行为</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>n</string>
+              <string>r</string>
+              <string>ota</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>build_verity</name>
+          <description>是否验收</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>need_publish</name>
+          <description>是否打包</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>test_pipeline</name>
+          <description>是否用来测试pipeline</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>test_host</name>
+          <description>是否用来测试主机</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>devops_host_id</name>
+          <description>服务器ID（DevOps）</description>
+          <defaultValue>12345</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>devops_compile_id</name>
+          <description>编译任务ID（DevOps）</description>
+          <defaultValue>1374633519564763138</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>is_new_project</name>
+          <description>是否是新项目</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.90">
+    <script>pipeline {
+    agent &apos;any&apos;
+    stages {
+        stage(&apos;prepare&apos;) {
+            steps {
+                script {
+                    println &quot;project_name: ${project_name}&quot;
+                    println &quot;code_dir: ${code_dir}&quot;
+                    println &quot;server_hostname: ${server_hostname}&quot;
+                    println &quot;server_ip_address: ${server_ip_address}&quot;
+                    println &quot;server_passwd: ${server_passwd}&quot;
+                    println &quot;build_variant: ${build_variant}&quot;
+                    println &quot;build_sign: ${build_sign}&quot;
+                    println &quot;build_verity: ${build_verity}&quot;
+                    println &quot;build_action: ${build_action}&quot;
+                    println &quot;need_publish: ${need_publish}&quot;
+                    println &quot;devops_host_id: ${devops_host_id}&quot;
+                    println &quot;devops_compile_id: ${devops_compile_id}&quot;
+                    println &quot;is_new_project: ${is_new_project}&quot;
+                    println &quot;is_test_pipeline: ${test_pipeline}&quot;
+                    println &quot;is_test_host: ${test_host}&quot;
+                }
+            }
+        }
+        stage(&apos;build&apos;) {
+            steps {
+                sh &apos;&apos;&apos;
+                sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
+                
+                if [ ! -d &quot;$code_dir&quot; ]; then
+                    echo &quot;Project code directory does not exist!!!&quot;
+                    exit -1;
+                fi
+                
+                cd &quot;$code_dir&quot;
+                echo &quot;&quot;
+                echo -------------------------------------------------
+                echo code_dir: 
+                pwd
+                echo -------------------------------------------------
+                echo &quot;&quot;
+                
+                if [ ! -f build.sh ]; then
+                    echo &quot;File build.sh does not exist!!!&quot;
+                    exit -2;
+                fi
+                
+                if [ $test_pipeline == &quot;true&quot; ]; then
+                    echo &quot;Just test pipeline, exit.&quot;
+                    exit 0
+                fi
+                bash build.sh &quot;$project_name&quot; &quot;$build_variant&quot; &quot;$build_action&quot; &quot;$build_sign&quot; &quot;$build_verity&quot; &quot;$need_publish&quot; &quot;$devops_host_id&quot; &quot;$devops_compile_id&quot; &quot;$is_new_project&quot; &quot;$test_host&quot;
+                &apos;&apos;&apos;
+            }
+        }
+    }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

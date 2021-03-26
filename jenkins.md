@@ -52,7 +52,7 @@ curl -X GET http://<user>:<user-token>@<jenkins-host>/job/<job-name>/<job-number
 
 2. 停止job
 ```shell
-curl -X GET http://<user>:<user-token>@<jenkins-host>/job/<job-name>/<job-number>/<stop/term>
+curl -X POST http://<user>:<user-token>@<jenkins-host>/job/<job-name>/<job-number>/<stop/term>
 ```
 
 ## jenkins job build-line
