@@ -21,6 +21,12 @@ def _exit(code, cursor=None):
 		cursor.close()
 	exit(code)
 
+HOST = "192.168.1.23"
+PORT = 3306
+USER = "root"
+PASSWORD = "root"
+DATABASE = "jeecg-boot242"
+
 if ( __name__ == "__main__"):
 	if len(sys.argv) <= 2:
 		print('\033[31mnotify_status: wrong params\033[0m')
@@ -32,10 +38,11 @@ if ( __name__ == "__main__"):
 
 	# sql connect
 	dev_ops_db = mysql.connector.connect(
-		host="192.168.1.23",
-		user="root",
-		passwd="root",
-		database="jeecg-boot242"
+		host=HOST,
+		port=PORT,
+		user=USER,
+		passwd=PASSWORD,
+		database=DATABASE
 	)
 	cursor = dev_ops_db.cursor()
 

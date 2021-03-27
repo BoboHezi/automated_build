@@ -16,12 +16,14 @@ devops_host_id=$7
 devops_compile_id=$8
 is_new_project=$9
 is_test=${10}
+build_url=${11}
+server_ip_address=${12}
 
 function printParams() {
     echo ""
     echo --------------------------------------------------------------------------
     echo "Compilation parameters: " 
-    echo "build project: $build_project"
+    echo "build project: $build_project" 
     echo "build variant: $build_variant" 
     echo "build action: $build_action" 
     echo "is sign: $is_sign" 
@@ -29,6 +31,7 @@ function printParams() {
     echo "is publish: $is_publish" 
     echo "devops host id: $devops_host_id" 
     echo "devops compile id: $devops_compile_id" 
+    echo "build_url: $build_url" 
     echo "is new project: $is_new_project" 
     echo "is test: $is_test" 
     echo --------------------------------------------------------------------------
@@ -119,16 +122,29 @@ fi
 # echo build info
 echo -e "\nmk -f -$build_variant $is_sign $build_project $build_action\n"
 
-# build
+# database option
 # status: compiling(4)
 python notify_status.py $devops_compile_id 4
-# return jenkins_id & status by devops_host_id devops_compile_id
+# table devops_server server status
+python update_db.py -t devops_server -k server_status -v 1 -w id -e $devops_host_id
+# table devops_compile infos
+host=`echo $build_url | awk -F"/" '{print $3}'`
+job_name=`echo $build_url | awk -F"/" '{print $5}'`
+build_id=`echo $build_url | awk -F"/" '{print $6}'`
+build_time=`date "+%Y-%m-%d %H:%M:%S"`
+python update_db.py -t devops_compile \
+    -k compile_jenkins_job_name,compile_jenkins_job_id,compile_log_url,compile_server_ip,compile_build_time \
+    -v "$job_name","$build_id","$build_url/consoleText","$server_ip_address","$build_time" \
+    -w id -e $devops_compile_id
+
+# build
 if [ $is_test == "true" ]; then
     ./test_script.sh ; build_rst=$?
 else
     ./mk -f -$build_variant $is_sign $build_project $build_action ; build_rst=$?
 fi
 
+# build result
 if test $build_rst = "0"
 then
     # status: build_success(0)
@@ -141,3 +157,11 @@ else
     exit 5
 fi
 
+# database option
+# table devops_server server status
+python update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+# table devops_compile infos
+build_finish_time=`date "+%Y-%m-%d %H:%M:%S"`
+python update_db.py -t devops_compile \
+    -k compile_build_finish_time -v "$build_finish_time" \
+    -w id -e $devops_compile_id

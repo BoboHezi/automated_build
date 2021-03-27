@@ -55,6 +55,15 @@ curl -X GET http://<user>:<user-token>@<jenkins-host>/job/<job-name>/<job-number
 curl -X POST http://<user>:<user-token>@<jenkins-host>/job/<job-name>/<job-number>/<stop/term>
 ```
 
+## Job可用环境变量
+|KEY|说明|eg|
+|:---|:---|:---|
+|BUILD_NUMBER	|The current build number				|12|
+|JOB_NAME				|Name of the project of this build	|foo|
+|JENKINS_URL			|Full URL of Jenkins							|http://server:port/jenkins|
+|BUILD_URL			|Full URL of this build						|http://server:port/jenkins/job/foo/15|
+|JOB_URL					|Full URL of this job							|http://server:port/jenkins/job/foo|
+
 ## jenkins job build-line
 
 ### 字段说明
