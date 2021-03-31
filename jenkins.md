@@ -22,6 +22,8 @@
 
 2. 安装sshpass: ```sudo apt-get install sshpass```
 
+3. 安装pip:
+
 ## 配置Remote-trigger
 
 ### 第一步需要给所属用户添加token
@@ -50,9 +52,16 @@ curl -X GET http://<user>:<user-token>@<jenkins-host>/job/<job-name>/api/json
 curl -X GET http://<user>:<user-token>@<jenkins-host>/job/<job-name>/<job-number>/api/json
 ```
 
-2. 停止job
+3. 停止job
 ```shell
 curl -X POST http://<user>:<user-token>@<jenkins-host>/job/<job-name>/<job-number>/<stop/term>
+```
+
+4. 创建job
+```shell
+curl -X POST --user "<user>:<user-token>" --data-binary "@/data/config.xml" -H "Content-Type: text/xml" http://<jenkins-host>/createItem\?name\=<job-name>
+
+curl -X POST http://<user>:<user-token>@<jenkins-host>/createItem\?name\=<job-name> --data-binary "@/data/config.xml" -H "Content-Type: text/xml"
 ```
 
 ## Job可用环境变量

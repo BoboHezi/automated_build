@@ -22,6 +22,55 @@ pipeline {
                 }
             }
         }
+        stage('prepare-jenkins-server') {
+            steps {
+                script {
+                    sh '''
+                    if ! type sshpass >/dev/null 2>&1; then
+                        echo -e "\nprepare-jenkins-server: install sshpass"
+                        sudo -S apt-get install sshpass -y << EOF
+1
+EOF
+                    fi
+                    if ! type pip >/dev/null 2>&1; then
+                        echo -e "\nprepare-jenkins-server: install python-pip"
+                        sudo -S apt-get install python-pip -y << EOF
+1
+EOF
+                    fi
+                    '''
+                }
+            }
+        }
+        stage('prepare-server-mkdir') {
+            steps {
+                sh '''
+                sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
+
+                if [ ! -d "$script_path" ]; then
+                    echo -e "\ncreate path $script_path"
+                    mkdir -p "$script_path"
+                fi
+                cd $script_path
+                pwd
+                '''
+            }
+        }
+        stage('prepare-server-upload-script') {
+            steps {
+                script {
+                    sh '''
+                    set +e
+                    sshpass -p "$server_passwd" scp -r $script_path "$server_hostname@$server_ip_address":/home/server/.jenkins > /dev/null 2>&1
+                    
+                    sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
+                    cd $script_path
+                    pwd
+                    ./link.sh $code_dir
+                    '''
+                }
+            }
+        }
         stage('build') {
             steps {
                 sh '''
