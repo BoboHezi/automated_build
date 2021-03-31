@@ -57,6 +57,12 @@ pwd
 script_files=`find -type f -regex &apos;.*\.sh\|.*\.py&apos;`
 
 echo &quot;script_files=$script_files&quot;
+
+mkdir -p /home/server/.jenkins/script/
+for file in $script_files; do
+	cp $file /home/server/.jenkins/script/
+    echo &quot;cp $file /home/server/.jenkins/script/&quot;
+done
 </command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>

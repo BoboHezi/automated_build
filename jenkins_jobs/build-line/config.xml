@@ -116,6 +116,12 @@
           <description>是否用来测试主机</description>
           <defaultValue>true</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>script_path</name>
+          <description>do not edit</description>
+          <defaultValue>/home/server/.jenkins/script</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
