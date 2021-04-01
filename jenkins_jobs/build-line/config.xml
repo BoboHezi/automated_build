@@ -31,13 +31,13 @@
         <hudson.model.StringParameterDefinition>
           <name>code_dir</name>
           <description>编译服务器上，项目所属仓库的位置</description>
-          <defaultValue>/data/58N/</defaultValue>
+          <defaultValue>/data/6758N/</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>server_ip_address</name>
           <description>编译服务器IP地址</description>
-          <defaultValue>192.168.151.238</defaultValue>
+          <defaultValue>10.20.100.16</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -49,7 +49,7 @@
         <hudson.model.StringParameterDefinition>
           <name>server_passwd</name>
           <description>编译服务器，SSH密码</description>
-          <defaultValue>1</defaultValue>
+          <defaultValue>Droi*#2020</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
@@ -92,13 +92,13 @@
         <hudson.model.StringParameterDefinition>
           <name>devops_host_id</name>
           <description>服务器ID（DevOps）</description>
-          <defaultValue>12345</defaultValue>
+          <defaultValue>1374206590156066818</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>devops_compile_id</name>
           <description>编译任务ID（DevOps）</description>
-          <defaultValue>1374633519564763138</defaultValue>
+          <defaultValue>1376786526867877890</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
@@ -170,7 +170,7 @@ EOF
                 }
             }
         }
-        stage(&apos;prepare-server-mkdir&apos;) {
+        stage(&apos;prepare-host-mkdir&apos;) {
             steps {
                 sh &apos;&apos;&apos;
                 sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
@@ -184,7 +184,7 @@ EOF
                 &apos;&apos;&apos;
             }
         }
-        stage(&apos;prepare-server-upload-script&apos;) {
+        stage(&apos;prepare-host-upload-script&apos;) {
             steps {
                 script {
                     sh &apos;&apos;&apos;

@@ -4,6 +4,14 @@
   <description>停止编译任务</description>
   <keepDependencies>false</keepDependencies>
   <properties>
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.19">
+      <gitLabConnection></gitLabConnection>
+      <jobCredentialId></jobCredentialId>
+      <useAlternativeCredential>false</useAlternativeCredential>
+    </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.5">
+      <giteeConnection>Gitee</giteeConnection>
+    </com.gitee.jenkins.connection.GiteeConnectionProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
@@ -21,8 +29,20 @@
         <hudson.model.PasswordParameterDefinition>
           <name>admin_token</name>
           <description>do not edit</description>
-          <defaultValue>{AQAAABAAAAAwTcintIr9II/EFnQPZCT3L2jFWCpgQGh/b3MNqjguRa6My5UIoq4WIErVDngFN4EJGVft42BO+KUsIpvFpsIuQA==}</defaultValue>
+          <defaultValue>{AQAAABAAAAAw5i55VYC2IEU/EuddpUdQRm3FZtXEFLtLRJ5d4ZkBxCPgzckwOqVgtFc32zgRcW3CmLMKm5eTeicpsUi8deaCxQ==}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>jenkins_user</name>
+          <description>Jenkins用户，do not edit</description>
+          <defaultValue>admin</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>script_path</name>
+          <description>do not edit</description>
+          <defaultValue>/home/server/.jenkins/script/</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -39,35 +59,57 @@
 
 if [ -z &quot;$job_id&quot; ] ; then
 	# get last number
-	api_url=&quot;http://admin:$admin_token@192.168.151.14:8080/job/$job_name_extra/api/json&quot;
+	api_url=&quot;$JENKINS_URL&quot;&quot;job/$job_name_extra/api/json&quot;
+	echo api_url=$api_url
 
-	all_job=`curl -X GET $api_url`
+	all_job=`curl -X GET $api_url --user $jenkins_user:$admin_token`
 	last_number=$(echo &quot;${all_job}&quot; | python -c &quot;import json, sys; obj=json.load(sys.stdin); print obj[&apos;lastBuild&apos;][&apos;number&apos;]&quot;)
 	echo -e &quot;\n\nlast number: $last_number\n\n&quot;
 
 	job_id=$last_number
 fi
 
-term_url=&quot;http://admin:$admin_token@192.168.151.14:8080/job/$job_name_extra/$job_id/term&quot;
-check_url=&quot;http://admin:$admin_token@192.168.151.14:8080/job/$job_name_extra/$job_id/api/json&quot;
+term_url=&quot;$JENKINS_URL&quot;&quot;job/$job_name_extra/$job_id/term&quot;
+check_url=&quot;$JENKINS_URL&quot;&quot;job/$job_name_extra/$job_id/api/json&quot;
 
+pwd
+echo term_url: $term_url
+echo check_url: $check_url
 
 # terminate
 time=0
 while [ $time -lt 3 ]; do
 	let &quot;time++&quot;
 
+	job_info=`curl -X GET $check_url --user $jenkins_user:$admin_token`
+
 	# check status first
-	rst=$(curl -X GET $check_url | python -c &quot;import json, sys; obj=json.load(sys.stdin); print obj[&apos;result&apos;]&quot;)
-    echo -e &quot;\ntime: $time, result=$rst\n&quot;
+	rst=$(echo &quot;${job_info}&quot; | python -c &quot;import json, sys; obj=json.load(sys.stdin); print obj[&apos;result&apos;]&quot;)
+	echo -e &quot;\ntime: $time, result=$rst\n&quot;
 
 	# None means ongoing
 	if [ &quot;$rst&quot; != &quot;None&quot; ]; then
+		devops_host_id=$(echo &quot;${job_info}&quot; | python -c &quot;import json, sys; obj=json.load(sys.stdin); print obj[&apos;actions&apos;][0][&apos;parameters&apos;][10][&apos;value&apos;]&quot;)
+		devops_compile_id=$(echo &quot;${job_info}&quot; | python -c &quot;import json, sys; obj=json.load(sys.stdin); print obj[&apos;actions&apos;][0][&apos;parameters&apos;][11][&apos;value&apos;]&quot;)
+		echo -e &quot;\ntime: $time, devops_host_id=$devops_host_id, devops_compile_id=$devops_compile_id\n&quot;
+
+		cd $script_path
+		pwd
+
+		# update host status
+		python update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+		# update compile finish time
+		build_finish_time=`date &quot;+%Y-%m-%d %H:%M:%S&quot;`
+		python update_db.py -t devops_compile \
+			-k compile_build_finish_time -v &quot;$build_finish_time&quot; \
+			-w id -e $devops_compile_id
+		# update status
+		python notify_status.py $devops_compile_id 6
 		exit 0
 	fi
 
-	curl -X POST $term_url &gt; /dev/null
-    sleep 5s
+	curl -X POST $term_url --user $jenkins_user:$admin_token &gt; /dev/null
+	sleep 5s
 done
 </command>
       <configuredLocalRules/>
