@@ -24,8 +24,11 @@ usage
 ''')
 	pass
 
-def _exit(code):
-	print()
+def _exit(code, cursor=None):
+	print('*' * 15 + 'update_db end' + '*' * 15)
+	if cursor != None:
+		cursor.close()
+	exit(code)
 
 HOST = "192.168.1.23"
 PORT = 3306
@@ -41,14 +44,14 @@ WHERE_VALUE=None
 
 if ( __name__ == "__main__"):
 	# dump options
-	print('*' * 15 + 'update_db' + '*' * 15)
+	print('*' * 15 + 'update_db start' + '*' * 15)
 	all_options = ('-d', '--database', '-t', '--table', '-k', '--keys', '-v', '--values', '-w', '--where', '-e', '--equals', '-h', '--help')
 	try:
 		options, args = getopt.getopt(sys.argv[1:], 'hd:t:k:v:w:e:', ["help","database=","table=","keys=","values=", '--where', '--equals'])
 		for opt, arg in options:
 			if arg in all_options or opt in ('-h', '--help'):
 				usage()
-				exit(1)
+				_exit(1)
 
 			# print('%s, %s' % (opt, arg))
 			if opt in ('-d', '--database'):
@@ -64,19 +67,19 @@ if ( __name__ == "__main__"):
 			elif opt in ('-e', '--equals'):
 				WHERE_VALUE = arg
 	except Exception as e:
-		print(e)
-		exit(2)
+		print('update_db ', e)
+		_exit(2)
 
 	# must specify below options
 	if not (DATABASE and TABLE and KEYS and VALUES):
 		usage()
-		exit(3)
+		_exit(3)
 	print('\nDATABASE:\t%s\nTABLE:\t%s\nKEYS:\t%s\nVALUES:\t%s\nWHERE_KEY:\t%s\nWHERE_VALUE:\t%s\n' % (DATABASE, TABLE, KEYS, VALUES, WHERE_KEY, WHERE_VALUE))
 
 	# KEYS and VALUES must have same length
 	if len(KEYS) != len(VALUES):
 		print('update_db: KEYS and VALUES must have same length')
-		exit(4)
+		_exit(4)
 
 	# genrate SQL
 	update_sql = ('UPDATE %s SET (UPDATES)' % TABLE)
@@ -108,8 +111,8 @@ if ( __name__ == "__main__"):
 	db_connect.commit()
 
 	if cursor.rowcount > 0:
-		print('\033[32mupdate_db: update success\033[0m')
+		print('update_db: update success')
 	else:
-		print('\033[31mupdate_db: update failed\033[0m')
+		print('update_db: update failed')
 
-	exit(0 if cursor.rowcount > 0 else -1)
+	_exit(0 if cursor.rowcount > 0 else -1)

@@ -19,6 +19,7 @@ def select_status(cursor, id):
 def _exit(code, cursor=None):
 	if cursor != None:
 		cursor.close()
+	print('*' * 15 + 'notify_status end' + '*' * 15)
 	exit(code)
 
 HOST = "192.168.1.23"
@@ -28,8 +29,9 @@ PASSWORD = "root"
 DATABASE = "jeecg-boot242"
 
 if ( __name__ == "__main__"):
+	print('*' * 15 + 'notify_status start' + '*' * 15)
 	if len(sys.argv) <= 2:
-		print('\033[31mnotify_status: wrong params\033[0m')
+		print('notify_status: wrong params')
 		_exit(1)
 
 	# get params
@@ -49,10 +51,10 @@ if ( __name__ == "__main__"):
 	# check id
 	pre_status = select_status(cursor, compile_id)
 	if pre_status == None:
-		print('\033[31mnotify_status: wrong id %s\033[0m' % compile_id)
+		print('notify_status: wrong id %s' % compile_id)
 		_exit(2, cursor)
 	elif str(pre_status) == status:
-		print('\033[31mnotify_status: same status\033[0m')
+		print('notify_status: same status')
 		_exit(3, cursor)
 
 	# update
@@ -62,8 +64,8 @@ if ( __name__ == "__main__"):
 
 	success = cursor.rowcount == 1
 	if success:
-		print('\033[32mnotify_status: update %s success\033[0m' % status)
+		print('notify_status: update %s success' % status)
 	else:
-		print('\033[31mnotify_status: update %s failed\033[0m' % status)
+		print('notify_status: update %s failed' % status)
 
 	_exit(0 if success else 4, cursor)

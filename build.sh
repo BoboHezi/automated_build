@@ -71,13 +71,11 @@ if [ -z "$build_project" ] || [ -z "$build_variant" ] || [ -z "$build_action" ] 
     exit 2;
 fi
 
+echo -e "\n---------------------source---------------------\n"
 # pre-build
-if [ "$is_test" != "true" ]; then
-    . build/envsetup.sh
-else
-    echo -e "\nsource build/envsetup.sh\n"
-fi
+. build/envsetup.sh
 
+echo -e "\n---------------------clean---------------------\n"
 # clean
 case $build_action in
     n|ota)
@@ -90,11 +88,13 @@ case $build_action in
         ;;
 esac
 
+echo -e "\n---------------------sync---------------------\n"
 # sync code
 if [[ "$is_test" != "true" && "$build_action" != "r" ]]; then
     repo sync
 fi
 
+echo -e "\n---------------------find---------------------\n"
 # find project
 find=$(find droi/ -maxdepth 3 -mindepth 3 -type d -name $build_project)
 
@@ -113,6 +113,7 @@ else
     echo -e "\n$build_project found\n"
 fi
 
+echo -e "\n---------------------overview---------------------\n"
 # just overview
 if [ $is_test != "true" ]; then
     echo "overview"
@@ -148,6 +149,7 @@ if [ $is_test != "true" ]; then
         -w id -e $devops_compile_id
 fi
 
+echo -e "\n---------------------build---------------------\n"
 # build
 if [ $is_test == "true" ]; then
     ./test_script.sh ; build_rst=$?
@@ -169,6 +171,13 @@ else
     fi
     echo -e "\nbuild failed\n"
     exit 5
+fi
+
+echo -e "\n---------------------publish---------------------\n"
+# publish
+if [ $is_publish == "true" ]; then
+    echo -e "\npiblish\n"
+    ./publish
 fi
 
 # database option
