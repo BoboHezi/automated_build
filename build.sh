@@ -17,7 +17,6 @@ devops_compile_id=$8
 is_new_project=$9
 is_test=${10}
 build_url=${11}
-server_ip_address=${12}
 
 function printParams() {
     echo ""
@@ -57,14 +56,18 @@ function printBlue() {
 printParams
 
 # status: init(1)
-python notify_status.py $devops_compile_id 1
+if [ $is_test != "true" ]; then
+    python notify_status.py $devops_compile_id 1
+fi
 
 # pre-check
 # check params
 if [ -z "$build_project" ] || [ -z "$build_variant" ] || [ -z "$build_action" ] ; then
     echo -e "\nThere is a problem with the incoming parameters, please check\n"
     # status: check_fail(2)
-    python notify_status.py $devops_compile_id 2
+    if [ $is_test != "true" ]; then
+        python notify_status.py $devops_compile_id 2
+    fi
     exit 2;
 fi
 
@@ -97,7 +100,9 @@ find=$(find droi/ -maxdepth 3 -mindepth 3 -type d -name $build_project)
 
 if [ ! $find ]; then
     # status: project_notfound(3)
-    python notify_status.py $devops_compile_id 3
+    if [ $is_test != "true" ]; then
+        python notify_status.py $devops_compile_id 3
+    fi
     echo -e "\n$build_project not found\n"
     exit 3
 else
@@ -124,18 +129,24 @@ echo -e "\nmk -f -$build_variant $is_sign $build_project $build_action\n"
 
 # database option
 # status: compiling(4)
-python notify_status.py $devops_compile_id 4
+if [ $is_test != "true" ]; then
+    python notify_status.py $devops_compile_id 4
+fi
 # table devops_server server status
-python update_db.py -t devops_server -k server_status -v 1 -w id -e $devops_host_id
+if [ $is_test != "true" ]; then
+    python update_db.py -t devops_server -k server_status -v 1 -w id -e $devops_host_id
+fi
 # table devops_compile infos
 host=`echo $build_url | awk -F"/" '{print $3}'`
 job_name=`echo $build_url | awk -F"/" '{print $5}'`
 build_id=`echo $build_url | awk -F"/" '{print $6}'`
 build_time=`date "+%Y-%m-%d %H:%M:%S"`
-python update_db.py -t devops_compile \
-    -k compile_jenkins_job_name,compile_jenkins_job_id,compile_log_url,compile_server_ip,compile_build_time \
-    -v "$job_name","$build_id","$build_url/consoleText","$server_ip_address","$build_time" \
-    -w id -e $devops_compile_id
+if [ $is_test != "true" ]; then
+    python update_db.py -t devops_compile \
+        -k compile_jenkins_job_name,compile_jenkins_job_id,compile_log_url,compile_server_ip,compile_build_time \
+        -v "$job_name","$build_id","$build_url/consoleText","$host","$build_time" \
+        -w id -e $devops_compile_id
+fi
 
 # build
 if [ $is_test == "true" ]; then
@@ -145,23 +156,30 @@ else
 fi
 
 # build result
-if test $build_rst = "0"
-then
+if test $build_rst = "0"; then
     # status: build_success(0)
-    python notify_status.py $devops_compile_id 0
+    if [ $is_test != "true" ]; then
+        python notify_status.py $devops_compile_id 0
+    fi
     echo -e "\nbuild success\n"
 else
     # status: build_failed(5)
-    python notify_status.py $devops_compile_id 5
+    if [ $is_test != "true" ]; then
+        python notify_status.py $devops_compile_id 5
+    fi
     echo -e "\nbuild failed\n"
     exit 5
 fi
 
 # database option
 # table devops_server server status
-python update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+if [ $is_test != "true" ]; then
+    python update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+fi
 # table devops_compile infos
 build_finish_time=`date "+%Y-%m-%d %H:%M:%S"`
-python update_db.py -t devops_compile \
-    -k compile_build_finish_time -v "$build_finish_time" \
-    -w id -e $devops_compile_id
+if [ $is_test != "true" ]; then
+    python update_db.py -t devops_compile \
+        -k compile_build_finish_time -v "$build_finish_time" \
+        -w id -e $devops_compile_id
+fi

@@ -42,7 +42,7 @@ EOF
                 }
             }
         }
-        stage('prepare-server-mkdir') {
+        stage('prepare-host-mkdir') {
             steps {
                 sh '''
                 sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
@@ -56,7 +56,7 @@ EOF
                 '''
             }
         }
-        stage('prepare-server-upload-script') {
+        stage('prepare-host-upload-script') {
             steps {
                 script {
                     sh '''
@@ -98,7 +98,7 @@ EOF
                     echo "Just test pipeline, exit."
                     exit 0
                 fi
-                bash build.sh "$project_name" "$build_variant" "$build_action" "$build_sign" "$build_verity" "$need_publish" "$devops_host_id" "$devops_compile_id" "$is_new_project" "$test_host"
+                bash build.sh "$project_name" "$build_variant" "$build_action" "$build_sign" "$build_verity" "$need_publish" "$devops_host_id" "$devops_compile_id" "$is_new_project" "$test_host" "$BUILD_URL"
                 '''
             }
         }

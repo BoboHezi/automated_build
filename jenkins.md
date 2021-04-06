@@ -67,30 +67,30 @@ curl -X POST http://<user>:<user-token>@<jenkins-host>/createItem\?name\=<job-na
 ## Job可用环境变量
 |KEY|说明|eg|
 |:---|:---|:---|
-|BUILD_NUMBER	|The current build number				|12|
-|JOB_NAME				|Name of the project of this build	|foo|
-|JENKINS_URL			|Full URL of Jenkins							|http://server:port/jenkins|
-|BUILD_URL			|Full URL of this build						|http://server:port/jenkins/job/foo/15|
-|JOB_URL					|Full URL of this job							|http://server:port/jenkins/job/foo|
+|BUILD_NUMBER |The current build number          |12|
+|JOB_NAME     |Name of the project of this build |foo|
+|JENKINS_URL  |Full URL of Jenkins               |http://server:port|
+|BUILD_URL    |Full URL of this build            |http://server:port/job/foo/15|
+|JOB_URL      |Full URL of this job              |http://server:port/job/foo|
 
 ## jenkins job build-line
 
 ### 字段说明
 |key_name | key_value | 说明 |
 |--|--|--|
-|project_name		|string			|项目名|
-|code_dir			|string			|代码路径|
-|server_hostname	|string			|编译服务器用户名|
-|server_ip_address	|string			|编译服务器IP|
-|server_passwd		|string			|编译服务器密码（SSH）|
-|devops_host_id		|string			|服务器ID（DevOps）|
-|devops_compile_id	|string			|编译任务ID（DevOps）|
-|is_new_project		|[true，false]	|是否是新项目|
-|build_variant		|[u，d，e]		|编译类型|
-|build_sign			|[true，false]	|是否签名|
-|build_verity		|[true，false]	|是否验收|
-|build_action		|[n，r，ota]		|编译动作|
-|need_publish		|[true，false]	|是否打包|
-|is_test_pipeline	|[true，false]	|测试pipeline|
-|is_test_host		|[true，false]	|测试脚本|
+|project_name      |string        |项目名|
+|code_dir          |string        |代码路径|
+|server_hostname   |string        |编译服务器用户名|
+|server_ip_address |string        |编译服务器IP|
+|server_passwd     |string        |编译服务器密码（SSH）|
+|devops_host_id    |string        |服务器ID（DevOps）|
+|devops_compile_id |string        |编译任务ID（DevOps）|
+|is_new_project    |[true, false] |是否是新项目|
+|build_variant     |[u, d, e]     |编译类型|
+|build_sign        |[true, false] |是否签名|
+|build_verity      |[true, false] |是否验收|
+|build_action      |[n, r, ota]   |编译动作|
+|need_publish      |[true, false] |是否打包|
+|is_test_pipeline  |[true, false] |测试pipeline|
+|is_test_host      |[true, false] |测试脚本|
 

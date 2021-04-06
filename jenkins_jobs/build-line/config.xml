@@ -114,7 +114,7 @@
         <hudson.model.BooleanParameterDefinition>
           <name>test_host</name>
           <description>是否用来测试主机</description>
-          <defaultValue>true</defaultValue>
+          <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>script_path</name>
@@ -226,7 +226,7 @@ EOF
                     echo &quot;Just test pipeline, exit.&quot;
                     exit 0
                 fi
-                bash build.sh &quot;$project_name&quot; &quot;$build_variant&quot; &quot;$build_action&quot; &quot;$build_sign&quot; &quot;$build_verity&quot; &quot;$need_publish&quot; &quot;$devops_host_id&quot; &quot;$devops_compile_id&quot; &quot;$is_new_project&quot; &quot;$test_host&quot;
+                bash build.sh &quot;$project_name&quot; &quot;$build_variant&quot; &quot;$build_action&quot; &quot;$build_sign&quot; &quot;$build_verity&quot; &quot;$need_publish&quot; &quot;$devops_host_id&quot; &quot;$devops_compile_id&quot; &quot;$is_new_project&quot; &quot;$test_host&quot; &quot;$BUILD_URL&quot;
                 &apos;&apos;&apos;
             }
         }
