@@ -127,9 +127,6 @@ else
     echo -e "\nrepo overview\n"
 fi
 
-# echo build info
-echo -e "\nmk -f -$build_variant $is_sign $build_project $build_action\n"
-
 # database option
 # status: compiling(4)
 if [ $is_test != "true" ]; then
@@ -151,6 +148,8 @@ if [ $is_test != "true" ]; then
 fi
 
 echo -e "\n---------------------build---------------------\n"
+# echo build script
+echo -e "\nmk -f -$build_variant $is_sign $build_project $build_action\n"
 # build
 if [ $is_test == "true" ]; then
     ./test_script.sh ; build_rst=$?
@@ -174,13 +173,6 @@ else
     exit 5
 fi
 
-echo -e "\n---------------------publish---------------------\n"
-# publish
-if [ "$is_publish" == "true" ]; then
-    echo -e "\npublish\n"
-    ./publish
-fi
-
 # database option
 # table devops_server server status
 if [ $is_test != "true" ]; then
@@ -192,4 +184,11 @@ if [ $is_test != "true" ]; then
     python update_db.py -t devops_compile \
         -k compile_build_finish_time -v "$build_finish_time" \
         -w id -e $devops_compile_id
+fi
+
+echo -e "\n---------------------publish---------------------\n"
+# publish
+if [ "$is_publish" == "true" ]; then
+    echo -e "\npublish\n"
+    ./publish
 fi

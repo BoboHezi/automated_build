@@ -74,7 +74,14 @@ if ( __name__ == "__main__"):
 	if not (DATABASE and TABLE and KEYS and VALUES):
 		usage()
 		_exit(3)
-	print('\nDATABASE:\t%s\nTABLE:\t%s\nKEYS:\t%s\nVALUES:\t%s\nWHERE_KEY:\t%s\nWHERE_VALUE:\t%s\n' % (DATABASE, TABLE, KEYS, VALUES, WHERE_KEY, WHERE_VALUE))
+	print('''
+	DATABASE:    %s
+	TABLE:       %s
+	KEYS:        %s
+	VALUES:      %s
+	WHERE_KEY:   %s
+	WHERE_VALUE: %s
+	''' % (DATABASE, TABLE, KEYS, VALUES, WHERE_KEY, WHERE_VALUE))
 
 	# KEYS and VALUES must have same length
 	if len(KEYS) != len(VALUES):
