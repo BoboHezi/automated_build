@@ -17,6 +17,7 @@ devops_compile_id=$8
 is_new_project=$9
 is_test=${10}
 build_url=${11}
+host_ip=${12}
 
 function printParams() {
     echo ""
@@ -31,6 +32,7 @@ function printParams() {
     echo "devops host id: $devops_host_id" 
     echo "devops compile id: $devops_compile_id" 
     echo "build_url: $build_url" 
+    echo "host_ip: $host_ip" 
     echo "is new project: $is_new_project" 
     echo "is test: $is_test" 
     echo --------------------------------------------------------------------------
@@ -138,14 +140,13 @@ if [ $is_test != "true" ]; then
     python update_db.py -t devops_server -k server_status -v 1 -w id -e $devops_host_id
 fi
 # table devops_compile infos
-host=`echo $build_url | awk -F"/" '{print $3}'`
 job_name=`echo $build_url | awk -F"/" '{print $5}'`
 build_id=`echo $build_url | awk -F"/" '{print $6}'`
 build_time=`date "+%Y-%m-%d %H:%M:%S"`
 if [ $is_test != "true" ]; then
     python update_db.py -t devops_compile \
         -k compile_jenkins_job_name,compile_jenkins_job_id,compile_log_url,compile_server_ip,compile_build_time \
-        -v "$job_name","$build_id","$build_url/consoleText","$host","$build_time" \
+        -v "$job_name","$build_id","$build_url/consoleText","$host_ip","$build_time" \
         -w id -e $devops_compile_id
 fi
 
@@ -175,8 +176,8 @@ fi
 
 echo -e "\n---------------------publish---------------------\n"
 # publish
-if [ $is_publish == "true" ]; then
-    echo -e "\npiblish\n"
+if [ "$is_publish" == "true" ]; then
+    echo -e "\npublish\n"
     ./publish
 fi
 
