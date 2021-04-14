@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from os import system as execulte
+from dump_argvs import dump
 import sys
 import getopt
 
@@ -45,30 +46,36 @@ WHERE_VALUE=None
 if ( __name__ == "__main__"):
 	# dump options
 	print('*' * 15 + 'update_db start' + '*' * 15)
-	all_options = ('-d', '--database', '-t', '--table', '-k', '--keys', '-v', '--values', '-w', '--where', '-e', '--equals', '-h', '--help')
-	try:
-		options, args = getopt.getopt(sys.argv[1:], 'hd:t:k:v:w:e:', ["help","database=","table=","keys=","values=", '--where', '--equals'])
-		for opt, arg in options:
-			if arg in all_options or opt in ('-h', '--help'):
-				usage()
-				_exit(1)
 
-			# print('%s, %s' % (opt, arg))
-			if opt in ('-d', '--database'):
-				DATABASE = arg
-			elif opt in ('-t', '--table'):
-				TABLE = arg
-			elif opt in ('-k', '--keys'):
-				KEYS = arg.split(',')
-			elif opt in ('-v', '--values'):
-				VALUES = arg.split(',')
-			elif opt in ('-w', '--where'):
-				WHERE_KEY = arg
-			elif opt in ('-e', '--equals'):
-				WHERE_VALUE = arg
-	except Exception as e:
-		print('update_db ', e)
+	option_str = 'h-help,d-database:,t-table:,k-keys:,v-values:,w-where:,e-equals:'
+	opts = dump(sys.argv[1:], option_str)
+
+	# check dump result
+	if not opts:
+		_exit(1)
+
+	# check help
+	if opts.has_key('-h') or opts.has_key('--help'):
+		usage()
 		_exit(2)
+
+	# check options
+	if opts.has_key('-d') or opts.has_key('--database'):
+		DATABASE = opts.get('-d') if opts.get('-d') else opts.get('--database')
+	if opts.has_key('-t') or opts.has_key('--table'):
+		TABLE = opts.get('-t') if opts.get('-t') else opts.get('--table')
+	if opts.has_key('-k') or opts.has_key('--keys'):
+		keys = opts.get('-k') if opts.get('-k') else opts.get('--keys')
+		if keys:
+			KEYS = str(keys).split(',')
+	if opts.has_key('-v') or opts.has_key('--values'):
+		values = opts.get('-v') if opts.get('-v') else opts.get('--values')
+		if values:
+			VALUES = str(values).split(',')
+	if opts.has_key('-w') or opts.has_key('--where'):
+		WHERE_KEY = opts.get('-w') if opts.get('-w') else opts.get('--where')
+	if opts.has_key('-e') or opts.has_key('--equals'):
+		WHERE_VALUE = opts.get('-e') if opts.get('-e') else opts.get('--equals')
 
 	# must specify below options
 	if not (DATABASE and TABLE and KEYS and VALUES):

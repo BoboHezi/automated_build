@@ -22,7 +22,9 @@
 
 2. 安装sshpass: ```sudo apt-get install sshpass```
 
-3. 安装pip:
+3. 安装pip: ```sudo apt-get install python pip```
+
+4. 安装mysql-connector: ```sudo pip install mysql-connector```
 
 ## 配置Remote-trigger
 

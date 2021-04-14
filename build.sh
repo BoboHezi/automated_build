@@ -110,6 +110,8 @@ if [ ! $find ]; then
 else
     if [ "$is_new_project" == "true" ]; then
         echo "return new_project found"
+        # INSERT INTO `jeecg-boot242`.`devops_project` (`project_name`, `project_code_id`) VALUES ('g2030upt_q6506gk_hlt', '71P');
+
         # (is_new_project ) :  return new_project found
     fi
     echo -e "\n$build_project found\n"
