@@ -1,10 +1,12 @@
 #!/usr/bin/python
 import sys
 import getopt
+from os import path
+from re import match
 
 def dump(args=[], opt_str = ''):
     """
-    dump args like: ./dump_argvs.py -n eli -u root -p 123456
+    dump args like: ./utils.py -n eli -u root -p 123456
     return a dictionary
     opt_str like: h-help,n-name:,u-user:,p-password:
     "n" for short, "name" for long, ":" for with parameter
@@ -43,6 +45,24 @@ def dump(args=[], opt_str = ''):
          result[opt] = arg
        return result
     pass
+
+def isempty(obj):
+    return True if not (obj and len(obj)) else False
+
+def get_option_val(fpath, key):
+    if not path.exists(fpath):
+        return
+
+    file = open(fpath, 'r')
+    str = file.read()
+    file.close()
+    lines = str.splitlines()
+    for line in lines:
+        if not line.lstrip().startswith('#'):
+            matchObj = match('^(%s)(\s*)=(\s*)(.*)' % key, line)
+            if matchObj:
+                return matchObj.group(4)
+    return
 
 if __name__ == '__main__':
 

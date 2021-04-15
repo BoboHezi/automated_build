@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from os import system as execulte
-from dump_argvs import dump
+from utils import dump
 import sys
 import getopt
 
