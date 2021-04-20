@@ -9,9 +9,15 @@ fi
 
 echo "src=$src, dest=$dest"
 
+excludes=("link.sh" "utils.py")
+
 src_files=`find -type f -regex '.*\.sh\|.*\.py'`
 for file in $src_files; do
-	if [ ! -d "$file" ]; then
+    file=${file:2:${#file}}
+    if [[ ${excludes[@]/${file}/} != ${excludes[@]} ]]; then
+        continue
+    fi
+    if [ ! -d "$file" ]; then
         target="$dest$file"
         echo "ln -s $src/$file $target"
         rm -rf $target

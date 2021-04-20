@@ -8,10 +8,6 @@ import re
 import time
 import utils
 
-def execute(cmd):
-    rst = getstatusoutput(cmd)
-    return rst[0], rst[1]
-
 def _exit(code, ftp = None):
     print('*' * 15 + 'upload ftp end' + '*' * 15)
     if ftp:
@@ -62,20 +58,7 @@ if __name__ == '__main__':
         _exit(3)
 
     # check MTK or SPRD
-    manifest = '.repo/manifest.xml'
-    if not (path.exists(manifest) and path.islink(manifest)):
-        print('upload_ftp %s check failed\n' % manifest)
-        _exit(4)
-    source = readlink(manifest)
-    PLATFORM = None
-    if 'SPRD' in source:
-        PLATFORM = 'SPRD'
-    elif 'MTK' in source:
-        PLATFORM = 'MTK'
-    elif path.exists('vendor/sprd'):
-        PLATFORM = 'SPRD'
-    elif path.exists('vendor/mediatek'):
-        PLATFORM = 'MTK'
+    PLATFORM = utils.dump_platform()
 
     if not PLATFORM:
         print('upload_ftp platform check failed\n')
@@ -84,7 +67,7 @@ if __name__ == '__main__':
 
     # find project first
     find_cmd = 'find droi/ -maxdepth 3 -mindepth 3 -type d -name %s' % PROJECT_NAME
-    status, project_path = execute(find_cmd)
+    status, project_path = utils.execute(find_cmd)
 
     if status or not project_path or not path.exists(project_path + '/ProjectConfig.mk'):
         print('upload_ftp %s not found\n' % PROJECT_NAME)
