@@ -1,35 +1,33 @@
 #!/usr/bin/python
-from commands import getstatusoutput
+import sys
+import time
 from ftplib import FTP
 from os import path
-from os import readlink
-import sys
-import re
-import time
+
 import utils
 
-def _exit(code, ftp = None):
+
+def _exit(code, ftp=None):
     print('*' * 15 + 'upload ftp end' + '*' * 15)
     if ftp:
         ftp.quit()
     exit(code)
 
+
 PROJECT_NAME = None
-ZIP_FILE     = None
-FTP_HOST     = '192.168.150.30'
-FTP_USER     = 'hongxiangyuan'
-FTP_PWD      = 'hongxiangyuan014'
+ZIP_FILE = None
+FTP_HOST = '192.168.150.30'
+FTP_USER = 'hongxiangyuan'
+FTP_PWD = 'hongxiangyuan014'
 
 if __name__ == '__main__':
     print('*' * 15 + 'upload ftp start' + '*' * 15)
-    option_str = 'h-help,p-project:,f-file:,i-ip:,u-user:,c-code:'
+    option_str = 'p-project:,f-file:,h-host:,u-user:,c-code:'
     opts = utils.dump(sys.argv[1:], option_str)
 
     if not opts:
         print("upload_ftp wrong parameter try '-h or --help' to get more information")
         _exit(1)
-    if opts.has_key('-h') or opts.has_key('--help'):
-        _exit(2)
     if opts.has_key('-p') or opts.has_key('--project'):
         PROJECT_NAME = opts.get('-p') if opts.get('-p') else opts.get('--project')
     if opts.has_key('-f') or opts.has_key('--file'):
@@ -45,13 +43,13 @@ if __name__ == '__main__':
         FTP_PWD = ftp_pwd if ftp_pwd else FTP_PWD
 
     print(
-    """
-    PROJECT_NAME: %s
-    ZIP_FILE:     %s
-    FTP_HOST:     %s
-    FTP_USER:     %s
-    FTP_PWD:      %s
-    """ % (PROJECT_NAME, ZIP_FILE, FTP_HOST, FTP_USER, FTP_PWD))
+            """
+            PROJECT_NAME: %s
+            ZIP_FILE:     %s
+            FTP_HOST:     %s
+            FTP_USER:     %s
+            FTP_PWD:      %s
+            """ % (PROJECT_NAME, ZIP_FILE, FTP_HOST, FTP_USER, FTP_PWD))
 
     if not PROJECT_NAME:
         print('upload_ftp must specify project(use -p or --project)\n')
@@ -76,11 +74,11 @@ if __name__ == '__main__':
 
     # find build config file
     build_config_file = utils.get_option_val('mk', 'readonly BUILD_INFO_FILE').replace('\'', '')
-    if utils.isempty(build_config_file) or not path.isfile(build_config_file) :
+    if utils.isempty(build_config_file) or not path.isfile(build_config_file):
         build_config_file = '%s/ProjectConfig.mk' % project_path
     project_product = utils.get_option_val(build_config_file, 'project' if PLATFORM == 'MTK' else 'product')
     if utils.isempty(project_product) \
-        or project_product != (PROJECT_NAME if PLATFORM == 'MTK' else 'full_' + PROJECT_NAME):
+            or project_product != (PROJECT_NAME if PLATFORM == 'MTK' else 'full_' + PROJECT_NAME):
         build_config_file = '%s/ProjectConfig.mk' % project_path
     print('upload_ftp build_config_file: %s\n' % build_config_file)
 
@@ -104,7 +102,7 @@ if __name__ == '__main__':
         _exit(7)
     print('upload_ftp ZIP_FILE: %s\n' % ZIP_FILE)
 
-    date_str = time.strftime('%Y%m',time.localtime())
+    date_str = time.strftime('%Y%m', time.localtime())
     upload_path = '/upload/%s/%s' % (date_str, PROJECT_NAME.upper())
     print('upload_ftp upload_path: %s' % upload_path)
 
