@@ -22,6 +22,7 @@ FTP_PWD = 'hongxiangyuan014'
 
 if __name__ == '__main__':
     print('*' * 15 + 'upload ftp start' + '*' * 15)
+    utils.execute('echo "" > ftp_url.txt')
     option_str = 'p-project:,f-file:,h-host:,u-user:,c-code:'
     opts = utils.dump(sys.argv[1:], option_str)
 
@@ -140,5 +141,6 @@ if __name__ == '__main__':
 
     file_url = 'ftp://%s@%s%s/%s' % (FTP_USER, FTP_HOST, upload_path, ZIP_FILE.split('/')[-1])
     print('upload success %s' % file_url)
+    utils.execute('echo %s > ftp_url.txt' % file_url)
 
     _exit(0, ftp)

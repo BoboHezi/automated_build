@@ -289,8 +289,8 @@ if __name__ == '__main__':
     option_str += ',b-board:'  # SV_BOARD
     option_str += ',l-cclist:'  # SV_CCLIST
     option_str += ',m-model:'  # SV_MODEL
-    option_str += ',b-brand:'  # SV_BRAND_CUSTOMER
-    option_str += ',o-odem:'  # SV_ODM_CUSTOMER
+    option_str += ',r-brand:'  # SV_BRAND_CUSTOMER
+    option_str += ',o-odm:'  # SV_ODM_CUSTOMER
     option_str += ',v-verity'  # SV_BUILD_VERITY
     option_str += ',i-publish:'  # SV_FTP_PUBLISH_USERNAME
     opts = utils.dump(sys.argv[1:], option_str)
@@ -318,10 +318,10 @@ if __name__ == '__main__':
         SV_CCLIST = opts.get('-l') if opts.get('-l') else opts.get('--cclist')
     if opts.has_key('-m') or opts.has_key('--model'):
         SV_MODEL = opts.get('-m') if opts.get('-m') else opts.get('--model')
-    if opts.has_key('-b') or opts.has_key('--brand'):
-        SV_BRAND_CUSTOMER = opts.get('-b') if opts.get('-b') else opts.get('--brand')
-    if opts.has_key('-o') or opts.has_key('--odem'):
-        SV_ODM_CUSTOMER = opts.get('-o') if opts.get('-o') else opts.get('--odem')
+    if opts.has_key('-r') or opts.has_key('--brand'):
+        SV_BRAND_CUSTOMER = opts.get('-r') if opts.get('-r') else opts.get('--brand')
+    if opts.has_key('-o') or opts.has_key('--odm'):
+        SV_ODM_CUSTOMER = opts.get('-o') if opts.get('-o') else opts.get('--odm')
     if opts.has_key('-v') or opts.has_key('--verity'):
         SV_BUILD_VERITY = True
     if opts.has_key('-i') or opts.has_key('--publish'):
