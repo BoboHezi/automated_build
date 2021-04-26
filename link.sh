@@ -11,7 +11,7 @@ echo "src=$src, dest=$dest"
 
 excludes=("link.sh" "utils.py")
 
-src_files=`find -type f -regex '.*\.sh\|.*\.py'`
+src_files=`find -maxdepth 1 -type f -regex '.*\.sh\|.*\.py'`
 for file in $src_files; do
     file=${file:2:${#file}}
     if [[ ${excludes[@]/${file}/} != ${excludes[@]} ]]; then
