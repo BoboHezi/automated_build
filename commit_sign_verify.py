@@ -475,4 +475,15 @@ if __name__ == '__main__':
     sign_task_data = create_sign_task(task_name, SV_FTP_PATH, SV_MODEL, SV_PLATFORM, 1 if SV_BUILD_VERITY else 0,
                                       ftpUsername, verity_task_id, USER_ID, headers_with_token)
     print('commit_sign_verify sign task created: %s\n' % sign_task_data['id'])
+
+    # start task
+    if sign_task_data and sign_task_data['id'] > 0:
+        start_status, start_response = utils.post('%s/sv/signtasks/handle' % SV_URL, {
+            'taskId': sign_task_data['id'],
+            'type': 10,
+            'userid': USER_ID
+        }, headers_with_token)
+
+        if start_status == 200 and start_response['code'] == 1000 and start_response['msg'] == 'SUCCESS':
+            print('commit_sign_verify sign task %s started!\n' % sign_task_data['id'])
     _exit(0)
