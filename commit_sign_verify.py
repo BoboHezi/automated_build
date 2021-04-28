@@ -222,7 +222,7 @@ def create_verity_task(project_id, ftpPath, ftpUsername, platform, board, ccList
                        ftpPublishUsername, userName, userId1, headers):
     request_data = {
         'signAndVerify': 1,
-        'purpose': 0,
+        'purpose': 1,
         'projectId': project_id,
         'ftpPath': ftpPath,
         'ftpUsername': ftpUsername,
