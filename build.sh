@@ -57,18 +57,18 @@ function printBlue() {
 
 printParams
 
-# status: init(1)
+# status: init(2)
 if [ $is_test != "true" ]; then
-    python notify_status.py $devops_compile_id 1
+    python notify_status.py $devops_compile_id 2
 fi
 
 # pre-check
 # check params
 if [ -z "$build_project" ] || [ -z "$build_variant" ] || [ -z "$build_action" ] ; then
     echo -e "\nThere is a problem with the incoming parameters, please check\n"
-    # status: check_fail(2)
+    # status: check_fail(3)
     if [ $is_test != "true" ]; then
-        python notify_status.py $devops_compile_id 2
+        python notify_status.py $devops_compile_id 3
     fi
     exit 2;
 fi
@@ -101,9 +101,9 @@ echo -e "\n---------------------find---------------------\n"
 find=$(find droi/ -maxdepth 3 -mindepth 3 -type d -name $build_project)
 
 if [ ! $find ]; then
-    # status: project_notfound(3)
+    # status: project_notfound(4)
     if [ $is_test != "true" ]; then
-        python notify_status.py $devops_compile_id 3
+        python notify_status.py $devops_compile_id 4
     fi
     echo -e "\n$build_project not found\n"
     exit 3
@@ -130,9 +130,9 @@ else
 fi
 
 # database option
-# status: compiling(4)
+# status: compiling(5)
 if [ $is_test != "true" ]; then
-    python notify_status.py $devops_compile_id 4
+    python notify_status.py $devops_compile_id 5
 fi
 # table devops_server server status
 if [ $is_test != "true" ]; then
@@ -167,9 +167,9 @@ if test $build_rst = "0"; then
     fi
     echo -e "\nbuild success\n"
 else
-    # status: build_failed(5)
+    # status: build_failed(6)
     if [ $is_test != "true" ]; then
-        python notify_status.py $devops_compile_id 5
+        python notify_status.py $devops_compile_id 6
     fi
     echo -e "\nbuild failed\n"
     exit 5

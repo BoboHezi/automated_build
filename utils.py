@@ -171,9 +171,11 @@ def post(url, data, headers=common_headers):
     data_str = data if isinstance(data, str) else json.dumps(data)
     headers['Content-Length'] = len(data_str)
 
-    r = requests.post(url, data=data_str, headers=headers)
-
-    return r.status_code, json.loads(r.text)
+    try:
+        r = requests.post(url, data=data_str, headers=headers)
+        return r.status_code, json.loads(r.text)
+    except Exception as e:
+        return 0, None
 
 
 if __name__ == '__main__':

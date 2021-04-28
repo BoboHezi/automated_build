@@ -374,10 +374,11 @@ if __name__ == '__main__':
         SV_FTP_PUBLISH_USERNAME = str(project.customer)
 
     # sign SV
-    status, response = utils.post('%s/sys/login' % SV_URL,
-                                  {'remember_me': True,
-                                   'username': SV_USERNAME,
-                                   'password': SV_PASSWD})
+    data = {'remember_me': True,
+            'username': SV_USERNAME,
+            'password': SV_PASSWD}
+    print data
+    status, response = utils.post('%s/sys/login' % SV_URL, data)
     if status == 200:
         try:
             TOKEN = response['result']['token']
@@ -387,6 +388,9 @@ if __name__ == '__main__':
             if utils.isempty(TOKEN) or utils.isempty(USER_ID):
                 print('commit_sign_verify login error!\n')
                 _exit(4)
+    else:
+        print('commit_sign_verify login error!\n')
+        _exit(4)
 
     headers_with_token = utils.common_headers.copy()
     headers_with_token['X-Access-Token'] = TOKEN

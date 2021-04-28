@@ -17,12 +17,12 @@ if [ -f ftp_url.txt ]; then
     ftp_url=$(cat ftp_url.txt)
     echo -e "\nftp_url: $ftp_url\n"
 
-    argv="-p '$project_name' -f '$ftp_url' -u '$sv_platform_url' \
-    -s '$sv_platform_username' -c '$sv_platform_passwd' \
-    -t '$sv_platform_terrace' -b '$sv_platform_board' \
-    -l '$sv_platform_cclist' -m '$sv_platform_model' \
-    -r '$sv_platform_brand' -o '$sv_platform_odm' \
-    -i '$publish_username'"
+    argv="-p \"$project_name\" -f \"$ftp_url\" -u \"$sv_platform_url\" \
+    -s \"$sv_platform_username\" -c \"$sv_platform_passwd\" \
+    -t \"$sv_platform_terrace\" -b \"$sv_platform_board\" \
+    -l \"$sv_platform_cclist\" -m \"$sv_platform_model\" \
+    -r \"$sv_platform_brand\" -o \"$sv_platform_odm\" \
+    -i \"$publish_username\""
 
     if [ "$build_verity" == "true" ]; then
         argv="$argv -v"

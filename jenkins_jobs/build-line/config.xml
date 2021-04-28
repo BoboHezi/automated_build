@@ -46,12 +46,11 @@
           <defaultValue>server</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
+        <hudson.model.PasswordParameterDefinition>
           <name>server_passwd</name>
           <description>编译服务器，SSH密码</description>
-          <defaultValue>Droi*#2020</defaultValue>
-          <trim>false</trim>
-        </hudson.model.StringParameterDefinition>
+          <defaultValue>{AQAAABAAAAAQc0jBGdWAQQVYAZKAArCjENR/rZc2G48vg32ptE0IP3Y=}</defaultValue>
+        </hudson.model.PasswordParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>build_variant</name>
           <description>软件类型</description>
@@ -87,7 +86,7 @@
         <hudson.model.BooleanParameterDefinition>
           <name>need_publish</name>
           <description>是否打包</description>
-          <defaultValue>false</defaultValue>
+          <defaultValue>true</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>devops_host_id</name>
@@ -122,6 +121,82 @@
           <defaultValue>/home/server/.jenkins/script</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>sign_ftp_url</name>
+          <description>签名包上传地址（请勿编辑）</description>
+          <defaultValue>192.168.150.30</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>sign_ftp_upload_username</name>
+          <description>签名包上传用户名</description>
+          <defaultValue>hongxiangyuan</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.PasswordParameterDefinition>
+          <name>sign_ftp_upload_passwd</name>
+          <description>签名包上传用户密码</description>
+          <defaultValue>{AQAAABAAAAAgSGjvO9hg4x7np2R8oOu021sfJoAx8axvhjYDAfxKwNEkXobhSLzoSxczyYgZeTlJ}</defaultValue>
+        </hudson.model.PasswordParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>sv_platform_url</name>
+          <description>签名验收后台URL，测试：http://192.168.151.31:8084，生产：http://sign.ttddsh.com:2030</description>
+          <defaultValue>http://192.168.151.31:8084</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>sv_platform_username</name>
+          <description>签名验收后台登录用户名</description>
+          <defaultValue>hongxiangyuan</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.PasswordParameterDefinition>
+          <name>sv_platform_passwd</name>
+          <description>签名验收后台登录用户密码</description>
+          <defaultValue>{AQAAABAAAAAgBYhKd0C2BhQFKC9yz7IfijthL36bXguWoToU2L08ICVAjZUQLx5CCSVNLXKvN9yf}</defaultValue>
+        </hudson.model.PasswordParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>sv_platform_terrace</name>
+          <description>签名平台，eg:SPRD_T310p_hongxiangyuan</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>sv_platform_board</name>
+          <description>主板（用与验收包释放路径），若为空，则使用大写的项目名</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>sv_platform_model</name>
+          <description>机型，若为空，则使用大写的项目名</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>sv_platform_brand</name>
+          <description>品牌商，若为空，则使用项目客户号</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>sv_platform_odm</name>
+          <description>方案商，若为空，则使用项目渠道号最后一段（eg:HONGXIANGYUAN_HONGXIANGYUAN）</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>sv_platform_cclist</name>
+          <description>CC list</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>publish_username</name>
+          <description>验收包释放用户，若为空，则使用项目客户号</description>
+          <defaultValue>hongxiangyuan</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -134,19 +209,33 @@
                 script {
                     println &quot;project_name: ${project_name}&quot;
                     println &quot;code_dir: ${code_dir}&quot;
-                    println &quot;server_hostname: ${server_hostname}&quot;
                     println &quot;server_ip_address: ${server_ip_address}&quot;
+                    println &quot;server_hostname: ${server_hostname}&quot;
                     println &quot;server_passwd: ${server_passwd}&quot;
                     println &quot;build_variant: ${build_variant}&quot;
                     println &quot;build_sign: ${build_sign}&quot;
-                    println &quot;build_verity: ${build_verity}&quot;
                     println &quot;build_action: ${build_action}&quot;
+                    println &quot;build_verity: ${build_verity}&quot;
                     println &quot;need_publish: ${need_publish}&quot;
                     println &quot;devops_host_id: ${devops_host_id}&quot;
                     println &quot;devops_compile_id: ${devops_compile_id}&quot;
                     println &quot;is_new_project: ${is_new_project}&quot;
-                    println &quot;is_test_pipeline: ${test_pipeline}&quot;
-                    println &quot;is_test_host: ${test_host}&quot;
+                    println &quot;test_pipeline: ${test_pipeline}&quot;
+                    println &quot;test_host: ${test_host}&quot;
+                    println &quot;script_path: ${script_path}&quot;
+                    println &quot;sign_ftp_url: ${sign_ftp_url}&quot;
+                    println &quot;sign_ftp_upload_username: ${sign_ftp_upload_username}&quot;
+                    println &quot;sign_ftp_upload_passwd: ${sign_ftp_upload_passwd}&quot;
+                    println &quot;sv_platform_url: ${sv_platform_url}&quot;
+                    println &quot;sv_platform_username: ${sv_platform_username}&quot;
+                    println &quot;sv_platform_passwd: ${sv_platform_passwd}&quot;
+                    println &quot;sv_platform_terrace: ${sv_platform_terrace}&quot;
+                    println &quot;sv_platform_board: ${sv_platform_board}&quot;
+                    println &quot;sv_platform_model: ${sv_platform_model}&quot;
+                    println &quot;sv_platform_brand: ${sv_platform_brand}&quot;
+                    println &quot;sv_platform_odm: ${sv_platform_odm}&quot;
+                    println &quot;sv_platform_cclist: ${sv_platform_cclist}&quot;
+                    println &quot;publish_username: ${publish_username}&quot;
                 }
             }
         }
@@ -156,15 +245,23 @@
                     sh &apos;&apos;&apos;
                     if ! type sshpass &gt;/dev/null 2&gt;&amp;1; then
                         echo -e &quot;\nprepare-jenkins-server: install sshpass&quot;
-                        sudo -S apt-get install sshpass -y &lt;&lt; EOF
+                        if type apt-get &gt;/dev/null 2&gt;&amp;1; then
+                            sudo -S apt-get install sshpass -y &lt;&lt; EOF
 1
 EOF
+                        elif type yum &gt;/dev/null 2&gt;&amp;1; then
+                            yum install sshpass -y
+                        fi
                     fi
                     if ! type pip &gt;/dev/null 2&gt;&amp;1; then
                         echo -e &quot;\nprepare-jenkins-server: install python-pip&quot;
-                        sudo -S apt-get install python-pip -y &lt;&lt; EOF
+                        if type apt-get &gt;/dev/null 2&gt;&amp;1; then
+                            sudo -S apt-get install python-pip -y &lt;&lt; EOF
 1
 EOF
+                        elif type yum &gt;/dev/null 2&gt;&amp;1; then
+                            yum install python-pip -y
+                        fi
                     fi
                     &apos;&apos;&apos;
                 }
@@ -227,8 +324,86 @@ EOF
                     exit 0
                 fi
                 bash build.sh &quot;$project_name&quot; &quot;$build_variant&quot; &quot;$build_action&quot; &quot;$build_sign&quot; &quot;$build_verity&quot; &quot;$need_publish&quot; &quot;$devops_host_id&quot; &quot;$devops_compile_id&quot; &quot;$is_new_project&quot; &quot;$test_host&quot; &quot;$BUILD_URL&quot; &quot;$server_ip_address&quot;
+                
                 &apos;&apos;&apos;
             }
+        }
+        stage(&apos;file-upload&apos;) {
+            steps {
+                sh &apos;&apos;&apos;
+                sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
+                if [ ! -d &quot;$code_dir&quot; ]; then
+                    echo &quot;Project code directory does not exist!!!&quot;
+                    exit -1;
+                fi
+                
+                cd &quot;$code_dir&quot;
+                echo &quot;&quot;
+                echo -------------------------------------------------
+                echo code_dir: 
+                pwd
+                echo -------------------------------------------------
+                echo &quot;&quot;
+                
+                if [ &quot;$build_sign&quot; != &quot;true&quot; ]; then
+                    echo -e &quot;\ndo not sign, exit!\n&quot;
+                    exit 0
+                fi
+                
+                # upload file
+                echo -e &apos;\n./upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;\n&apos;
+                python upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;
+                # if [ &quot;$test_host&quot; == &quot;true&quot; ]; then
+                #     echo ftp://hongxiangyuan@192.168.150.30/upload/202104/G1930EPQ_V15_HL/V15-HL-G1930DPQV1HB-ZY-0420-V0103.zip &gt; ftp_url.txt
+                # else
+                #     python upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;
+                # fi
+                &apos;&apos;&apos;
+            }
+        }
+        
+        stage(&apos;sign-verity&apos;) {
+            steps {
+                sh &apos;&apos;&apos;
+                sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
+                if [ ! -d &quot;$code_dir&quot; ]; then
+                    echo &quot;Project code directory does not exist!!!&quot;
+                    exit -1;
+                fi
+                
+                cd &quot;$code_dir&quot;
+                echo &quot;&quot;
+                echo -------------------------------------------------
+                echo code_dir: 
+                pwd
+                echo -------------------------------------------------
+                echo &quot;&quot;
+                
+                if [ ! -f sign_verify.sh ]; then
+                    echo -e &quot;File sign_verify.sh does not exist!!!&quot;
+                    exit -2
+                fi
+                
+                bash sign_verify.sh &quot;$project_name&quot; &quot;$sv_platform_url&quot; &quot;$sv_platform_username&quot; &quot;$sv_platform_passwd&quot; &quot;$sv_platform_terrace&quot; &quot;$sv_platform_board&quot; &quot;$sv_platform_cclist&quot; &quot;$sv_platform_model&quot; &quot;$sv_platform_brand&quot; &quot;$sv_platform_odm&quot; &quot;$publish_username&quot; &quot;$build_verity&quot;
+                &apos;&apos;&apos;
+            }
+        }
+    }
+    
+    post {
+        aborted {
+            echo &apos;this build was aborted&apos;
+            sh &apos;&apos;&apos;
+            cd $script_path
+            
+            # compile status: 7(stoped)
+            echo &quot;./notify_status.py $devops_compile_id 7&quot;
+            ./notify_status.py $devops_compile_id 7
+            
+            # devops_server server status 0(idle)
+            echo &quot;./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id&quot;
+            ./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+            &apos;&apos;&apos;
         }
     }
 }</script>
