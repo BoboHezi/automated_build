@@ -6,19 +6,33 @@ pipeline {
                 script {
                     println "project_name: ${project_name}"
                     println "code_dir: ${code_dir}"
-                    println "server_hostname: ${server_hostname}"
                     println "server_ip_address: ${server_ip_address}"
+                    println "server_hostname: ${server_hostname}"
                     println "server_passwd: ${server_passwd}"
                     println "build_variant: ${build_variant}"
                     println "build_sign: ${build_sign}"
-                    println "build_verity: ${build_verity}"
                     println "build_action: ${build_action}"
+                    println "build_verity: ${build_verity}"
                     println "need_publish: ${need_publish}"
                     println "devops_host_id: ${devops_host_id}"
                     println "devops_compile_id: ${devops_compile_id}"
                     println "is_new_project: ${is_new_project}"
-                    println "is_test_pipeline: ${test_pipeline}"
-                    println "is_test_host: ${test_host}"
+                    println "test_pipeline: ${test_pipeline}"
+                    println "test_host: ${test_host}"
+                    println "script_path: ${script_path}"
+                    println "sign_ftp_url: ${sign_ftp_url}"
+                    println "sign_ftp_upload_username: ${sign_ftp_upload_username}"
+                    println "sign_ftp_upload_passwd: ${sign_ftp_upload_passwd}"
+                    println "sv_platform_url: ${sv_platform_url}"
+                    println "sv_platform_username: ${sv_platform_username}"
+                    println "sv_platform_passwd: ${sv_platform_passwd}"
+                    println "sv_platform_terrace: ${sv_platform_terrace}"
+                    println "sv_platform_board: ${sv_platform_board}"
+                    println "sv_platform_model: ${sv_platform_model}"
+                    println "sv_platform_brand: ${sv_platform_brand}"
+                    println "sv_platform_odm: ${sv_platform_odm}"
+                    println "sv_platform_cclist: ${sv_platform_cclist}"
+                    println "publish_username: ${publish_username}"
                 }
             }
         }
@@ -28,15 +42,23 @@ pipeline {
                     sh '''
                     if ! type sshpass >/dev/null 2>&1; then
                         echo -e "\nprepare-jenkins-server: install sshpass"
-                        sudo -S apt-get install sshpass -y << EOF
+                        if type apt-get >/dev/null 2>&1; then
+                            sudo -S apt-get install sshpass -y << EOF
 1
 EOF
+                        elif type yum >/dev/null 2>&1; then
+                            yum install sshpass -y
+                        fi
                     fi
                     if ! type pip >/dev/null 2>&1; then
                         echo -e "\nprepare-jenkins-server: install python-pip"
-                        sudo -S apt-get install python-pip -y << EOF
+                        if type apt-get >/dev/null 2>&1; then
+                            sudo -S apt-get install python-pip -y << EOF
 1
 EOF
+                        elif type yum >/dev/null 2>&1; then
+                            yum install python-pip -y
+                        fi
                     fi
                     '''
                 }
@@ -62,7 +84,7 @@ EOF
                     sh '''
                     set +e
                     sshpass -p "$server_passwd" scp -r $script_path "$server_hostname@$server_ip_address":/home/server/.jenkins > /dev/null 2>&1
-                    
+
                     sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
                     cd $script_path
                     pwd
@@ -75,32 +97,110 @@ EOF
             steps {
                 sh '''
                 sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
-                
+
                 if [ ! -d "$code_dir" ]; then
                     echo "Project code directory does not exist!!!"
                     exit -1;
                 fi
-                
+
                 cd "$code_dir"
                 echo ""
                 echo -------------------------------------------------
-                echo code_dir: 
+                echo code_dir:
                 pwd
                 echo -------------------------------------------------
                 echo ""
-                
+
                 if [ ! -f build.sh ]; then
                     echo "File build.sh does not exist!!!"
                     exit -2;
                 fi
-                
+
                 if [ $test_pipeline == "true" ]; then
                     echo "Just test pipeline, exit."
                     exit 0
                 fi
-                bash build.sh "$project_name" "$build_variant" "$build_action" "$build_sign" "$build_verity" "$need_publish" "$devops_host_id" "$devops_compile_id" "$is_new_project" "$test_host" "$BUILD_URL"
+                bash build.sh "$project_name" "$build_variant" "$build_action" "$build_sign" "$build_verity" "$need_publish" "$devops_host_id" "$devops_compile_id" "$is_new_project" "$test_host" "$BUILD_URL" "$server_ip_address"
+
                 '''
             }
+        }
+        stage('file-upload') {
+            steps {
+                sh '''
+                sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
+                if [ ! -d "$code_dir" ]; then
+                    echo "Project code directory does not exist!!!"
+                    exit -1;
+                fi
+
+                cd "$code_dir"
+                echo ""
+                echo -------------------------------------------------
+                echo code_dir:
+                pwd
+                echo -------------------------------------------------
+                echo ""
+
+                if [ "$build_sign" != "true" ]; then
+                    echo -e "\ndo not sign, exit!\n"
+                    exit 0
+                fi
+
+                # upload file
+                echo -e '\n./upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"\n'
+                python upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
+                # if [ "$test_host" == "true" ]; then
+                #     echo ftp://hongxiangyuan@192.168.150.30/upload/202104/G1930EPQ_V15_HL/V15-HL-G1930DPQV1HB-ZY-0420-V0103.zip > ftp_url.txt
+                # else
+                #     python upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
+                # fi
+                '''
+            }
+        }
+
+        stage('sign-verity') {
+            steps {
+                sh '''
+                sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
+                if [ ! -d "$code_dir" ]; then
+                    echo "Project code directory does not exist!!!"
+                    exit -1;
+                fi
+
+                cd "$code_dir"
+                echo ""
+                echo -------------------------------------------------
+                echo code_dir:
+                pwd
+                echo -------------------------------------------------
+                echo ""
+
+                if [ ! -f sign_verify.sh ]; then
+                    echo -e "File sign_verify.sh does not exist!!!"
+                    exit -2
+                fi
+
+                bash sign_verify.sh "$project_name" "$sv_platform_url" "$sv_platform_username" "$sv_platform_passwd" "$sv_platform_terrace" "$sv_platform_board" "$sv_platform_cclist" "$sv_platform_model" "$sv_platform_brand" "$sv_platform_odm" "$publish_username" "$build_verity"
+                '''
+            }
+        }
+    }
+
+    post {
+        aborted {
+            echo 'this build was aborted'
+            sh '''
+            cd $script_path
+
+            # compile status: 7(stoped)
+            echo "./notify_status.py $devops_compile_id 7"
+            ./notify_status.py $devops_compile_id 7
+
+            # devops_server server status 0(idle)
+            echo "./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id"
+            ./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+            '''
         }
     }
 }

@@ -377,7 +377,6 @@ if __name__ == '__main__':
     data = {'remember_me': True,
             'username': SV_USERNAME,
             'password': SV_PASSWD}
-    print data
     status, response = utils.post('%s/sys/login' % SV_URL, data)
     if status == 200:
         try:
