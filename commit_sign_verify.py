@@ -220,9 +220,10 @@ def create_project(project=None, channel=None, brand=None, user=USER_ID, headers
 # create verity task
 def create_verity_task(project_id, ftpPath, ftpUsername, platform, board, ccList, model, brandCustomer, odmCustomer,
                        ftpPublishUsername, userName, userId1, headers):
+    purpose = 0 if 'sign.ttddsh.com' in SV_URL else 1
     request_data = {
         'signAndVerify': 1,
-        'purpose': 1,
+        'purpose': purpose,
         'projectId': project_id,
         'ftpPath': ftpPath,
         'ftpUsername': ftpUsername,
