@@ -73,6 +73,19 @@ if [ -z "$build_project" ] || [ -z "$build_variant" ] || [ -z "$build_action" ] 
     exit 2;
 fi
 
+if [ $is_test != "true" ]; then
+    # table devops_server server status
+    python update_db.py -t devops_server -k server_status -v 1 -w id -e $devops_host_id
+
+    # table devops_compile infos
+    job_name=`echo $build_url | awk -F"/" '{print $5}'`
+    build_id=`echo $build_url | awk -F"/" '{print $6}'`
+    python update_db.py -t devops_compile \
+        -k compile_jenkins_job_name,compile_jenkins_job_id,compile_log_url,compile_server_ip \
+        -v "$job_name","$build_id","$build_url/consoleText","$host_ip" \
+        -w id -e $devops_compile_id
+fi
+
 echo -e "\n---------------------source---------------------\n"
 # pre-build
 . build/envsetup.sh
@@ -134,18 +147,11 @@ fi
 if [ $is_test != "true" ]; then
     python notify_status.py $devops_compile_id 5
 fi
-# table devops_server server status
+
 if [ $is_test != "true" ]; then
-    python update_db.py -t devops_server -k server_status -v 1 -w id -e $devops_host_id
-fi
-# table devops_compile infos
-job_name=`echo $build_url | awk -F"/" '{print $5}'`
-build_id=`echo $build_url | awk -F"/" '{print $6}'`
-build_time=`date "+%Y-%m-%d %H:%M:%S"`
-if [ $is_test != "true" ]; then
+    build_time=`date "+%Y-%m-%d %H:%M:%S"`
     python update_db.py -t devops_compile \
-        -k compile_jenkins_job_name,compile_jenkins_job_id,compile_log_url,compile_server_ip,compile_build_time \
-        -v "$job_name","$build_id","$build_url/consoleText","$host_ip","$build_time" \
+        -k compile_build_time -v "$build_time" \
         -w id -e $devops_compile_id
 fi
 

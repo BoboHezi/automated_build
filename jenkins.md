@@ -114,3 +114,11 @@ SSL error when connecting to the Jack server. Try 'jack-diagnose'
 经过google后找到了问题原因（https://stackoverflow.com/questions/67330554/is-openjdk-upgrading-to-8u292-break-my-aosp-build-system）。
 新配置的机器，openjdk版本是1.8.0_292，java Security默认打开了TLSv1, TLSv1.1（/etc/java-8-openjdk/security/java.security），关闭即可解决。
 
+## 需要优化和修改的地方
+
+1. 建议在上传完成后，自动将out产生的包删除（0508）
+
+2. 可将out目录的vmlinux自动上传某一地址（0508）
+
+3. 优化build.sh脚本，修改更新数据库操作（0508）
+    done(0508)

@@ -410,6 +410,10 @@ EOF
             sh &apos;&apos;&apos;
             cd $script_path
             
+            # compile status: 6(build failed)
+            echo &quot;./notify_status.py $devops_compile_id 6&quot;
+            ./notify_status.py $devops_compile_id 6
+            
             # devops_server server status 0(idle)
             echo &quot;./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id&quot;
             ./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
