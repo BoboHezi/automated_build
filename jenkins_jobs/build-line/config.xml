@@ -140,8 +140,8 @@
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_url</name>
-          <description>签名验收后台URL，测试：http://192.168.151.31:8084，生产：http://sign.ttddsh.com:2030</description>
-          <defaultValue>http://192.168.151.31:8084</defaultValue>
+          <description>签名验收后台URL，测试：http://192.168.151.31:8084，生产：http://sign.ttddsh.com:8084</description>
+          <defaultValue>http://sign.ttddsh.com:8084</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -399,6 +399,16 @@ EOF
             # compile status: 7(stoped)
             echo &quot;./notify_status.py $devops_compile_id 7&quot;
             ./notify_status.py $devops_compile_id 7
+            
+            # devops_server server status 0(idle)
+            echo &quot;./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id&quot;
+            ./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+            &apos;&apos;&apos;
+        }
+        failure {
+            echo &apos;this build was failed&apos;
+            sh &apos;&apos;&apos;
+            cd $script_path
             
             # devops_server server status 0(idle)
             echo &quot;./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id&quot;

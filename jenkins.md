@@ -26,6 +26,8 @@
 
 4. 安装mysql-connector: ```sudo pip install mysql-connector```
 
+5. 安装requests: ```sudo pip install requests```
+
 ## 配置Remote-trigger
 
 ### 第一步需要给所属用户添加token
@@ -95,4 +97,20 @@ curl -X POST http://<user>:<user-token>@<jenkins-host>/createItem\?name\=<job-na
 |need_publish      |[true, false] |是否打包|
 |is_test_pipeline  |[true, false] |测试pipeline|
 |is_test_host      |[true, false] |测试脚本|
+
+## 遇到的问题和解决方法
+
+1. ssh连接某个服务器后，无法对代码进行sync，和git相关的操作均提示无权限。这是因为我在创建秘钥时，将文件名修改成id_rsa_gerrit（目的是管理多个不同的git账号）了，改成默认的id_rsa就好了。
+
+2. 新配置的机器编译N平台代码时，报如下错误：
+```
+FAILED: /bin/bash -c "(prebuilts/sdk/tools/jack-admin install-server prebuilts/sdk/tools/jack-launcher.jar prebuilts/sdk/tools/jack-server-4.8.ALPHA.jar  2>&1 || (exit 0) ) && (JACK_SERVER_VM_ARGUMENTS=\"-Dfile.encoding=UTF-8 -XX:+TieredCompilation\" prebuilts/sdk/tools/jack-admin start-server 2>&1 || exit 0 ) && (prebuilts/sdk/tools/jack-admin update server prebuilts/sdk/tools/jack-server-4.8.ALPHA.jar 4.8.ALPHA 2>&1 || exit 0 ) && (prebuilts/sdk/tools/jack-admin update jack prebuilts/sdk/tools/jacks/jack-2.28.RELEASE.jar 2.28.RELEASE || exit 47; prebuilts/sdk/tools/jack-admin update jack prebuilts/sdk/tools/jacks/jack-3.36.CANDIDATE.jar 3.36.CANDIDATE || exit 47; prebuilts/sdk/tools/jack-admin update jack prebuilts/sdk/tools/jacks/jack-4.7.BETA.jar 4.7.BETA || exit 47 )"
+Jack server already installed in "/home/server/.jack-server"
+Launching Jack server java -XX:MaxJavaStackTraceDepth=-1 -Djava.io.tmpdir=/tmp -Dfile.encoding=UTF-8 -XX:+TieredCompilation -cp /home/server/.jack-server/launcher.jar com.android.jack.launcher.ServerLauncher
+Jack server failed to (re)start, try 'jack-diagnose' or see Jack server log
+SSL error when connecting to the Jack server. Try 'jack-diagnose'
+SSL error when connecting to the Jack server. Try 'jack-diagnose'
+```
+经过google后找到了问题原因（https://stackoverflow.com/questions/67330554/is-openjdk-upgrading-to-8u292-break-my-aosp-build-system）。
+新配置的机器，openjdk版本是1.8.0_292，java Security默认打开了TLSv1, TLSv1.1（/etc/java-8-openjdk/security/java.security），关闭即可解决。
 

@@ -103,7 +103,8 @@ if __name__ == '__main__':
         _exit(7)
     print('upload_ftp ZIP_FILE: %s\n' % ZIP_FILE)
 
-    date_str = time.strftime('%Y%m', time.localtime())
+    # date_str = time.strftime('%Y%m', time.localtime())
+    date_str = '202106'
     upload_path = '/upload/%s/%s' % (date_str, PROJECT_NAME.upper())
     print('upload_ftp upload_path: %s' % upload_path)
 
@@ -124,7 +125,16 @@ if __name__ == '__main__':
     except Exception as e:
         print('upload_ftp cwd failed, try mkd\n')
         try:
-            ftp.mkd(upload_path)
+            ftp.cwd('~')
+            base_dir = ftp.pwd()
+            for p in upload_path.split('/'):
+                if utils.isempty(p):
+                    continue
+                base_dir = base_dir + p + '/'
+                try:
+                    ftp.cwd(base_dir)
+                except Exception as e:
+                    ftp.mkd(base_dir)
             ftp.cwd(upload_path)
         except Exception as e:
             print('upload_ftp mkd failed\n')
