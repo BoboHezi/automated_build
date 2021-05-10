@@ -379,6 +379,11 @@ EOF
                 echo -------------------------------------------------
                 echo &quot;&quot;
                 
+                if [ &quot;$build_sign&quot; != &quot;true&quot; ]; then
+                    echo -e &quot;\ndo not sign, exit!\n&quot;
+                    exit 0
+                fi
+                
                 if [ ! -f sign_verify.sh ]; then
                     echo -e &quot;File sign_verify.sh does not exist!!!&quot;
                     exit -2

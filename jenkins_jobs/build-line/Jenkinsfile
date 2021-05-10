@@ -84,7 +84,7 @@ EOF
                     sh '''
                     set +e
                     sshpass -p "$server_passwd" scp -r $script_path "$server_hostname@$server_ip_address":/home/server/.jenkins > /dev/null 2>&1
-
+                    
                     sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
                     cd $script_path
                     pwd
@@ -97,31 +97,31 @@ EOF
             steps {
                 sh '''
                 sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
-
+                
                 if [ ! -d "$code_dir" ]; then
                     echo "Project code directory does not exist!!!"
                     exit -1;
                 fi
-
+                
                 cd "$code_dir"
                 echo ""
                 echo -------------------------------------------------
-                echo code_dir:
+                echo code_dir: 
                 pwd
                 echo -------------------------------------------------
                 echo ""
-
+                
                 if [ ! -f build.sh ]; then
                     echo "File build.sh does not exist!!!"
                     exit -2;
                 fi
-
+                
                 if [ $test_pipeline == "true" ]; then
                     echo "Just test pipeline, exit."
                     exit 0
                 fi
                 bash build.sh "$project_name" "$build_variant" "$build_action" "$build_sign" "$build_verity" "$need_publish" "$devops_host_id" "$devops_compile_id" "$is_new_project" "$test_host" "$BUILD_URL" "$server_ip_address"
-
+                
                 '''
             }
         }
@@ -133,20 +133,19 @@ EOF
                     echo "Project code directory does not exist!!!"
                     exit -1;
                 fi
-
+                
                 cd "$code_dir"
                 echo ""
                 echo -------------------------------------------------
-                echo code_dir:
+                echo code_dir: 
                 pwd
                 echo -------------------------------------------------
                 echo ""
-
                 if [ "$build_sign" != "true" ]; then
                     echo -e "\ndo not sign, exit!\n"
                     exit 0
                 fi
-
+                
                 # upload file
                 echo -e '\n./upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"\n'
                 python upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
@@ -158,7 +157,7 @@ EOF
                 '''
             }
         }
-
+        
         stage('sign-verity') {
             steps {
                 sh '''
@@ -167,36 +166,41 @@ EOF
                     echo "Project code directory does not exist!!!"
                     exit -1;
                 fi
-
+                
                 cd "$code_dir"
                 echo ""
                 echo -------------------------------------------------
-                echo code_dir:
+                echo code_dir: 
                 pwd
                 echo -------------------------------------------------
                 echo ""
-
+                
+                if [ "$build_sign" != "true" ]; then
+                    echo -e "\ndo not sign, exit!\n"
+                    exit 0
+                fi
+                
                 if [ ! -f sign_verify.sh ]; then
                     echo -e "File sign_verify.sh does not exist!!!"
                     exit -2
                 fi
-
+                
                 bash sign_verify.sh "$project_name" "$sv_platform_url" "$sv_platform_username" "$sv_platform_passwd" "$sv_platform_terrace" "$sv_platform_board" "$sv_platform_cclist" "$sv_platform_model" "$sv_platform_brand" "$sv_platform_odm" "$publish_username" "$build_verity"
                 '''
             }
         }
     }
-
+    
     post {
         aborted {
             echo 'this build was aborted'
             sh '''
             cd $script_path
-
+            
             # compile status: 7(stoped)
             echo "./notify_status.py $devops_compile_id 7"
             ./notify_status.py $devops_compile_id 7
-
+            
             # devops_server server status 0(idle)
             echo "./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id"
             ./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
@@ -206,11 +210,11 @@ EOF
             echo 'this build was failed'
             sh '''
             cd $script_path
-
+            
             # compile status: 6(build failed)
             echo "./notify_status.py $devops_compile_id 6"
             ./notify_status.py $devops_compile_id 6
-
+            
             # devops_server server status 0(idle)
             echo "./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id"
             ./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id

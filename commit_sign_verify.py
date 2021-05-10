@@ -478,6 +478,9 @@ if __name__ == '__main__':
     task_name = SV_FTP_PATH.split('/')[-1].replace('.zip', '')
     sign_task_data = create_sign_task(task_name, SV_FTP_PATH, SV_MODEL, SV_PLATFORM, 1 if SV_BUILD_VERITY else 0,
                                       ftpUsername, verity_task_id, USER_ID, headers_with_token)
+    if not sign_task_data:
+        print('commit_sign_verify create sign task failed!\n')
+        _exit(11)
     print('commit_sign_verify sign task created: %s\n' % sign_task_data['id'])
 
     # start task
