@@ -103,8 +103,7 @@ if __name__ == '__main__':
         _exit(7)
     print('upload_ftp ZIP_FILE: %s\n' % ZIP_FILE)
 
-    # date_str = time.strftime('%Y%m', time.localtime())
-    date_str = '202106'
+    date_str = time.strftime('%Y%m', time.localtime())
     upload_path = '/upload/%s/%s' % (date_str, PROJECT_NAME.upper())
     print('upload_ftp upload_path: %s' % upload_path)
 
@@ -152,5 +151,8 @@ if __name__ == '__main__':
     file_url = 'ftp://%s@%s%s/%s' % (FTP_USER, FTP_HOST, upload_path, ZIP_FILE.split('/')[-1])
     print('upload success %s' % file_url)
     utils.execute('echo %s > ftp_url.txt' % file_url)
+
+    # delete publish package
+    utils.removedirs(publish_out)
 
     _exit(0, ftp)

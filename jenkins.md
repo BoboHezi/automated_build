@@ -81,22 +81,36 @@ curl -X POST http://<user>:<user-token>@<jenkins-host>/createItem\?name\=<job-na
 
 ### 字段说明
 |key_name | key_value | 说明 |
-|--|--|--|
-|project_name      |string        |项目名|
-|code_dir          |string        |代码路径|
-|server_hostname   |string        |编译服务器用户名|
-|server_ip_address |string        |编译服务器IP|
-|server_passwd     |string        |编译服务器密码（SSH）|
-|devops_host_id    |string        |服务器ID（DevOps）|
-|devops_compile_id |string        |编译任务ID（DevOps）|
-|is_new_project    |[true, false] |是否是新项目|
-|build_variant     |[u, d, e]     |编译类型|
-|build_sign        |[true, false] |是否签名|
-|build_verity      |[true, false] |是否验收|
-|build_action      |[n, r, ota]   |编译动作|
-|need_publish      |[true, false] |是否打包|
-|is_test_pipeline  |[true, false] |测试pipeline|
-|is_test_host      |[true, false] |测试脚本|
+|---|---|---|
+|project_name             |string        |项目名|
+|code_dir                 |string        |代码路径|
+|server_hostname          |string        |编译服务器用户名|
+|server_ip_address        |string        |编译服务器IP|
+|server_passwd            |string        |编译服务器密码（SSH）|
+|devops_host_id           |string        |服务器ID（DevOps）|
+|devops_compile_id        |string        |编译任务ID（DevOps）|
+|is_new_project           |[true, false] |是否是新项目|
+|build_variant            |[u, d, e]     |编译类型|
+|build_sign               |[true, false] |是否签名|
+|build_verity             |[true, false] |是否验收|
+|build_action             |[n, r, ota]   |编译动作|
+|need_publish             |[true, false] |是否打包|
+|test_pipeline            |[true, false] |测试pipeline|
+|test_host                |[true, false] |测试脚本|
+|script_path              |string        |脚本路径|
+|sign_ftp_url             |string        |签名包上传地址（请勿编辑）|
+|sign_ftp_upload_username |string        |签名包上传用户名|
+|sign_ftp_upload_passwd   |string        |签名包上传用户密码|
+|sv_platform_url          |string        |签名验收后台URL，测试：http://192.168.151.31:8084，生产：http://sign.ttddsh.com:8084|
+|sv_platform_username     |string        |签名验收后台登录用户名|
+|sv_platform_passwd       |string        |签名验收后台登录用户密码|
+|sv_platform_terrace      |string        |签名平台，eg:SPRD_T310p_hongxiangyuan|
+|sv_platform_board        |string        |主板（用与验收包释放路径），若为空，则使用大写的项目名|
+|sv_platform_model        |string        |机型，若为空，则使用大写的项目名|
+|sv_platform_brand        |string        |品牌商，若为空，则使用项目客户号|
+|sv_platform_odm          |string        |方案商，若为空，则使用项目渠道号最后一段（eg:HONGXIANGYUAN_HONGXIANGYUAN）|
+|sv_platform_cclist       |string        |CC list|
+|publish_username         |string        |验收包释放用户，若为空，则使用项目客户号|
 
 ## 遇到的问题和解决方法
 
@@ -114,11 +128,29 @@ SSL error when connecting to the Jack server. Try 'jack-diagnose'
 经过google后找到了问题原因（https://stackoverflow.com/questions/67330554/is-openjdk-upgrading-to-8u292-break-my-aosp-build-system）。
 新配置的机器，openjdk版本是1.8.0_292，java Security默认打开了TLSv1, TLSv1.1（/etc/java-8-openjdk/security/java.security），关闭即可解决。
 
+3. 新配置的机器编译P平台代码时，报如下错误：
+```
+FAILED: /home/server/codes/SPRD-P0-HXY-T310/vendor/sprd/proprietories-source/sprdtrusty/vendor/sprd/modules/faceid/faceid.elf 
+/bin/bash -c "(rm /home/server/codes/SPRD-P0-HXY-T310/vendor/sprd/proprietories-source/sprdtrusty/vendor/sprd/modules/faceid/faceid.elf ; true ) && (python /home/server/codes/SPRD-P0-HXY-T310/vendor/sprd/proprietories-source/packimage_scripts/signimage/dynamicTA/signta.py --uuid f4bc36e68ec246e2a82ef7cb6cdc6f72 --key /home/server/codes/SPRD-P0-HXY-T310/vendor/sprd/proprietories-source/packimage_scripts/signimage/sprd/config/dynamic_ta_privatekey.pem --in /home/server/codes/SPRD-P0-HXY-T310/vendor/sprd/proprietories-source/sprdtrusty/vendor/sprd/modules/faceid/full/ta/ums312/faceid.elf --out /home/server/codes/SPRD-P0-HXY-T310/vendor/sprd/proprietories-source/sprdtrusty/vendor/sprd/modules/faceid/faceid.elf ) && (echo \"sign faceid ta end\" )"
+rm: 无法删除"/home/server/codes/SPRD-P0-HXY-T310/vendor/sprd/proprietories-source/sprdtrusty/vendor/sprd/modules/faceid/faceid.elf": 没有那个文件或目录
+Traceback (most recent call last):
+  File "/home/server/codes/SPRD-P0-HXY-T310/vendor/sprd/proprietories-source/packimage_scripts/signimage/dynamicTA/signta.py", line 77, in <module>
+    main()
+  File "/home/server/codes/SPRD-P0-HXY-T310/vendor/sprd/proprietories-source/packimage_scripts/signimage/dynamicTA/signta.py", line 31, in main
+    from Crypto.Signature import PKCS1_v1_5
+ImportError: No module named Crypto.Signature
+```
+```shell
+sudo pip install pycryptodome
+```
+
 ## 需要优化和修改的地方
 
-1. 建议在上传完成后，自动将out产生的包删除（0508）
+1. 建议在上传完成后，自动将out产生的包删除（0508） 
+* done(0510)
 
 2. 可将out目录的vmlinux自动上传某一地址（0508）
 
+
 3. 优化build.sh脚本，修改更新数据库操作（0508）
-    done(0508)
+* done(0508)

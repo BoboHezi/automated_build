@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import getopt
 import json
+import os
 import requests
 import sys
 from commands import getstatusoutput
@@ -176,6 +177,23 @@ def post(url, data, headers=common_headers):
         return r.status_code, json.loads(r.text)
     except Exception as e:
         return 0, None
+
+
+def removedirs(file):
+    if isempty(file) or not path.exists(file):
+        return False
+    if path.isfile(file) or path.islink(file):
+        try:
+            os.remove(file)
+        except Exception as e:
+            print(e)
+    else:
+        for i in os.listdir(file):
+            removedirs('%s/%s' % (file, i))
+        try:
+            os.removedirs(file)
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
