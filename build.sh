@@ -82,7 +82,7 @@ if [ $is_test != "true" ]; then
     build_id=`echo $build_url | awk -F"/" '{print $6}'`
     python update_db.py -t devops_compile \
         -k compile_jenkins_job_name,compile_jenkins_job_id,compile_log_url,compile_server_ip \
-        -v "$job_name","$build_id","$build_url/consoleText","$host_ip" \
+        -v "$job_name","$build_id","$build_url""console","$host_ip" \
         -w id -e $devops_compile_id
 fi
 
