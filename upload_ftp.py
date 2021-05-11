@@ -150,7 +150,7 @@ if __name__ == '__main__':
 
     file_url = 'ftp://%s@%s%s/%s' % (FTP_USER, FTP_HOST, upload_path, ZIP_FILE.split('/')[-1])
     print('upload success %s' % file_url)
-    utils.execute('echo %s > ftp_url.txt' % file_url)
+    utils.execute('echo "%s" > ftp_url.txt' % file_url)
 
     # delete publish package
     utils.removedirs(publish_out)
