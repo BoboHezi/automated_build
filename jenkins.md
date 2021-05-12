@@ -43,7 +43,7 @@ http://<user>:<user-token>@host:port/
 ### Reset API
 
 1. 触发job
-```
+```shell
 curl -X POST http://<user>:<user-token>@<jenkins-host>/job/<job-name>/build?token=<job-token>
 curl -X POST http://<user>:<user-token>@<jenkins-host>/job/<job-name>/buildWithParameters?token=<job-token>&key=value
 ```
@@ -154,3 +154,12 @@ sudo pip install pycryptodome
 
 3. 优化build.sh脚本，修改更新数据库操作（0508）
 * done(0508)
+
+
+4. 配合devops实现“闲时清环境 & 下载代码”功能（0512）
+
+
+5. 自动cherry-pick & clean（清除高于服务器的提交节点）（0512）
+
+
+6. 统计服务器平均编译时间，自动化性能评估（0512）

@@ -42,6 +42,8 @@ PROJECT_ID = None
 SV_BUILD_VERITY = False
 # 验收包释放用户
 SV_FTP_PUBLISH_USERNAME = None
+# 验收用途
+SV_VERITY_PURPOSE = 'official'
 
 TOKEN = None
 
@@ -220,7 +222,7 @@ def create_project(project=None, channel=None, brand=None, user=USER_ID, headers
 # create verity task
 def create_verity_task(project_id, ftpPath, ftpUsername, platform, board, ccList, model, brandCustomer, odmCustomer,
                        ftpPublishUsername, userName, userId1, headers):
-    purpose = 0 if 'sign.ttddsh.com' in SV_URL else 1
+    purpose = 0 if SV_VERITY_PURPOSE == 'official' else 1
     request_data = {
         'signAndVerify': 1,
         'purpose': purpose,
@@ -294,6 +296,7 @@ if __name__ == '__main__':
     option_str += ',o-odm:'  # SV_ODM_CUSTOMER
     option_str += ',v-verity'  # SV_BUILD_VERITY
     option_str += ',i-publish:'  # SV_FTP_PUBLISH_USERNAME
+    option_str += ',e-purpose:'  # SV_VERITY_PURPOSE
     opts = utils.dump(sys.argv[1:], option_str)
     # print(opts)
 
@@ -327,6 +330,8 @@ if __name__ == '__main__':
         SV_BUILD_VERITY = True
     if opts.has_key('-i') or opts.has_key('--publish'):
         SV_FTP_PUBLISH_USERNAME = opts.get('-i') if opts.get('-i') else opts.get('--publish')
+    if opts.has_key('-e') or opts.has_key('--purpose'):
+        SV_VERITY_PURPOSE = opts.get('-e') if opts.get('-e') else opts.get('--purpose')
 
     print '''
     PROJECT_NAME:            %s
