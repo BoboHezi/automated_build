@@ -43,10 +43,6 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>#!/usr/bin/env bash</command>
-      <configuredLocalRules/>
-    </hudson.tasks.Shell>
-    <hudson.tasks.Shell>
       <command>#!/usr/bin/env bash
 
 pwd

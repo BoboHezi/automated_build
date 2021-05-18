@@ -191,6 +191,16 @@
           <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>sv_verity_purpose</name>
+          <description>验收用途，official：正式验收，factory：验收</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>official</string>
+              <string>factory</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>publish_username</name>
           <description>验收包释放用户，若为空，则使用项目客户号</description>
@@ -235,6 +245,7 @@
                     println &quot;sv_platform_brand: ${sv_platform_brand}&quot;
                     println &quot;sv_platform_odm: ${sv_platform_odm}&quot;
                     println &quot;sv_platform_cclist: ${sv_platform_cclist}&quot;
+                    println &quot;sv_verity_purpose: ${sv_verity_purpose}&quot;
                     println &quot;publish_username: ${publish_username}&quot;
                 }
             }
@@ -272,11 +283,11 @@ EOF
                 sh &apos;&apos;&apos;
                 sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
 
-                if [ ! -d &quot;$script_path&quot; ]; then
-                    echo -e &quot;\ncreate path $script_path&quot;
-                    mkdir -p &quot;$script_path&quot;
+                if [ ! -d ~/.jenkins/script ]; then
+                    echo -e &quot;\ncreate path ~/.jenkins/script&quot;
+                    mkdir -p ~/.jenkins/script
                 fi
-                cd $script_path
+                cd ~/.jenkins/script
                 pwd
                 &apos;&apos;&apos;
             }
@@ -286,10 +297,10 @@ EOF
                 script {
                     sh &apos;&apos;&apos;
                     set +e
-                    sshpass -p &quot;$server_passwd&quot; scp -r $script_path &quot;$server_hostname@$server_ip_address&quot;:/home/server/.jenkins &gt; /dev/null 2&gt;&amp;1
+                    sshpass -p &quot;$server_passwd&quot; scp -r $script_path &quot;$server_hostname@$server_ip_address&quot;:~/.jenkins &gt; /dev/null 2&gt;&amp;1
                     
                     sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
-                    cd $script_path
+                    cd ~/.jenkins/script
                     pwd
                     ./link.sh $code_dir
                     &apos;&apos;&apos;
@@ -344,7 +355,6 @@ EOF
                 pwd
                 echo -------------------------------------------------
                 echo &quot;&quot;
-                
                 if [ &quot;$build_sign&quot; != &quot;true&quot; ]; then
                     echo -e &quot;\ndo not sign, exit!\n&quot;
                     exit 0
@@ -389,7 +399,7 @@ EOF
                     exit -2
                 fi
                 
-                bash sign_verify.sh &quot;$project_name&quot; &quot;$sv_platform_url&quot; &quot;$sv_platform_username&quot; &quot;$sv_platform_passwd&quot; &quot;$sv_platform_terrace&quot; &quot;$sv_platform_board&quot; &quot;$sv_platform_cclist&quot; &quot;$sv_platform_model&quot; &quot;$sv_platform_brand&quot; &quot;$sv_platform_odm&quot; &quot;$publish_username&quot; &quot;$build_verity&quot;
+                bash sign_verify.sh &quot;$project_name&quot; &quot;$sv_platform_url&quot; &quot;$sv_platform_username&quot; &quot;$sv_platform_passwd&quot; &quot;$sv_platform_terrace&quot; &quot;$sv_platform_board&quot; &quot;$sv_platform_cclist&quot; &quot;$sv_platform_model&quot; &quot;$sv_platform_brand&quot; &quot;$sv_platform_odm&quot; &quot;$publish_username&quot; &quot;$build_verity&quot; &quot;$sv_verity_purpose&quot;
                 &apos;&apos;&apos;
             }
         }

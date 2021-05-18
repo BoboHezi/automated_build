@@ -132,15 +132,8 @@ fi
 
 echo -e "\n---------------------overview---------------------\n"
 # just overview
-if [ $is_test != "true" ]; then
-    echo "overview"
-    echo --------------------------------------------------------------------------
-    repo overview
-    echo --------------------------------------------------------------------------
-    echo ""
-else
-    echo -e "\nrepo overview\n"
-fi
+repo overview
+echo ""
 
 # database option
 # status: compiling(5)
@@ -196,7 +189,7 @@ fi
 
 echo -e "\n---------------------publish---------------------\n"
 # publish
-if [ "$is_publish" == "true" ]; then
+if [ $is_test != "true" && "$is_publish" == "true" && "$build_variant" != "ota" ]; then
     echo -e "\npublish\n"
     ./publish
 fi
