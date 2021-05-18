@@ -187,9 +187,8 @@ if [ $is_test != "true" ]; then
         -w id -e $devops_compile_id
 fi
 
-echo -e "\n---------------------publish---------------------\n"
 # publish
-if [ $is_test != "true" && "$is_publish" == "true" && "$build_variant" != "ota" ]; then
-    echo -e "\npublish\n"
+if [[ $is_test != "true" && "$is_publish" == "true" && "$build_variant" != "ota" ]]; then
+    echo -e "\n---------------------publish---------------------\n"
     ./publish
 fi
