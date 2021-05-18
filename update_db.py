@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 import sys
 from os import system as execulte
 
@@ -58,26 +58,26 @@ if __name__ == "__main__":
         _exit(1)
 
     # check help
-    if '-h' in opts or '--help' in opts:
+    if opts.has_key('-h') or opts.has_key('--help'):
         usage()
         _exit(2)
 
     # check options
-    if '-d' in opts or '--database' in opts:
+    if opts.has_key('-d') or opts.has_key('--database'):
         DATABASE = opts.get('-d') if opts.get('-d') else opts.get('--database')
-    if '-t' in opts or '--table' in opts:
+    if opts.has_key('-t') or opts.has_key('--table'):
         TABLE = opts.get('-t') if opts.get('-t') else opts.get('--table')
-    if '-k' in opts or '--keys' in opts:
+    if opts.has_key('-k') or opts.has_key('--keys'):
         keys = opts.get('-k') if opts.get('-k') else opts.get('--keys')
         if keys:
             KEYS = str(keys).split(',')
-    if '-v' in opts or '--values' in opts:
+    if opts.has_key('-v') or opts.has_key('--values'):
         values = opts.get('-v') if opts.get('-v') else opts.get('--values')
         if values:
             VALUES = str(values).split(',')
-    if '-w' in opts or '--where' in opts:
+    if opts.has_key('-w') or opts.has_key('--where'):
         WHERE_KEY = opts.get('-w') if opts.get('-w') else opts.get('--where')
-    if '-e' in opts or '--equals' in opts:
+    if opts.has_key('-e') or opts.has_key('--equals'):
         WHERE_VALUE = opts.get('-e') if opts.get('-e') else opts.get('--equals')
 
     # must specify below options

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 import sys
 import time
 from ftplib import FTP
@@ -29,17 +29,17 @@ if __name__ == '__main__':
     if not opts:
         print("upload_ftp wrong parameter try '-h or --help' to get more information")
         _exit(1)
-    if '-p' in opts or '--project' in opts:
+    if opts.has_key('-p') or opts.has_key('--project'):
         PROJECT_NAME = opts.get('-p') if opts.get('-p') else opts.get('--project')
-    if '-f' in opts or '--file' in opts:
+    if opts.has_key('-f') or opts.has_key('--file'):
         ZIP_FILE = opts.get('-f') if opts.get('-f') else opts.get('--file')
-    if '-h' in opts or '--host' in opts:
+    if opts.has_key('-h') or opts.has_key('--host'):
         ftp_host = opts.get('-h') if opts.get('-h') else opts.get('--host')
         FTP_HOST = ftp_host if ftp_host else FTP_HOST
-    if '-u' in opts or '--user' in opts:
+    if opts.has_key('-u') or opts.has_key('--user'):
         ftp_user = opts.get('-u') if opts.get('-u') else opts.get('--user')
         FTP_USER = ftp_user if ftp_user else FTP_USER
-    if '-c' in opts or '--code' in opts:
+    if opts.has_key('-c') or opts.has_key('--code'):
         ftp_pwd = opts.get('-c') if opts.get('-c') else opts.get('--code')
         FTP_PWD = ftp_pwd if ftp_pwd else FTP_PWD
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
@@ -82,7 +82,7 @@ def check_item(user_id=USER_ID, name=None, keyword=None, url=None, headers=utils
                         if item[name] == keyword:
                             return item
         except Exception as e:
-            print(e)
+            print e
         finally:
             pass
 
@@ -304,36 +304,36 @@ if __name__ == '__main__':
         print('commit_sign_verify wrong parameter')
         _exit(1)
 
-    if '-p' in opts or '--project' in opts:
+    if opts.has_key('-p') or opts.has_key('--project'):
         PROJECT_NAME = opts.get('-p') if opts.get('-p') else opts.get('--project')
-    if '-f' in opts or '--ftp' in opts:
+    if opts.has_key('-f') or opts.has_key('--ftp'):
         SV_FTP_PATH = opts.get('-f') if opts.get('-f') else opts.get('--ftp')
-    if '-u' in opts or '--url' in opts:
+    if opts.has_key('-u') or opts.has_key('--url'):
         SV_URL = opts.get('-u') if opts.get('-u') else opts.get('--url')
-    if '-s' in opts or '--user' in opts:
+    if opts.has_key('-s') or opts.has_key('--user'):
         SV_USERNAME = opts.get('-s') if opts.get('-s') else opts.get('--user')
-    if '-c' in opts or '--code' in opts:
+    if opts.has_key('-c') or opts.has_key('--code'):
         SV_PASSWD = opts.get('-c') if opts.get('-c') else opts.get('--code')
-    if '-t' in opts or '--terrace' in opts:
+    if opts.has_key('-t') or opts.has_key('--terrace'):
         SV_PLATFORM = opts.get('-t') if opts.get('-t') else opts.get('--terrace')
-    if '-b' in opts or '--board' in opts:
+    if opts.has_key('-b') or opts.has_key('--board'):
         SV_BOARD = opts.get('-b') if opts.get('-b') else opts.get('--board')
-    if '-l' in opts or '--cclist' in opts:
+    if opts.has_key('-l') or opts.has_key('--cclist'):
         SV_CCLIST = opts.get('-l') if opts.get('-l') else opts.get('--cclist')
-    if '-m' in opts or '--model' in opts:
+    if opts.has_key('-m') or opts.has_key('--model'):
         SV_MODEL = opts.get('-m') if opts.get('-m') else opts.get('--model')
-    if '-r' in opts or '--brand' in opts:
+    if opts.has_key('-r') or opts.has_key('--brand'):
         SV_BRAND_CUSTOMER = opts.get('-r') if opts.get('-r') else opts.get('--brand')
-    if '-o' in opts or '--odm' in opts:
+    if opts.has_key('-o') or opts.has_key('--odm'):
         SV_ODM_CUSTOMER = opts.get('-o') if opts.get('-o') else opts.get('--odm')
-    if '-v' in opts or '--verity' in opts:
+    if opts.has_key('-v') or opts.has_key('--verity'):
         SV_BUILD_VERITY = True
-    if '-i' in opts or '--publish' in opts:
+    if opts.has_key('-i') or opts.has_key('--publish'):
         SV_FTP_PUBLISH_USERNAME = opts.get('-i') if opts.get('-i') else opts.get('--publish')
-    if '-e' in opts or '--purpose' in opts:
+    if opts.has_key('-e') or opts.has_key('--purpose'):
         SV_VERITY_PURPOSE = opts.get('-e') if opts.get('-e') else opts.get('--purpose')
 
-    print('''
+    print '''
     PROJECT_NAME:            %s
     SV_FTP_PATH:             %s
     SV_URL:                  %s
@@ -349,7 +349,7 @@ if __name__ == '__main__':
     SV_FTP_PUBLISH_USERNAME: %s
     ''' % (PROJECT_NAME, SV_FTP_PATH, SV_URL, SV_USERNAME, SV_PASSWD,
            SV_PLATFORM, SV_BOARD, SV_CCLIST, SV_MODEL, SV_BRAND_CUSTOMER,
-           SV_ODM_CUSTOMER, SV_BUILD_VERITY, SV_FTP_PUBLISH_USERNAME))
+           SV_ODM_CUSTOMER, SV_BUILD_VERITY, SV_FTP_PUBLISH_USERNAME)
 
     if not (PROJECT_NAME and SV_FTP_PATH):
         print('commit_sign_verify miss importent parameter\n')
