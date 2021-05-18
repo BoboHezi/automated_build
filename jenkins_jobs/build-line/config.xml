@@ -265,13 +265,13 @@ EOF
                         fi
                     fi
                     if ! type pip &gt;/dev/null 2&gt;&amp;1; then
-                        echo -e &quot;\nprepare-jenkins-server: install python-pip&quot;
+                        echo -e &quot;\nprepare-jenkins-server: install python3-pip&quot;
                         if type apt-get &gt;/dev/null 2&gt;&amp;1; then
-                            sudo -S apt-get install python-pip -y &lt;&lt; EOF
+                            sudo -S apt-get install python3-pip -y &lt;&lt; EOF
 1
 EOF
                         elif type yum &gt;/dev/null 2&gt;&amp;1; then
-                            yum install python-pip -y
+                            yum install python3-pip -y
                         fi
                     fi
                     &apos;&apos;&apos;
@@ -362,11 +362,11 @@ EOF
                 
                 # upload file
                 echo -e &apos;\n./upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;\n&apos;
-                python upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;
+                python3 upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;
                 # if [ &quot;$test_host&quot; == &quot;true&quot; ]; then
                 #     echo ftp://hongxiangyuan@192.168.150.30/upload/202104/G1930EPQ_V15_HL/V15-HL-G1930DPQV1HB-ZY-0420-V0103.zip &gt; ftp_url.txt
                 # else
-                #     python upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;
+                #     python3 upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;
                 # fi
                 &apos;&apos;&apos;
             }

@@ -111,8 +111,8 @@
                         yum install sshpass -y
                     fi
                     if ! type pip &gt;/dev/null 2&gt;&amp;1; then
-                        echo -e &quot;\nprepare-jenkins-server: install python-pip&quot;
-                        yum install python-pip -y
+                        echo -e &quot;\nprepare-jenkins-server: install python3-pip&quot;
+                        yum install python3-pip -y
                     fi
                     &apos;&apos;&apos;
                 }

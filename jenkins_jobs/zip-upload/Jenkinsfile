@@ -25,8 +25,8 @@ pipeline {
                         yum install sshpass -y
                     fi
                     if ! type pip >/dev/null 2>&1; then
-                        echo -e "\nprepare-jenkins-server: install python-pip"
-                        yum install python-pip -y
+                        echo -e "\nprepare-jenkins-server: install python3-pip"
+                        yum install python3-pip -y
                     fi
                     '''
                 }
