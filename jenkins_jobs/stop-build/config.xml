@@ -97,14 +97,14 @@ while [ $time -lt 3 ]; do
 		pwd
 
 		# update host status
-		python update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+		python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
 		# update compile finish time
 		build_finish_time=`date &quot;+%Y-%m-%d %H:%M:%S&quot;`
-		python update_db.py -t devops_compile \
+		python3 update_db.py -t devops_compile \
 			-k compile_build_finish_time -v &quot;$build_finish_time&quot; \
 			-w id -e $devops_compile_id
 		# update status
-		python notify_status.py $devops_compile_id 6
+		python3 notify_status.py $devops_compile_id 6
 		exit 0
 	fi
 

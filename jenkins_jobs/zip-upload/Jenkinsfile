@@ -24,9 +24,9 @@ pipeline {
                         echo -e "\nprepare-jenkins-server: install sshpass"
                         yum install sshpass -y
                     fi
-                    if ! type pip >/dev/null 2>&1; then
-                        echo -e "\nprepare-jenkins-server: install python-pip"
-                        yum install python-pip -y
+                    if ! type pip3 >/dev/null 2>&1; then
+                        echo -e "\nprepare-jenkins-server: install python3-pip"
+                        yum install python3-pip -y
                     fi
                     '''
                 }
@@ -52,7 +52,7 @@ pipeline {
                     sh '''
                     set +e
                     sshpass -p "$server_passwd" scp -r $script_path "$server_hostname@$server_ip_address":/home/server/.jenkins > /dev/null 2>&1
-
+                    
                     sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
                     cd $script_path
                     pwd
@@ -70,15 +70,15 @@ pipeline {
                     echo "Project code directory does not exist!!!"
                     exit -1;
                     fi
-
+                    
                     cd "$code_dir"
                     echo ""
                     echo -------------------------------------------------
-                    echo code_dir:
+                    echo code_dir: 
                     pwd
                     echo -------------------------------------------------
                     echo ""
-
+                    
                     if [ ! -f upload_ftp.py ]; then
                     echo "File upload_ftp.py does not exist!!!"
                     exit -2;

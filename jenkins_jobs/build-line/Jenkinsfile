@@ -32,6 +32,7 @@ pipeline {
                     println "sv_platform_brand: ${sv_platform_brand}"
                     println "sv_platform_odm: ${sv_platform_odm}"
                     println "sv_platform_cclist: ${sv_platform_cclist}"
+                    println "sv_verity_purpose: ${sv_verity_purpose}"
                     println "publish_username: ${publish_username}"
                 }
             }
@@ -50,14 +51,14 @@ EOF
                             yum install sshpass -y
                         fi
                     fi
-                    if ! type pip >/dev/null 2>&1; then
-                        echo -e "\nprepare-jenkins-server: install python-pip"
+                    if ! type pip3 >/dev/null 2>&1; then
+                        echo -e "\nprepare-jenkins-server: install python3-pip"
                         if type apt-get >/dev/null 2>&1; then
-                            sudo -S apt-get install python-pip -y << EOF
+                            sudo -S apt-get install python3-pip -y << EOF
 1
 EOF
                         elif type yum >/dev/null 2>&1; then
-                            yum install python-pip -y
+                            yum install python-pip3 -y
                         fi
                     fi
                     '''
@@ -69,11 +70,11 @@ EOF
                 sh '''
                 sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
 
-                if [ ! -d "$script_path" ]; then
-                    echo -e "\ncreate path $script_path"
-                    mkdir -p "$script_path"
+                if [ ! -d ~/.jenkins/script ]; then
+                    echo -e "\ncreate path ~/.jenkins/script"
+                    mkdir -p ~/.jenkins/script
                 fi
-                cd $script_path
+                cd ~/.jenkins/script
                 pwd
                 '''
             }
@@ -83,10 +84,10 @@ EOF
                 script {
                     sh '''
                     set +e
-                    sshpass -p "$server_passwd" scp -r $script_path "$server_hostname@$server_ip_address":/home/server/.jenkins > /dev/null 2>&1
+                    sshpass -p "$server_passwd" scp -r $script_path "$server_hostname@$server_ip_address":~/.jenkins > /dev/null 2>&1
                     
                     sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
-                    cd $script_path
+                    cd ~/.jenkins/script
                     pwd
                     ./link.sh $code_dir
                     '''
@@ -148,11 +149,11 @@ EOF
                 
                 # upload file
                 echo -e '\n./upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"\n'
-                python upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
+                python3 upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
                 # if [ "$test_host" == "true" ]; then
                 #     echo ftp://hongxiangyuan@192.168.150.30/upload/202104/G1930EPQ_V15_HL/V15-HL-G1930DPQV1HB-ZY-0420-V0103.zip > ftp_url.txt
                 # else
-                #     python upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
+                #     python3 upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
                 # fi
                 '''
             }
@@ -185,7 +186,7 @@ EOF
                     exit -2
                 fi
                 
-                bash sign_verify.sh "$project_name" "$sv_platform_url" "$sv_platform_username" "$sv_platform_passwd" "$sv_platform_terrace" "$sv_platform_board" "$sv_platform_cclist" "$sv_platform_model" "$sv_platform_brand" "$sv_platform_odm" "$publish_username" "$build_verity"
+                bash sign_verify.sh "$project_name" "$sv_platform_url" "$sv_platform_username" "$sv_platform_passwd" "$sv_platform_terrace" "$sv_platform_board" "$sv_platform_cclist" "$sv_platform_model" "$sv_platform_brand" "$sv_platform_odm" "$publish_username" "$build_verity" "$sv_verity_purpose"
                 '''
             }
         }

@@ -59,7 +59,7 @@ printParams
 
 # status: init(2)
 if [ $is_test != "true" ]; then
-    python notify_status.py $devops_compile_id 2
+    python3 notify_status.py $devops_compile_id 2
 fi
 
 # pre-check
@@ -68,19 +68,19 @@ if [ -z "$build_project" ] || [ -z "$build_variant" ] || [ -z "$build_action" ] 
     echo -e "\nThere is a problem with the incoming parameters, please check\n"
     # status: check_fail(3)
     if [ $is_test != "true" ]; then
-        python notify_status.py $devops_compile_id 3
+        python3 notify_status.py $devops_compile_id 3
     fi
     exit 2;
 fi
 
 if [ $is_test != "true" ]; then
     # table devops_server server status
-    python update_db.py -t devops_server -k server_status -v 1 -w id -e $devops_host_id
+    python3 update_db.py -t devops_server -k server_status -v 1 -w id -e $devops_host_id
 
     # table devops_compile infos
     job_name=`echo $build_url | awk -F"/" '{print $5}'`
     build_id=`echo $build_url | awk -F"/" '{print $6}'`
-    python update_db.py -t devops_compile \
+    python3 update_db.py -t devops_compile \
         -k compile_jenkins_job_name,compile_jenkins_job_id,compile_log_url,compile_server_ip \
         -v "$job_name","$build_id","$build_url""console","$host_ip" \
         -w id -e $devops_compile_id
@@ -103,10 +103,10 @@ case $build_action in
         ;;
 esac
 
-echo -e "\n---------------------sync---------------------\n"
-# sync code
+echo -e "\n---------------------repo handler---------------------\n"
+# 'clean code'
 if [[ "$is_test" != "true" && "$build_action" != "r" ]]; then
-    repo sync
+    python3 repo_handler.py -c
 fi
 
 echo -e "\n---------------------find---------------------\n"
@@ -116,7 +116,7 @@ find=$(find droi/ -maxdepth 3 -mindepth 3 -type d -name $build_project)
 if [ ! $find ]; then
     # status: project_notfound(4)
     if [ $is_test != "true" ]; then
-        python notify_status.py $devops_compile_id 4
+        python3 notify_status.py $devops_compile_id 4
     fi
     echo -e "\n$build_project not found\n"
     exit 3
@@ -138,12 +138,12 @@ echo ""
 # database option
 # status: compiling(5)
 if [ $is_test != "true" ]; then
-    python notify_status.py $devops_compile_id 5
+    python3 notify_status.py $devops_compile_id 5
 fi
 
 if [ $is_test != "true" ]; then
     build_time=`date "+%Y-%m-%d %H:%M:%S"`
-    python update_db.py -t devops_compile \
+    python3 update_db.py -t devops_compile \
         -k compile_build_time -v "$build_time" \
         -w id -e $devops_compile_id
 fi
@@ -162,13 +162,13 @@ fi
 if test $build_rst = "0"; then
     # status: build_success(0)
     if [ $is_test != "true" ]; then
-        python notify_status.py $devops_compile_id 0
+        python3 notify_status.py $devops_compile_id 0
     fi
     echo -e "\nbuild success\n"
 else
     # status: build_failed(6)
     if [ $is_test != "true" ]; then
-        python notify_status.py $devops_compile_id 6
+        python3 notify_status.py $devops_compile_id 6
     fi
     echo -e "\nbuild failed\n"
     exit 5
@@ -177,12 +177,12 @@ fi
 # database option
 # table devops_server server status
 if [ $is_test != "true" ]; then
-    python update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+    python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
 fi
 # table devops_compile infos
 build_finish_time=`date "+%Y-%m-%d %H:%M:%S"`
 if [ $is_test != "true" ]; then
-    python update_db.py -t devops_compile \
+    python3 update_db.py -t devops_compile \
         -k compile_build_finish_time -v "$build_finish_time" \
         -w id -e $devops_compile_id
 fi

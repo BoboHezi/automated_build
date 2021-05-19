@@ -1,10 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import getopt
 import json
 import os
 import requests
 import sys
-from commands import getstatusoutput
 from os import getcwd
 from os import path
 from os import readlink
@@ -22,6 +21,17 @@ common_headers = {
     'Referer': 'http://192.168.151.31:2030/',
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'
 }
+
+
+def getstatusoutput(cmd):
+    """Return (status, output) of executing cmd in a shell."""
+    import os
+    pipe = os.popen('{ ' + cmd + '; } 2>&1', 'r')
+    text = pipe.read()
+    sts = pipe.close()
+    if sts is None: sts = 0
+    if text[-1:] == '\n': text = text[:-1]
+    return sts, text
 
 
 class ProjectInfo(object):
@@ -194,6 +204,14 @@ def removedirs(file):
             os.removedirs(file)
         except Exception as e:
             print(e)
+
+
+def star_log(msg, length):
+    msg = msg if msg else ''
+    remain = length - len(msg)
+    before_len = int((remain - 1) / 2 if remain % 2 else remain / 2)
+    after_len = remain - before_len
+    print('*' * before_len + msg + '*' * after_len)
 
 
 if __name__ == '__main__':
