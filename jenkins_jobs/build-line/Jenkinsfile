@@ -200,11 +200,11 @@ EOF
             
             # compile status: 7(stoped)
             echo "./notify_status.py $devops_compile_id 7"
-            ./notify_status.py $devops_compile_id 7
+            python3 notify_status.py $devops_compile_id 7
             
             # devops_server server status 0(idle)
             echo "./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id"
-            ./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+            python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
             '''
         }
         failure {
@@ -214,11 +214,11 @@ EOF
             
             # compile status: 6(build failed)
             echo "./notify_status.py $devops_compile_id 6"
-            ./notify_status.py $devops_compile_id 6
+            python3 notify_status.py $devops_compile_id 6
             
             # devops_server server status 0(idle)
             echo "./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id"
-            ./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+            python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
             '''
         }
     }
