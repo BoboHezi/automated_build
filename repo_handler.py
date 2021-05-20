@@ -1,15 +1,20 @@
 #!/usr/bin/python3
+import re
 import warnings
 
+import utils
+
 warnings.filterwarnings("ignore")
-import sys
 import os
-from re import search
+import sys
+import RepoParser
+from fuzzywuzzy import fuzz
 from git import *
+from re import search
+from RepoParser import *
 from utils import dump
 from utils import execute
 from utils import star_log
-
 
 # 1. clean
 #     |
@@ -32,6 +37,10 @@ from utils import star_log
 #     v
 #  SUCCESS
 
+SYNC_RECURSIVE_TIMES = 3
+OVERVIEW_RECURSIVE_TIMES = 3
+ORIGIN_WORK_DIRECTORY = os.getcwd()
+
 
 # repo sync
 def sync():
@@ -40,7 +49,7 @@ def sync():
         sync_errors = {}
         for line in text.split('\n'):
             if line.startswith('error:'):
-                error_git = os.getcwd() + os.sep + line.split(': ')[1]
+                error_git = ORIGIN_WORK_DIRECTORY + os.sep + line.split(': ')[1]
                 error_reason = line.split(': ')[2]
                 sync_errors[error_git] = error_reason
         # print(sync_errors)
@@ -52,7 +61,9 @@ def handle_sync():
     star_log('handle_sync', 60)
     sync_failed = sync()
     # sync failed
-    if sync_failed and len(sync_failed.keys()) > 0:
+    if SYNC_RECURSIVE_TIMES > 0 and sync_failed and len(sync_failed.keys()) > 0:
+        global SYNC_RECURSIVE_TIMES
+        SYNC_RECURSIVE_TIMES -= 1
         print('sync failed')
         for path in sync_failed.keys():
             print('pull %s:' % path)
@@ -117,7 +128,7 @@ def overview():
         unclean_paths = []
         for line in ary[1].split('\n'):
             if os.path.isdir(line):
-                unclean_paths.append(os.getcwd() + os.sep + line)
+                unclean_paths.append(ORIGIN_WORK_DIRECTORY + os.sep + line)
                 # print(line)
         return unclean_paths
 
@@ -127,7 +138,9 @@ def handle_overview():
     star_log('handle_overview', 60)
     unclean_paths = overview()
     # overview failed
-    if unclean_paths and len(unclean_paths) > 0:
+    if OVERVIEW_RECURSIVE_TIMES > 0 and not utils.isempty(unclean_paths):
+        global OVERVIEW_RECURSIVE_TIMES
+        OVERVIEW_RECURSIVE_TIMES -= 1
         print('overview failed')
         for path in unclean_paths:
             print('clean %s:' % path)
@@ -153,11 +166,58 @@ def handle_clean():
     handle_sync()
 
 
+def read_cps_from_file(path):
+    if not os.path.exists(path):
+        return None
+    file = open(path, 'r')
+    str = file.read()
+    lines = str.split(';')
+    result = []
+    for line in lines:
+        if not line.lstrip().startswith('#'):
+            result.append(line)
+    return result
+
+
+def fuzzy_match(str, list, nearly=85):
+    # print('%s matchs below:' % str)
+    most_suit = 0
+    most_match = None
+    for item in list:
+        suit = fuzz.ratio(str, item)
+        if suit > most_suit and suit >= nearly:
+            most_suit = suit
+            most_match = item
+            if suit == 100:
+                break
+    # print('most_match: %s, %d' % (most_match, most_suit))
+    return most_suit, most_match
+
+
+def change_name(cmd, new_name):
+    if not utils.isempty(cmd):
+        match = re.search('ssh://(.*)@', cmd)
+        if match:
+            old_name = match.group(1)
+            cmd = cmd.replace(old_name, new_name)
+    return cmd
+
+
+def cherry_pick(path, cmd):
+    os.chdir(path)
+    rst_code, rst_msg = execute(cmd)
+    if rst_code != 0:
+        execute('git cherry-pick --abort')
+    os.chdir(ORIGIN_WORK_DIRECTORY)
+    return rst_code
+
+
 if __name__ == '__main__':
     option_str = 'h-help'
     option_str += ',c-clean'
     option_str += ',s-sync'
     option_str += ',o-overview'
+    option_str += ',p-pick:'
 
     opts = dump(sys.argv[1:], option_str)
     if not opts:
@@ -170,3 +230,39 @@ if __name__ == '__main__':
             handle_clean()
         elif opt in ['-o', '--overview']:
             handle_overview()
+        elif opt in ['-p', '--pick']:
+            star_log('cherry-pick', 60)
+            file = opts.get(opt)
+            if utils.isempty(file) or not os.path.exists(file):
+                continue
+            # dump current repo
+            google_repo = dump_projects()
+            git_name_path_dict = {}
+            for project in google_repo.projects:
+                git_name_path_dict[project.name] = project.path
+            # dump cherry-pick cmd
+            cps = read_cps_from_file(file)
+            if not utils.isempty(cps):
+                # cherry-pick cmd & project map
+                cmd_project = {}
+                for cmd in cps:
+                    match = re.search('[0-9]\/.*"', cmd)
+                    if match:
+                        git_name = match.group()[2: -1]
+                        suit, local_git_name = fuzzy_match(git_name, git_name_path_dict.keys())
+                        if local_git_name:
+                            cmd_project[cmd] = [local_git_name, git_name_path_dict[local_git_name]]
+                # begin cherry-pick
+                for cmd in cmd_project.keys():
+                    path = ORIGIN_WORK_DIRECTORY + os.sep + cmd_project[cmd][1]
+                    repo = Repo(path)
+                    # git checkout .
+                    if repo.is_dirty():
+                        repo.git.checkout('.')
+                    # git clean -xfd
+                    if repo.untracked_files:
+                        repo.git.clean('-xdf')
+                    local_user_name = repo.config_reader('global').get_value('user', 'name')
+                    cmd = change_name(cmd, local_user_name)
+                    print('\nin %s try exxcute\n%s' % (path, cmd))
+                    print('result: %d' % cherry_pick(path, cmd))

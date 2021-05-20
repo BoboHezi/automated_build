@@ -24,11 +24,13 @@
 
 3. 安装pip: ```sudo apt-get install python3-pip```
 
-4. 安装mysql-connector: ```sudo pip install mysql-connector```
+4. 安装mysql-connector: ```sudo pip3 install mysql-connector```
 
-5. 安装requests: ```sudo pip install requests```
+5. 安装requests: ```sudo pip3 install requests```
 
-6. 安装gitpython: ```sudo pip install gitpython```
+6. 安装gitpython: ```sudo pip3 install gitpython```
+
+7. 安装fuzzywuzzy: ```sudo pip3 install fuzzywuzzy```
 
 ## 配置Remote-trigger
 
