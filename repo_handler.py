@@ -234,6 +234,7 @@ if __name__ == '__main__':
             star_log('cherry-pick', 60)
             file = opts.get(opt)
             if utils.isempty(file) or not os.path.exists(file):
+                print('%s not exists' % file)
                 continue
             # dump current repo
             google_repo = dump_projects()

@@ -62,6 +62,12 @@
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>cherry_picks</name>
+          <description>cherry-pick命令</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>build_sign</name>
           <description>是否签名</description>
@@ -316,6 +322,8 @@ EOF
                     echo &quot;Project code directory does not exist!!!&quot;
                     exit -1;
                 fi
+                
+                echo &quot;$cherry_picks&quot; &gt; cps
                 
                 cd &quot;$code_dir&quot;
                 echo &quot;&quot;

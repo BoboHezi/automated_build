@@ -104,6 +104,8 @@ EOF
                     exit -1;
                 fi
                 
+                echo "$cherry_picks" > cps
+                
                 cd "$code_dir"
                 echo ""
                 echo -------------------------------------------------
