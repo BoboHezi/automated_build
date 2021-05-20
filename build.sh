@@ -111,7 +111,7 @@ fi
 
 echo -e "\n---------------------cherry pick---------------------\n"
 # cherry pick
-python3 repo_handler.py -p ~/cps
+python3 repo_handler.py -p ~/.jenkins/script/cps
 
 echo -e "\n---------------------find---------------------\n"
 # find project
