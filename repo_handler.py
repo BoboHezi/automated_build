@@ -170,7 +170,7 @@ def read_cps_from_file(path):
     if not os.path.exists(path):
         return None
     file = open(path, 'r')
-    str = file.read()
+    str = file.read().strip()
     lines = str.split(';')
     result = []
     for line in lines:
@@ -244,6 +244,8 @@ if __name__ == '__main__':
             # dump cherry-pick cmd
             cps = read_cps_from_file(file)
             print('cps:\n%s' % cps)
+            # delete file cps
+            os.remove(file)
             if not utils.isempty(cps):
                 # cherry-pick cmd & project map
                 cmd_project = {}
