@@ -90,6 +90,8 @@ EOF
                     cd ~/.jenkins/script
                     pwd
                     ./link.sh $code_dir
+
+                    echo "$cherry_picks" > cps
                     '''
                 }
             }
@@ -103,8 +105,6 @@ EOF
                     echo "Project code directory does not exist!!!"
                     exit -1;
                 fi
-                
-                echo "$cherry_picks" > cps
                 
                 cd "$code_dir"
                 echo ""

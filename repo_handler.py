@@ -241,7 +241,6 @@ if __name__ == '__main__':
             git_name_path_dict = {}
             for project in google_repo.projects:
                 git_name_path_dict[project.name] = project.path
-            print('git_name_path_dict size: %d' % len(git_name_path_dict.keys()))
             # dump cherry-pick cmd
             cps = read_cps_from_file(file)
             print('cps:\n%s' % cps)
@@ -255,7 +254,6 @@ if __name__ == '__main__':
                         suit, local_git_name = fuzzy_match(git_name, git_name_path_dict.keys())
                         if local_git_name:
                             cmd_project[cmd] = [local_git_name, git_name_path_dict[local_git_name]]
-                print('cmd_project size: %d' % len(cmd_project.keys()))
                 # begin cherry-pick
                 for cmd in cmd_project.keys():
                     path = ORIGIN_WORK_DIRECTORY + os.sep + cmd_project[cmd][1]
