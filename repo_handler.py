@@ -125,35 +125,75 @@ def overview():
     rst_code, text = execute('repo info -o')
     ary = text.split('-' * 28)
     if ary and len(ary) >= 2:
-        unclean_paths = []
+        unclean_nodes = []
+        available_lines = []
+        path_index = []
+        # clean empty line & record 'path'
         for line in ary[1].split('\n'):
+            if utils.isempty(line):
+                continue
+            available_lines.append(line)
             if os.path.isdir(line):
-                unclean_paths.append(ORIGIN_WORK_DIRECTORY + os.sep + line)
-                # print(line)
-        return unclean_paths
+                path_index.append(len(available_lines) - 1)
+
+        # by path, dump unclean node
+        for i in path_index:
+            region_start = i
+            region_end = len(available_lines) - 1 if path_index.index(i) == len(path_index) - 1 else path_index[
+                path_index.index(i) + 1] - 1
+
+            node = {}
+            while region_start < region_end:
+                line = available_lines[region_start + 1]
+                match = re.search('^([ ]{2}|\*)(.*)\([ ]([\d]+)[ ]commit', line)
+                if match:
+                    branch = match.group(2).strip()
+                    heads = int(match.group(3).strip())
+                    # print('branch: %s, heads: %s' % (branch, heads))
+                    node[branch] = heads
+                region_start += 1
+            if len(node.keys()) > 0:
+                node['path'] = available_lines[i]
+                unclean_nodes.append(node)
+        # print(unclean_nodes)
+        return unclean_nodes
 
 
 # recursive overview util success
 def handle_overview():
     star_log('handle_overview', 60)
-    unclean_paths = overview()
+    unclean_nodes = overview()
     # overview failed
-    if OVERVIEW_RECURSIVE_TIMES > 0 and not utils.isempty(unclean_paths):
+    if OVERVIEW_RECURSIVE_TIMES > 0 and not utils.isempty(unclean_nodes):
         global OVERVIEW_RECURSIVE_TIMES
         OVERVIEW_RECURSIVE_TIMES -= 1
         print('overview failed')
-        for path in unclean_paths:
-            print('clean %s:' % path)
-            repo = Repo(path)
+        # clean unclean node
+        for node in unclean_nodes:
+            print('clean %s:' % node)
+            repo = Repo(node['path'])
             if not repo:
                 continue
-            node = dump_node(repo.git.status())
-            # print(node)
-            if isinstance(node, list):
-                reset(repo, node[0])
-            elif isinstance(node, int):
-                reset(repo, node)
-            repo.remotes.origin.pull()
+            # clean unclean branch
+            repo.active_branch.name
+            repo.branches
+            for branch in node.keys():
+                if branch == 'path':
+                    continue
+                repo.git.checkout(branch)
+                heads = dump_node(repo.git.status())
+                # print(node)
+                if isinstance(heads, list):
+                    reset(repo, heads[0])
+                elif isinstance(heads, int):
+                    reset(repo, heads)
+                repo.remotes.origin.pull()
+            checkout_cmd = ['-b', 'auto_build']
+            for branch in repo.branches:
+                if branch.name == 'auto_build':
+                    checkout_cmd.remove('-b')
+                    break
+            repo.git.checkout(checkout_cmd)
         handle_overview()
     else:
         print('overview success')

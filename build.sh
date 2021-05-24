@@ -104,6 +104,7 @@ case $build_action in
 esac
 
 echo -e "\n---------------------repo handler---------------------\n"
+repo start --all auto_build
 # 'clean code'
 if [[ "$is_test" != "true" && "$build_action" != "r" ]]; then
     python3 repo_handler.py -c
@@ -162,6 +163,9 @@ if [ $is_test == "true" ]; then
 else
     ./mk -f -$build_variant $is_sign $build_project $build_action ; build_rst=$?
 fi
+
+repo abandon auto_build
+repo start --all master
 
 # build result
 if test $build_rst = "0"; then
