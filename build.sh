@@ -106,13 +106,13 @@ esac
 echo -e "\n---------------------repo handler---------------------\n"
 # 'clean code'
 if [[ "$is_test" != "true" && "$build_action" != "r" ]]; then
-    # python3 repo_handler.py -c
-    repo sync
+    python3 repo_handler.py -c
+    # repo sync
 fi
 
 echo -e "\n---------------------cherry pick---------------------\n"
 # cherry pick
-# python3 repo_handler.py -p ~/.jenkins/script/cps
+python3 repo_handler.py -p ~/.jenkins/script/cps
 
 echo -e "\n---------------------find---------------------\n"
 # find project
@@ -160,7 +160,8 @@ echo -e "\nmk -f -$build_variant $is_sign $build_project $build_action\n"
 if [ $is_test == "true" ]; then
     ./test_script.sh ; build_rst=$?
 else
-    ./mk -f -$build_variant $is_sign $build_project $build_action ; build_rst=$?
+    # ./mk -f -$build_variant $is_sign $build_project $build_action ; build_rst=$?
+    ./test_script.sh ; build_rst=$?
 fi
 
 # build result
