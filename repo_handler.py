@@ -297,6 +297,7 @@ if __name__ == '__main__':
                         if local_git_name:
                             cmd_project[cmd] = [local_git_name, git_name_path_dict[local_git_name]]
                 # begin cherry-pick
+                success = 0
                 for cmd in cmd_project.keys():
                     path = ORIGIN_WORK_DIRECTORY + os.sep + cmd_project[cmd][1]
                     repo = Repo(path)
@@ -309,4 +310,7 @@ if __name__ == '__main__':
                     local_user_name = repo.config_reader('global').get_value('user', 'name')
                     cmd = change_name(cmd, local_user_name)
                     print('\nin %s try exxcute\n%s' % (path, cmd))
-                    print('result: %d' % cherry_pick(path, cmd))
+                    result = cherry_pick(path, cmd)
+                    print('result: %d' % result)
+                    success = result if result != 0 else success
+                exit(0 if success == 0 else 1)
