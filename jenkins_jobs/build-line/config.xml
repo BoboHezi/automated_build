@@ -417,6 +417,7 @@ EOF
         aborted {
             echo &apos;this build was aborted&apos;
             sh &apos;&apos;&apos;
+            set +e
             cd $script_path
             
             # compile status: 7(stoped)
@@ -426,11 +427,19 @@ EOF
             # devops_server server status 0(idle)
             echo &quot;./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id&quot;
             python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+            
+            # devops_compile finish time
+            build_finish_time=`date &quot;+%Y-%m-%d %H:%M:%S&quot;`
+            python3 update_db.py -t devops_compile \
+                -k compile_build_finish_time -v &quot;$build_finish_time&quot; \
+                -w id -e $devops_compile_id
+            echo &quot;complete&quot;
             &apos;&apos;&apos;
         }
         failure {
             echo &apos;this build was failed&apos;
             sh &apos;&apos;&apos;
+            set +e
             cd $script_path
             
             # compile status: 6(build failed)
@@ -440,6 +449,7 @@ EOF
             # devops_server server status 0(idle)
             echo &quot;./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id&quot;
             python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+            echo &quot;complete&quot;
             &apos;&apos;&apos;
         }
     }
