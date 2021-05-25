@@ -58,33 +58,27 @@ function printBlue() {
 printParams
 
 # status: init(2)
-if [ $is_test != "true" ]; then
-    python3 notify_status.py $devops_compile_id 2
-fi
+python3 notify_status.py $devops_compile_id 2
 
 # pre-check
 # check params
 if [ -z "$build_project" ] || [ -z "$build_variant" ] || [ -z "$build_action" ] ; then
     echo -e "\nThere is a problem with the incoming parameters, please check\n"
     # status: check_fail(3)
-    if [ $is_test != "true" ]; then
-        python3 notify_status.py $devops_compile_id 3
-    fi
+    python3 notify_status.py $devops_compile_id 3
     exit 2;
 fi
 
-if [ $is_test != "true" ]; then
-    # table devops_server server status
-    python3 update_db.py -t devops_server -k server_status -v 1 -w id -e $devops_host_id
+# table devops_server server status
+python3 update_db.py -t devops_server -k server_status -v 1 -w id -e $devops_host_id
 
-    # table devops_compile infos
-    job_name=`echo $build_url | awk -F"/" '{print $5}'`
-    build_id=`echo $build_url | awk -F"/" '{print $6}'`
-    python3 update_db.py -t devops_compile \
-        -k compile_jenkins_job_name,compile_jenkins_job_id,compile_log_url,compile_server_ip \
-        -v "$job_name","$build_id","$build_url""console","$host_ip" \
-        -w id -e $devops_compile_id
-fi
+# table devops_compile infos
+job_name=`echo $build_url | awk -F"/" '{print $5}'`
+build_id=`echo $build_url | awk -F"/" '{print $6}'`
+python3 update_db.py -t devops_compile \
+    -k compile_jenkins_job_name,compile_jenkins_job_id,compile_log_url,compile_server_ip \
+    -v "$job_name","$build_id","$build_url""console","$host_ip" \
+    -w id -e $devops_compile_id
 
 echo -e "\n---------------------source---------------------\n"
 # pre-build
@@ -121,9 +115,7 @@ find=$(find droi/ -maxdepth 3 -mindepth 3 -type d -name $build_project)
 
 if [ ! $find ]; then
     # status: project_notfound(4)
-    if [ $is_test != "true" ]; then
-        python3 notify_status.py $devops_compile_id 4
-    fi
+    python3 notify_status.py $devops_compile_id 4
     echo -e "\n$build_project not found\n"
     exit 3
 else
@@ -143,16 +135,12 @@ echo ""
 
 # database option
 # status: compiling(5)
-if [ $is_test != "true" ]; then
-    python3 notify_status.py $devops_compile_id 5
-fi
+python3 notify_status.py $devops_compile_id 5
 
-if [ $is_test != "true" ]; then
-    build_time=`date "+%Y-%m-%d %H:%M:%S"`
-    python3 update_db.py -t devops_compile \
-        -k compile_build_time -v "$build_time" \
-        -w id -e $devops_compile_id
-fi
+build_time=`date "+%Y-%m-%d %H:%M:%S"`
+python3 update_db.py -t devops_compile \
+    -k compile_build_time -v "$build_time" \
+    -w id -e $devops_compile_id
 
 echo -e "\n---------------------build---------------------\n"
 # echo build script
