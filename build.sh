@@ -161,40 +161,33 @@ echo -e "\nmk -f -$build_variant $is_sign $build_project $build_action\n"
 if [ $is_test == "true" ]; then
     ./test_script.sh ; build_rst=$?
 else
-    # ./mk -f -$build_variant $is_sign $build_project $build_action ; build_rst=$?
-    ./test_script.sh ; build_rst=$?
+    ./mk -f -$build_variant $is_sign $build_project $build_action ; build_rst=$?
+    # ./test_script.sh ; build_rst=$?
 fi
 
 repo abandon auto_build
 repo start --all master
 
+# database option
+# table devops_server server status
+python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+
+# table devops_compile infos
+build_finish_time=`date "+%Y-%m-%d %H:%M:%S"`
+python3 update_db.py -t devops_compile \
+    -k compile_build_finish_time -v "$build_finish_time" \
+    -w id -e $devops_compile_id
+
 # build result
 if test $build_rst = "0"; then
     # status: build_success(0)
-    if [ $is_test != "true" ]; then
-        python3 notify_status.py $devops_compile_id 0
-    fi
+    python3 notify_status.py $devops_compile_id 0
     echo -e "\nbuild success\n"
 else
     # status: build_failed(6)
-    if [ $is_test != "true" ]; then
-        python3 notify_status.py $devops_compile_id 6
-    fi
+    python3 notify_status.py $devops_compile_id 6
     echo -e "\nbuild failed\n"
     exit 5
-fi
-
-# database option
-# table devops_server server status
-if [ $is_test != "true" ]; then
-    python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
-fi
-# table devops_compile infos
-build_finish_time=`date "+%Y-%m-%d %H:%M:%S"`
-if [ $is_test != "true" ]; then
-    python3 update_db.py -t devops_compile \
-        -k compile_build_finish_time -v "$build_finish_time" \
-        -w id -e $devops_compile_id
 fi
 
 # publish
