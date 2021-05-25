@@ -132,4 +132,4 @@ if __name__ == "__main__":
     else:
         print('update_db: update failed')
 
-    _exit(0 if cursor.rowcount > 0 else -1)
+    _exit(0 if cursor.rowcount > 0 else 5)
