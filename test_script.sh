@@ -1,5 +1,5 @@
 #!/bin/bash
 echo "Test script running..."
-sleep 2m
+sleep 1m
 echo "Test script stop..."
-exit 0
+exit 1
