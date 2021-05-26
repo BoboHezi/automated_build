@@ -40,6 +40,7 @@ if (__name__ == "__main__"):
     # get params
     compile_id = sys.argv[1]
     status = sys.argv[2]
+    check = True if len(sys.argv) > 3 and sys.argv[3] == 'check' else False
 
     # sql connect
     dev_ops_db = mysql.connector.connect(
@@ -53,12 +54,15 @@ if (__name__ == "__main__"):
 
     # check id
     pre_status = select_status(cursor, compile_id)
-    if pre_status == None:
+    if pre_status is None:
         print('notify_status: wrong id %s' % compile_id)
         _exit(2, cursor)
     elif str(pre_status) == status:
         print('notify_status: same status')
         _exit(3, cursor)
+
+    if check:
+        _exit(0)
 
     # update
     update_sql = ('UPDATE devops_compile SET compile_status = %s WHERE id = \'%s\'' % (status, compile_id))

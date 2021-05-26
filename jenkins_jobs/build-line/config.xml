@@ -124,7 +124,7 @@
         <hudson.model.StringParameterDefinition>
           <name>script_path</name>
           <description>do not edit</description>
-          <defaultValue>/home/server/.jenkins/script</defaultValue>
+          <defaultValue>/home/server/.jenkins/script_test/</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -303,14 +303,14 @@ EOF
                 script {
                     sh &apos;&apos;&apos;
                     set +e
-                    sshpass -p &quot;$server_passwd&quot; scp -r $script_path &quot;$server_hostname@$server_ip_address&quot;:~/.jenkins &gt; /dev/null 2&gt;&amp;1
+                    sshpass -p &quot;$server_passwd&quot; scp -r $script_path &quot;$server_hostname@$server_ip_address&quot;:~/.jenkins/script_test &gt; /dev/null 2&gt;&amp;1
                     
                     sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
-                    cd ~/.jenkins/script
+                    cd ~/.jenkins/script_test
                     pwd
                     ./link.sh $code_dir
                     
-                    echo &quot;$cherry_picks&quot; &gt; cps 
+                    echo &quot;$cherry_picks&quot; &gt; ~/.jenkins/script/cps
                     &apos;&apos;&apos;
                 }
             }
@@ -441,11 +441,18 @@ EOF
             sh &apos;&apos;&apos;
             set +e
             cd $script_path
-            
-            # compile status: 6(build failed)
-            echo &quot;./notify_status.py $devops_compile_id 6&quot;
-            python3 notify_status.py $devops_compile_id 6
-            
+
+            # check compile status is 2(init) or 5(compiling)
+            python3 notify_status.py $devops_compile_id 2 check
+            is_init=$?
+            python3 notify_status.py $devops_compile_id 5 check
+            is_compiling=$?
+            if [[ &quot;$is_init&quot; == &quot;3&quot; || &quot;$is_compiling&quot; == &quot;3&quot; ]]; then
+                # compile status: 6(build failed)
+                echo &quot;./notify_status.py $devops_compile_id 6&quot;
+                python3 notify_status.py $devops_compile_id 6
+            fi
+
             # devops_server server status 0(idle)
             echo &quot;./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id&quot;
             python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
