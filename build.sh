@@ -6,10 +6,10 @@ build_action=$3
 if [ "$4" == "true" ]; then
     is_sign="-s";
 fi
-if [[ "$5" == "true" || "$build_variant" == "ota" ]]; then
+if [[ "$5" == "true" || "$build_action" == "ota" ]]; then
     is_verity="true";
 fi
-if [[ "$6" == "true" && "$build_variant" != "ota" ]]; then
+if [[ "$6" == "true" && "$build_action" != "ota" ]]; then
     is_publish="true";
 fi
 devops_host_id=$7
@@ -155,6 +155,12 @@ fi
 repo abandon auto_build
 repo start --all master
 
+# publish
+if [[ $is_test != "true" && "$is_publish" == "true" && "$build_action" != "ota" && $build_rst = "0" ]]; then
+    echo -e "\n---------------------publish---------------------\n"
+    ./publish
+fi
+
 # database option
 # table devops_server server status
 python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
@@ -175,10 +181,4 @@ else
     python3 notify_status.py $devops_compile_id 6
     echo -e "\nbuild failed\n"
     exit 5
-fi
-
-# publish
-if [[ $is_test != "true" && "$is_publish" == "true" && "$build_variant" != "ota" ]]; then
-    echo -e "\n---------------------publish---------------------\n"
-    ./publish
 fi
