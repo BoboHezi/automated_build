@@ -84,14 +84,14 @@ EOF
                 script {
                     sh '''
                     set +e
-                    sshpass -p "$server_passwd" scp -r $script_path "$server_hostname@$server_ip_address":~/.jenkins > /dev/null 2>&1
-                    
+                    sshpass -p "$server_passwd" scp -r $script_path "$server_hostname@$server_ip_address":~/.jenkins/script_test > /dev/null 2>&1
+
                     sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
-                    cd ~/.jenkins/script
+                    cd ~/.jenkins/script_test
                     pwd
                     ./link.sh $code_dir
 
-                    echo "$cherry_picks" > cps
+                    echo "$cherry_picks" > ~/.jenkins/script/cps
                     '''
                 }
             }
@@ -228,7 +228,7 @@ EOF
             is_init=$?
             python3 notify_status.py $devops_compile_id 5 check
             is_compiling=$?
-            if [[ "$is_init" == "3" || "$is_compiling" == "3" ]]; then
+            if [ "$is_init" = "3" ] || [ "$is_compiling" = "3" ]; then
                 # compile status: 6(build failed)
                 echo "./notify_status.py $devops_compile_id 6"
                 python3 notify_status.py $devops_compile_id 6

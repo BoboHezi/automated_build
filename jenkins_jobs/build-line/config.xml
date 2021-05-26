@@ -447,7 +447,7 @@ EOF
             is_init=$?
             python3 notify_status.py $devops_compile_id 5 check
             is_compiling=$?
-            if [[ &quot;$is_init&quot; == &quot;3&quot; || &quot;$is_compiling&quot; == &quot;3&quot; ]]; then
+            if [ &quot;$is_init&quot; = &quot;3&quot; ] || [ &quot;$is_compiling&quot; = &quot;3&quot; ]; then
                 # compile status: 6(build failed)
                 echo &quot;./notify_status.py $devops_compile_id 6&quot;
                 python3 notify_status.py $devops_compile_id 6
