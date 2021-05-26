@@ -214,7 +214,7 @@ def read_cps_from_file(path):
     lines = str.split(';')
     result = []
     for line in lines:
-        if not line.lstrip().startswith('#'):
+        if not line.lstrip().startswith('#') and not utils.isempty(line.strip()):
             result.append(line)
     return result
 
@@ -296,6 +296,10 @@ if __name__ == '__main__':
                         suit, local_git_name = fuzzy_match(git_name, git_name_path_dict.keys())
                         if local_git_name:
                             cmd_project[cmd] = [local_git_name, git_name_path_dict[local_git_name]]
+                # check all matched
+                if len(cps) != len(cmd_project):
+                    print('not all commands match successfully')
+                    exit(2)
                 # begin cherry-pick
                 success = 0
                 for cmd in cmd_project.keys():
@@ -313,4 +317,4 @@ if __name__ == '__main__':
                     result = cherry_pick(path, cmd)
                     print('result: %d' % result)
                     success = result if result != 0 else success
-                exit(0 if success == 0 else 1)
+                exit(0 if success == 0 else 3)

@@ -107,7 +107,15 @@ fi
 
 echo -e "\n---------------------cherry pick---------------------\n"
 # cherry pick
-python3 repo_handler.py -p ~/.jenkins/script/cps && cp_rst=$?
+python3 repo_handler.py -p ~/.jenkins/script/cps ; cp_rst=$?
+if test $cp_rst != "0"; then
+    echo -e "\ncherry-pick failed, exit\n"
+    # status: cherry-pick failed(7)
+    python3 notify_status.py $devops_compile_id 7
+    exit 7
+else
+    echo -e "\ncherry-pick success\n"
+fi
 
 echo -e "\n---------------------find---------------------\n"
 # find project
