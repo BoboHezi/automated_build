@@ -14,7 +14,7 @@ common_headers = {
     'Accept-Encoding': 'gzip, deflate',
     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
     'Connection': 'keep-alive',
-    'Content-Length': 77,
+    'Content-Length': '77',
     'Content-Type': 'application/json;charset=UTF-8',
     'Host': '192.168.151.31:8084',
     'Origin': 'http://192.168.151.31:2030',
@@ -180,12 +180,13 @@ def post(url, data, headers=common_headers):
         headers = common_headers.copy()
 
     data_str = data if isinstance(data, str) else json.dumps(data)
-    headers['Content-Length'] = len(data_str)
+    headers['Content-Length'] = str(len(data_str))
 
     try:
         r = requests.post(url, data=data_str, headers=headers)
         return r.status_code, json.loads(r.text)
     except Exception as e:
+        print('util.post Exception: %s' % e)
         return 0, None
 
 
