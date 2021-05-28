@@ -302,7 +302,7 @@ if __name__ == '__main__':
                     exit(2)
                 # begin cherry-pick
                 success = 0
-                for cmd in cmd_project.keys():
+                for cmd in cps:
                     path = ORIGIN_WORK_DIRECTORY + os.sep + cmd_project[cmd][1]
                     repo = Repo(path)
                     # git checkout .
