@@ -29,7 +29,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>admin_token</name>
           <description>do not edit</description>
-          <defaultValue>{AQAAABAAAAAwnfXAiu1w6DK9Quw29WzCNKsZxlaA0NIzMyHqDJaxkJ+pPMtrvvLbthRNjOh+h9H9XLINcxWi7dmS1J/GLuUzdg==}</defaultValue>
+          <defaultValue>{AQAAABAAAAAwkTB5PtdbBbGZYH+yCmNZQVoMoT6MyyWHSEBtRgB6qkS08VqPbyNQd0anFVzGbqSuIJAHKim3KSc3aEtEWDKZ2w==}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>jenkins_user</name>
