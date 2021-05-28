@@ -104,7 +104,7 @@ while [ $time -lt 3 ]; do
 			-k compile_build_finish_time -v &quot;$build_finish_time&quot; \
 			-w id -e $devops_compile_id
 		# update status
-		python3 notify_status.py $devops_compile_id 6
+		python3 notify_status.py $devops_compile_id 7
 		exit 0
 	fi
 

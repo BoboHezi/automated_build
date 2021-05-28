@@ -110,9 +110,9 @@ echo -e "\n---------------------cherry pick---------------------\n"
 python3 repo_handler.py -p ~/.jenkins/script/cps ; cp_rst=$?
 if test $cp_rst != "0"; then
     echo -e "\ncherry-pick failed, exit\n"
-    # status: cherry-pick failed(7)
-    python3 notify_status.py $devops_compile_id 7
-    exit 7
+    # status: cherry-pick failed(8)
+    python3 notify_status.py $devops_compile_id 8
+    exit 8
 else
     echo -e "\ncherry-pick success\n"
 fi
