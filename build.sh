@@ -138,7 +138,7 @@ fi
 
 echo -e "\n---------------------overview---------------------\n"
 # just overview
-repo overview
+repo info -o
 echo ""
 
 # database option
