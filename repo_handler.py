@@ -188,9 +188,9 @@ def handle_overview():
                 elif isinstance(heads, int):
                     reset(repo, heads)
                 repo.remotes.origin.pull()
-            checkout_cmd = ['-b', 'auto_build']
+            checkout_cmd = ['-b', 'master']
             for branch in repo.branches:
-                if branch.name == 'auto_build':
+                if branch.name == 'master':
                     checkout_cmd.remove('-b')
                     break
             repo.git.checkout(checkout_cmd)

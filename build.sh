@@ -98,7 +98,7 @@ case $build_action in
 esac
 
 echo -e "\n---------------------repo handler---------------------\n"
-repo start --all auto_build
+repo start --all master
 # 'clean code'
 if [[ "$is_test" != "true" && "$build_action" != "r" ]]; then
     python3 repo_handler.py -c
@@ -160,9 +160,6 @@ else
     ./mk -f -$build_variant $is_sign $build_project $build_action ; build_rst=$?
     # ./test_script.sh ; build_rst=$?
 fi
-
-repo abandon auto_build
-repo start --all master
 
 # publish
 if [[ $is_test != "true" && "$is_publish" == "true" && "$build_action" != "ota" && $build_rst = "0" ]]; then
