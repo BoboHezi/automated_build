@@ -34,10 +34,10 @@ def _exit(code, cursor=None):
     exit(code)
 
 
-HOST = "192.168.1.23"
+HOST = "192.168.48.105"
 PORT = 3306
 USER = "root"
-PASSWORD = "root"
+PASSWORD = "yun764946"
 
 DATABASE = "jeecg-boot242"
 TABLE = None
