@@ -202,8 +202,8 @@ EOF
             cd $script_path
 
             # compile status: 7(stoped)
-            echo "./notify_status.py $devops_compile_id 7"
-            python3 notify_status.py $devops_compile_id 7
+            echo "./notify_status.py $devops_compile_id task_stopped"
+            python3 notify_status.py $devops_compile_id task_stopped
 
             # devops_server server status 0(idle)
             echo "./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id"
@@ -224,14 +224,14 @@ EOF
             cd $script_path
 
             # check compile status is 2(init) or 5(compiling)
-            python3 notify_status.py $devops_compile_id 2 check
+            python3 notify_status.py $devops_compile_id connecting check
             is_init=$?
-            python3 notify_status.py $devops_compile_id 5 check
+            python3 notify_status.py $devops_compile_id compiling check
             is_compiling=$?
             if [ "$is_init" = "3" ] || [ "$is_compiling" = "3" ]; then
                 # compile status: 6(build failed)
-                echo "./notify_status.py $devops_compile_id 6"
-                python3 notify_status.py $devops_compile_id 6
+                echo "./notify_status.py $devops_compile_id build_failed"
+                python3 notify_status.py $devops_compile_id build_failed
             fi
 
             # devops_server server status 0(idle)

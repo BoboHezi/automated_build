@@ -2,6 +2,8 @@
 import sys
 from os import system as execulte
 
+import utils
+
 try:
     import mysql.connector
 except Exception as e:
@@ -21,7 +23,7 @@ def select_status(cursor, id):
 def _exit(code, cursor=None):
     if cursor != None:
         cursor.close()
-    print('*' * 15 + 'notify_status end' + '*' * 15)
+    utils.star_log('notify_status end', 60)
     exit(code)
 
 
@@ -31,8 +33,24 @@ USER = "root"
 PASSWORD = "yun764946"
 DATABASE = "jeecg-boot242"
 
-if (__name__ == "__main__"):
-    print('*' * 15 + 'notify_status start' + '*' * 15)
+STATUS_CODE = {
+    'success': 0,
+    'initial': 1,
+    'connecting': 2,
+    'check_fail': 3,
+    'project_not_found': 4,
+    'compiling': 5,
+    'build_failed': 6,
+    'task_stopped': 7,
+    'code_not_found': 8,
+    'cp_failed': 9,
+    'upload_failed': 10,
+    'sv_failed': 11,
+}
+
+
+if __name__ == "__main__":
+    utils.star_log('notify_status start', 60)
     if len(sys.argv) <= 2:
         print('notify_status: wrong params')
         _exit(1)
@@ -41,6 +59,11 @@ if (__name__ == "__main__"):
     compile_id = sys.argv[1]
     status = sys.argv[2]
     check = True if len(sys.argv) > 3 and sys.argv[3] == 'check' else False
+
+    if status not in STATUS_CODE:
+        print('wrong status')
+        _exit(1)
+    code = STATUS_CODE[status]
 
     # sql connect
     dev_ops_db = mysql.connector.connect(
@@ -57,7 +80,7 @@ if (__name__ == "__main__"):
     if pre_status is None:
         print('notify_status: wrong id %s' % compile_id)
         _exit(2, cursor)
-    elif str(pre_status) == status:
+    elif pre_status == code:
         print('notify_status: same status')
         _exit(3, cursor)
 
@@ -65,14 +88,11 @@ if (__name__ == "__main__"):
         _exit(0)
 
     # update
-    update_sql = ('UPDATE devops_compile SET compile_status = %s WHERE id = \'%s\'' % (status, compile_id))
+    update_sql = ('UPDATE devops_compile SET compile_status = %s WHERE id = \'%s\'' % (code, compile_id))
     cursor.execute(update_sql)
     dev_ops_db.commit()
 
     success = cursor.rowcount == 1
-    if success:
-        print('notify_status: update %s success' % status)
-    else:
-        print('notify_status: update %s failed' % status)
+    print('notify_status: update "%s" %s' % (status, 'success' if success else 'failed'))
 
     _exit(0 if success else 4, cursor)
