@@ -34,6 +34,7 @@ PASSWORD = "yun764946"
 DATABASE = "jeecg-boot242"
 
 STATUS_CODE = {
+    'queue_up': -1,
     'success': 0,
     'initial': 1,
     'connecting': 2,
