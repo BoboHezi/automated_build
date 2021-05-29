@@ -49,7 +49,7 @@ http://<user>:<user-token>@host:port/
 1. 触发job
 ```shell
 curl -X POST http://<user>:<user-token>@<jenkins-host>/job/<job-name>/build?token=<job-token>
-curl -X POST http://<user>:<user-token>@<jenkins-host>/job/<job-name>/buildWithParameters?token=<job-token>&key=value
+curl -X POST http://<user>:<user-token>@<jenkins-host>/job/<job-name>/buildWithParameters?key=value
 ```
 
 2. 查询job
@@ -70,6 +70,11 @@ curl -X POST http://<user>:<user-token>@<jenkins-host>/job/<job-name>/<job-numbe
 curl -X POST --user "<user>:<user-token>" --data-binary "@/data/config.xml" -H "Content-Type: text/xml" http://<jenkins-host>/createItem\?name\=<job-name>
 
 curl -X POST http://<user>:<user-token>@<jenkins-host>/createItem\?name\=<job-name> --data-binary "@/data/config.xml" -H "Content-Type: text/xml"
+```
+
+5. 修改job
+```shell
+curl -X POST http://<user>:<user-token>@<jenkins-host>/job/<job-name>/config.xml --data-binary "@/<job-name>/config.xml"
 ```
 
 ## Job可用环境变量
@@ -164,6 +169,7 @@ sudo pip install pycryptodome
 
 
 5. 自动cherry-pick & clean（清除高于服务器的提交节点）（0512）
+* done(0525)
 
 
 6. 统计服务器平均编译时间，自动化性能评估（0512）
