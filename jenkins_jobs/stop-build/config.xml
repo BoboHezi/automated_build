@@ -89,8 +89,8 @@ while [ $time -lt 3 ]; do
 
 	# None means ongoing
 	if [ &quot;$rst&quot; != &quot;None&quot; ]; then
-		devops_host_id=$(echo &quot;${job_info}&quot; | python -c &quot;import json, sys; obj=json.load(sys.stdin); print obj[&apos;actions&apos;][0][&apos;parameters&apos;][10][&apos;value&apos;]&quot;)
-		devops_compile_id=$(echo &quot;${job_info}&quot; | python -c &quot;import json, sys; obj=json.load(sys.stdin); print obj[&apos;actions&apos;][0][&apos;parameters&apos;][11][&apos;value&apos;]&quot;)
+		devops_host_id=$(echo &quot;${job_info}&quot; | python -c &quot;import json, sys; obj=json.load(sys.stdin); print obj[&apos;actions&apos;][0][&apos;parameters&apos;][11][&apos;value&apos;]&quot;)
+		devops_compile_id=$(echo &quot;${job_info}&quot; | python -c &quot;import json, sys; obj=json.load(sys.stdin); print obj[&apos;actions&apos;][0][&apos;parameters&apos;][12][&apos;value&apos;]&quot;)
 		echo -e &quot;\ntime: $time, devops_host_id=$devops_host_id, devops_compile_id=$devops_compile_id\n&quot;
 
 		cd $script_path
