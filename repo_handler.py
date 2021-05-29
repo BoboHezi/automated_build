@@ -49,9 +49,12 @@ def sync():
         sync_errors = {}
         for line in text.split('\n'):
             if line.startswith('error:'):
-                error_git = ORIGIN_WORK_DIRECTORY + os.sep + line.split(': ')[1]
-                error_reason = line.split(': ')[2]
-                sync_errors[error_git] = error_reason
+                try:
+                    error_git = ORIGIN_WORK_DIRECTORY + os.sep + line.split(': ')[1]
+                    error_reason = line.split(': ')[2]
+                    sync_errors[error_git] = error_reason
+                except Exception as e:
+                    print('%s\nexception: %s' % (line, e))
         # print(sync_errors)
         return sync_errors
 

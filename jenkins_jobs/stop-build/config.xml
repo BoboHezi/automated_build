@@ -40,7 +40,7 @@
         <hudson.model.StringParameterDefinition>
           <name>script_path</name>
           <description>do not edit</description>
-          <defaultValue>/home/server/.jenkins/script/</defaultValue>
+          <defaultValue>/home/server/.jenkins/script_test/</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
