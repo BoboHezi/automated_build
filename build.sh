@@ -57,15 +57,15 @@ function printBlue() {
 
 printParams
 
-# status: init(2)
-python3 notify_status.py $devops_compile_id 2
+# status: connecting(2)
+python3 notify_status.py $devops_compile_id connecting
 
 # pre-check
 # check params
 if [ -z "$build_project" ] || [ -z "$build_variant" ] || [ -z "$build_action" ] ; then
     echo -e "\nThere is a problem with the incoming parameters, please check\n"
     # status: check_fail(3)
-    python3 notify_status.py $devops_compile_id 3
+    python3 notify_status.py $devops_compile_id check_fail
     exit 2;
 fi
 
@@ -107,7 +107,15 @@ fi
 
 echo -e "\n---------------------cherry pick---------------------\n"
 # cherry pick
-python3 repo_handler.py -p ~/.jenkins/script/cps && cp_rst=$?
+python3 repo_handler.py -p ~/.jenkins/script/cps ; cp_rst=$?
+if test $cp_rst != "0"; then
+    echo -e "\ncherry-pick failed, exit\n"
+    # status: cherry-pick failed(9)
+    python3 notify_status.py $devops_compile_id cp_failed
+    exit 9
+else
+    echo -e "\ncherry-pick success\n"
+fi
 
 echo -e "\n---------------------find---------------------\n"
 # find project
@@ -115,7 +123,7 @@ find=$(find droi/ -maxdepth 3 -mindepth 3 -type d -name $build_project)
 
 if [ ! $find ]; then
     # status: project_notfound(4)
-    python3 notify_status.py $devops_compile_id 4
+    python3 notify_status.py $devops_compile_id project_not_found
     echo -e "\n$build_project not found\n"
     exit 3
 else
@@ -130,12 +138,12 @@ fi
 
 echo -e "\n---------------------overview---------------------\n"
 # just overview
-repo overview
+repo info -o
 echo ""
 
 # database option
 # status: compiling(5)
-python3 notify_status.py $devops_compile_id 5
+python3 notify_status.py $devops_compile_id compiling
 
 build_time=`date "+%Y-%m-%d %H:%M:%S"`
 python3 update_db.py -t devops_compile \
@@ -171,11 +179,11 @@ python3 update_db.py -t devops_compile \
 # build result
 if test $build_rst = "0"; then
     # status: build_success(0)
-    python3 notify_status.py $devops_compile_id 0
+    python3 notify_status.py $devops_compile_id success
     echo -e "\nbuild success\n"
 else
     # status: build_failed(6)
-    python3 notify_status.py $devops_compile_id 6
+    python3 notify_status.py $devops_compile_id build_failed
     echo -e "\nbuild failed\n"
     exit 5
 fi
