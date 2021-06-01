@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
     # update by http
     devops_token = os.getenv('DEVOPS_TOKEN')
-    print('notify_status: devops_token:\n%s' % devops_token)
+    print('notify_status: devops_token: %s' % devops_token)
     if not utils.isempty(devops_token):
         url = SET_STATUS_URL + ('?id=%s&status=%s' % (compile_id, code))
         headers = {

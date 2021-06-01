@@ -19,7 +19,6 @@ pipeline {
                     println "is_new_project: ${is_new_project}"
                     println "test_pipeline: ${test_pipeline}"
                     println "test_host: ${test_host}"
-                    println "LOCAL_SCRIPT_PATH: ${LOCAL_SCRIPT_PATH}"
                     println "sign_ftp_url: ${sign_ftp_url}"
                     println "sign_ftp_upload_username: ${sign_ftp_upload_username}"
                     println "sign_ftp_upload_passwd: ${sign_ftp_upload_passwd}"
@@ -34,6 +33,8 @@ pipeline {
                     println "sv_platform_cclist: ${sv_platform_cclist}"
                     println "sv_verity_purpose: ${sv_verity_purpose}"
                     println "publish_username: ${publish_username}"
+                    println "LOCAL_SCRIPT_PATH: ${LOCAL_SCRIPT_PATH}"
+                    println "REMOTE_SCRIPT_PATH: ${REMOTE_SCRIPT_PATH}"
                 }
             }
         }
@@ -84,7 +85,7 @@ EOF
                 script {
                     sh '''
                     set +e
-                    sshpass -p "$server_passwd" scp -r $LOCAL_SCRIPT_PATH "$server_hostname@$server_ip_address":$REMOTE_SCRIPT_PATH > /dev/null 2>&1
+                    sshpass -p "$server_passwd" scp -r $LOCAL_SCRIPT_PATH* "$server_hostname@$server_ip_address":$REMOTE_SCRIPT_PATH > /dev/null 2>&1
 
                     sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
                     cd $REMOTE_SCRIPT_PATH
@@ -99,7 +100,14 @@ EOF
         stage('build') {
             steps {
                 sh '''
+                devops_token=`cat $DEVOPS_TOKEN_FILE || echo ""`
+
                 sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
+
+                # export devops_token
+                echo "devops_token: $devops_token"
+                export DEVOPS_TOKEN=$devops_token
+                readonly DEVOPS_TOKEN
 
                 if [ ! -d "$code_dir" ]; then
                     echo "Project code directory does not exist!!!"
@@ -131,7 +139,15 @@ EOF
         stage('file-upload') {
             steps {
                 sh '''
+                devops_token=`cat $DEVOPS_TOKEN_FILE || echo ""`
+
                 sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
+
+                # export devops_token
+                echo "devops_token: $devops_token"
+                export DEVOPS_TOKEN=$devops_token
+                readonly DEVOPS_TOKEN
+
                 if [ ! -d "$code_dir" ]; then
                     echo "Project code directory does not exist!!!"
                     exit -1;
@@ -164,7 +180,15 @@ EOF
         stage('sign-verity') {
             steps {
                 sh '''
+                devops_token=`cat $DEVOPS_TOKEN_FILE || echo ""`
+
                 sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
+
+                # export devops_token
+                echo "devops_token: $devops_token"
+                export DEVOPS_TOKEN=$devops_token
+                readonly DEVOPS_TOKEN
+
                 if [ ! -d "$code_dir" ]; then
                     echo "Project code directory does not exist!!!"
                     exit -1;
@@ -198,6 +222,12 @@ EOF
         aborted {
             echo 'this build was aborted'
             sh '''
+            devops_token=`cat $DEVOPS_TOKEN_FILE || echo ""`
+            # export devops_token
+            echo "devops_token: $devops_token"
+            export DEVOPS_TOKEN=$devops_token
+            readonly DEVOPS_TOKEN
+
             set +e
             cd $LOCAL_SCRIPT_PATH
 
@@ -220,6 +250,12 @@ EOF
         failure {
             echo 'this build was failed'
             sh '''
+            devops_token=`cat $DEVOPS_TOKEN_FILE || echo ""`
+            # export devops_token
+            echo "devops_token: $devops_token"
+            export DEVOPS_TOKEN=$devops_token
+            readonly DEVOPS_TOKEN
+
             set +e
             cd $LOCAL_SCRIPT_PATH
 

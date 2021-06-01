@@ -51,7 +51,7 @@
     <hudson.tasks.Shell>
       <command>#!/usr/bin/env bash
 
-devops_token=`cat $DEVOPS_TOKEN_FILE`
+devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
 export DEVOPS_TOKEN=$devops_token
 readonly DEVOPS_TOKEN
 

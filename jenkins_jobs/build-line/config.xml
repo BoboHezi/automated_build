@@ -232,7 +232,6 @@
                     println &quot;is_new_project: ${is_new_project}&quot;
                     println &quot;test_pipeline: ${test_pipeline}&quot;
                     println &quot;test_host: ${test_host}&quot;
-                    println &quot;LOCAL_SCRIPT_PATH: ${LOCAL_SCRIPT_PATH}&quot;
                     println &quot;sign_ftp_url: ${sign_ftp_url}&quot;
                     println &quot;sign_ftp_upload_username: ${sign_ftp_upload_username}&quot;
                     println &quot;sign_ftp_upload_passwd: ${sign_ftp_upload_passwd}&quot;
@@ -247,6 +246,8 @@
                     println &quot;sv_platform_cclist: ${sv_platform_cclist}&quot;
                     println &quot;sv_verity_purpose: ${sv_verity_purpose}&quot;
                     println &quot;publish_username: ${publish_username}&quot;
+                    println &quot;LOCAL_SCRIPT_PATH: ${LOCAL_SCRIPT_PATH}&quot;
+                    println &quot;REMOTE_SCRIPT_PATH: ${REMOTE_SCRIPT_PATH}&quot;
                 }
             }
         }
@@ -297,7 +298,7 @@ EOF
                 script {
                     sh &apos;&apos;&apos;
                     set +e
-                    sshpass -p &quot;$server_passwd&quot; scp -r $LOCAL_SCRIPT_PATH &quot;$server_hostname@$server_ip_address&quot;:$REMOTE_SCRIPT_PATH &gt; /dev/null 2&gt;&amp;1
+                    sshpass -p &quot;$server_passwd&quot; scp -r $LOCAL_SCRIPT_PATH* &quot;$server_hostname@$server_ip_address&quot;:$REMOTE_SCRIPT_PATH &gt; /dev/null 2&gt;&amp;1
 
                     sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
                     cd $REMOTE_SCRIPT_PATH
@@ -312,7 +313,14 @@ EOF
         stage(&apos;build&apos;) {
             steps {
                 sh &apos;&apos;&apos;
+                devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+                
                 sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
+                
+                # export devops_token
+                echo &quot;devops_token: $devops_token&quot;
+                export DEVOPS_TOKEN=$devops_token
+                readonly DEVOPS_TOKEN
 
                 if [ ! -d &quot;$code_dir&quot; ]; then
                     echo &quot;Project code directory does not exist!!!&quot;
@@ -344,7 +352,15 @@ EOF
         stage(&apos;file-upload&apos;) {
             steps {
                 sh &apos;&apos;&apos;
+                devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+                
                 sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
+                
+                # export devops_token
+                echo &quot;devops_token: $devops_token&quot;
+                export DEVOPS_TOKEN=$devops_token
+                readonly DEVOPS_TOKEN
+                
                 if [ ! -d &quot;$code_dir&quot; ]; then
                     echo &quot;Project code directory does not exist!!!&quot;
                     exit -1;
@@ -377,7 +393,15 @@ EOF
         stage(&apos;sign-verity&apos;) {
             steps {
                 sh &apos;&apos;&apos;
+                devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+                
                 sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
+                
+                # export devops_token
+                echo &quot;devops_token: $devops_token&quot;
+                export DEVOPS_TOKEN=$devops_token
+                readonly DEVOPS_TOKEN
+                
                 if [ ! -d &quot;$code_dir&quot; ]; then
                     echo &quot;Project code directory does not exist!!!&quot;
                     exit -1;
@@ -411,6 +435,12 @@ EOF
         aborted {
             echo &apos;this build was aborted&apos;
             sh &apos;&apos;&apos;
+            devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+            # export devops_token
+            echo &quot;devops_token: $devops_token&quot;
+            export DEVOPS_TOKEN=$devops_token
+            readonly DEVOPS_TOKEN
+            
             set +e
             cd $LOCAL_SCRIPT_PATH
 
@@ -433,6 +463,12 @@ EOF
         failure {
             echo &apos;this build was failed&apos;
             sh &apos;&apos;&apos;
+            devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+            # export devops_token
+            echo &quot;devops_token: $devops_token&quot;
+            export DEVOPS_TOKEN=$devops_token
+            readonly DEVOPS_TOKEN
+            
             set +e
             cd $LOCAL_SCRIPT_PATH
 

@@ -1,0 +1,95 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.19">
+      <gitLabConnection></gitLabConnection>
+      <jobCredentialId></jobCredentialId>
+      <useAlternativeCredential>false</useAlternativeCredential>
+    </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.5">
+      <giteeConnection>Gitee</giteeConnection>
+    </com.gitee.jenkins.connection.GiteeConnectionProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>devops_username</name>
+          <description>do not edit</description>
+          <defaultValue>jenkins</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.PasswordParameterDefinition>
+          <name>devops_password</name>
+          <description>do not edit</description>
+          <defaultValue>{AQAAABAAAAAQoZUuaaPczshhx6PUxUFgSPC2NZdDzyvhK8n3ykKUEDc=}</defaultValue>
+        </hudson.model.PasswordParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>devops_backend_url</name>
+          <description>do not edit</description>
+          <defaultValue>192.168.48.105:8080</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>devops_forntend_url</name>
+          <description></description>
+          <defaultValue>192.168.48.105:3000</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>0 1 * * *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/usr/bin/env bash
+
+current=`date &quot;+%Y-%m-%d %H:%M:%S&quot;`
+timeStamp=`date -d &quot;$current&quot; +%s`
+currentTimeStamp=$((timeStamp*1000))
+
+data=&quot;{\&quot;username\&quot;:\&quot;$devops_username\&quot;,\&quot;password\&quot;:\&quot;$devops_password\&quot;,\&quot;remember_me\&quot;:true,\&quot;captcha\&quot;:\&quot;\&quot;,\&quot;checkKey\&quot;:$currentTimeStamp}&quot;
+echo &quot;data: $data&quot;
+length=${#data}
+
+response=`curl -X POST http://$devops_backend_url/jeecg-boot/sys/login \
+    --header &quot;Accept: application/json, text/plain, */*&quot; \
+    --header &quot;Accept-Encoding: utf-8&quot; \
+    --header &quot;Accept-Language: zh-CN,zh;q=0.9,en;q=0.8&quot; \
+    --header &quot;Connection: keep-alive&quot; \
+    --header &quot;Content-Length: $length&quot; \
+    --header &quot;Content-Type: application/json;charset=UTF-8&quot; \
+    --header &quot;Host: $devops_backend_url&quot; \
+    --header &quot;Origin: http://$devops_forntend_url&quot; \
+    --header &quot;Referer: http://$devops_forntend_url&quot; \
+    --header &quot;tenant_id: 0&quot; \
+    --header &quot;User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36&quot; \
+    --data &quot;$data&quot;`
+
+token=$(echo &quot;${response}&quot; | python -c &quot;import json, sys; obj=json.load(sys.stdin); print obj[&apos;result&apos;][&apos;token&apos;]&quot;)
+echo -e &quot;\ntoken: $token\n&quot;
+
+if [[ &quot;$token&quot; == &quot;&quot; ]]; then
+    echo -e &quot;token is empty&quot;
+    exit 1
+fi
+
+echo &quot;$token&quot; &gt; $DEVOPS_TOKEN_FILE
+</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>
