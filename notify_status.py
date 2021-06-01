@@ -99,7 +99,7 @@ if __name__ == "__main__":
         headers = {
             'X-Access-Token': devops_token
         }
-        http_code, response = utils.get(SET_STATUS_URL, None, headers=headers)
+        http_code, response = utils.get(url, None, headers=headers)
         if http_code == 200:
             try:
                 code = response['code']
@@ -109,6 +109,8 @@ if __name__ == "__main__":
                     _exit(0)
             except Exception as e:
                 print('notify_status: Exception %s' % e)
+        else:
+            print('notify_status: http_code: %s, response:\n%s' % (http_code, response))
 
     # update
     update_sql = ('UPDATE devops_compile SET compile_status = %s WHERE id = \'%s\'' % (code, compile_id))
