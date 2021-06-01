@@ -122,12 +122,6 @@
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>script_path</name>
-          <description>do not edit</description>
-          <defaultValue>/home/server/.jenkins/script_test/</defaultValue>
-          <trim>false</trim>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
           <name>sign_ftp_url</name>
           <description>签名包上传地址（请勿编辑）</description>
           <defaultValue>192.168.150.30</defaultValue>
@@ -238,7 +232,7 @@
                     println &quot;is_new_project: ${is_new_project}&quot;
                     println &quot;test_pipeline: ${test_pipeline}&quot;
                     println &quot;test_host: ${test_host}&quot;
-                    println &quot;script_path: ${script_path}&quot;
+                    println &quot;LOCAL_SCRIPT_PATH: ${LOCAL_SCRIPT_PATH}&quot;
                     println &quot;sign_ftp_url: ${sign_ftp_url}&quot;
                     println &quot;sign_ftp_upload_username: ${sign_ftp_upload_username}&quot;
                     println &quot;sign_ftp_upload_passwd: ${sign_ftp_upload_passwd}&quot;
@@ -289,11 +283,11 @@ EOF
                 sh &apos;&apos;&apos;
                 sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
 
-                if [ ! -d ~/.jenkins/script ]; then
-                    echo -e &quot;\ncreate path ~/.jenkins/script&quot;
-                    mkdir -p ~/.jenkins/script
+                if [ ! -d $REMOTE_SCRIPT_PATH ]; then
+                    echo -e &quot;\ncreate path $REMOTE_SCRIPT_PATH&quot;
+                    mkdir -p $REMOTE_SCRIPT_PATH
                 fi
-                cd ~/.jenkins/script
+                cd $REMOTE_SCRIPT_PATH
                 pwd
                 &apos;&apos;&apos;
             }
@@ -303,10 +297,10 @@ EOF
                 script {
                     sh &apos;&apos;&apos;
                     set +e
-                    sshpass -p &quot;$server_passwd&quot; scp -r $script_path &quot;$server_hostname@$server_ip_address&quot;:~/.jenkins/script_test &gt; /dev/null 2&gt;&amp;1
+                    sshpass -p &quot;$server_passwd&quot; scp -r $LOCAL_SCRIPT_PATH &quot;$server_hostname@$server_ip_address&quot;:$REMOTE_SCRIPT_PATH &gt; /dev/null 2&gt;&amp;1
 
                     sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
-                    cd ~/.jenkins/script_test
+                    cd $REMOTE_SCRIPT_PATH
                     pwd
                     ./link.sh $code_dir
 
@@ -418,7 +412,7 @@ EOF
             echo &apos;this build was aborted&apos;
             sh &apos;&apos;&apos;
             set +e
-            cd $script_path
+            cd $LOCAL_SCRIPT_PATH
 
             # compile status: 7(stoped)
             echo &quot;./notify_status.py $devops_compile_id task_stopped&quot;
@@ -440,7 +434,7 @@ EOF
             echo &apos;this build was failed&apos;
             sh &apos;&apos;&apos;
             set +e
-            cd $script_path
+            cd $LOCAL_SCRIPT_PATH
 
             # check compile status is 2(init) or 5(compiling)
             python3 notify_status.py $devops_compile_id connecting check

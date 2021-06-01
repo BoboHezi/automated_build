@@ -19,7 +19,7 @@ pipeline {
                     println "is_new_project: ${is_new_project}"
                     println "test_pipeline: ${test_pipeline}"
                     println "test_host: ${test_host}"
-                    println "script_path: ${script_path}"
+                    println "LOCAL_SCRIPT_PATH: ${LOCAL_SCRIPT_PATH}"
                     println "sign_ftp_url: ${sign_ftp_url}"
                     println "sign_ftp_upload_username: ${sign_ftp_upload_username}"
                     println "sign_ftp_upload_passwd: ${sign_ftp_upload_passwd}"
@@ -70,11 +70,11 @@ EOF
                 sh '''
                 sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
 
-                if [ ! -d ~/.jenkins/script ]; then
-                    echo -e "\ncreate path ~/.jenkins/script"
-                    mkdir -p ~/.jenkins/script
+                if [ ! -d $REMOTE_SCRIPT_PATH ]; then
+                    echo -e "\ncreate path $REMOTE_SCRIPT_PATH"
+                    mkdir -p $REMOTE_SCRIPT_PATH
                 fi
-                cd ~/.jenkins/script
+                cd $REMOTE_SCRIPT_PATH
                 pwd
                 '''
             }
@@ -84,10 +84,10 @@ EOF
                 script {
                     sh '''
                     set +e
-                    sshpass -p "$server_passwd" scp -r $script_path "$server_hostname@$server_ip_address":~/.jenkins/script_test > /dev/null 2>&1
+                    sshpass -p "$server_passwd" scp -r $LOCAL_SCRIPT_PATH "$server_hostname@$server_ip_address":$REMOTE_SCRIPT_PATH > /dev/null 2>&1
 
                     sshpass -p "$server_passwd" ssh -o StrictHostKeyChecking=no "$server_hostname@$server_ip_address" << EOF
-                    cd ~/.jenkins/script_test
+                    cd $REMOTE_SCRIPT_PATH
                     pwd
                     ./link.sh $code_dir
 
@@ -199,7 +199,7 @@ EOF
             echo 'this build was aborted'
             sh '''
             set +e
-            cd $script_path
+            cd $LOCAL_SCRIPT_PATH
 
             # compile status: 7(stoped)
             echo "./notify_status.py $devops_compile_id task_stopped"
@@ -221,7 +221,7 @@ EOF
             echo 'this build was failed'
             sh '''
             set +e
-            cd $script_path
+            cd $LOCAL_SCRIPT_PATH
 
             # check compile status is 2(init) or 5(compiling)
             python3 notify_status.py $devops_compile_id connecting check
