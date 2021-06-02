@@ -435,13 +435,13 @@ EOF
         aborted {
             echo &apos;this build was aborted&apos;
             sh &apos;&apos;&apos;
+            set +e
             devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
             # export devops_token
             echo &quot;devops_token: $devops_token&quot;
             export DEVOPS_TOKEN=$devops_token
             readonly DEVOPS_TOKEN
             
-            set +e
             cd $LOCAL_SCRIPT_PATH
 
             # compile status: 7(stoped)
@@ -463,13 +463,13 @@ EOF
         failure {
             echo &apos;this build was failed&apos;
             sh &apos;&apos;&apos;
+            set +e
             devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
             # export devops_token
             echo &quot;devops_token: $devops_token&quot;
             export DEVOPS_TOKEN=$devops_token
             readonly DEVOPS_TOKEN
             
-            set +e
             cd $LOCAL_SCRIPT_PATH
 
             # check compile status is 2(init) or 5(compiling)

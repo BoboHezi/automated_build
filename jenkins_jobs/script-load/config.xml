@@ -53,7 +53,7 @@ echo &quot;script_files=$script_files&quot;
 
 mkdir -p $LOCAL_SCRIPT_PATH
 for file in $script_files; do
-	cp $file $LOCAL_SCRIPT_PATH
+    cp $file $LOCAL_SCRIPT_PATH
     echo &quot;cp $file $LOCAL_SCRIPT_PATH&quot;
 done
 </command>
