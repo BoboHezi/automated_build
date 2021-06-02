@@ -53,7 +53,7 @@ STATUS_CODE = {
     'sv_failed': 11,
 }
 
-SET_STATUS_URL = 'http://192.168.48.105:8080/jeecg-boot/compile/devopsCompile/setStatusJenkins'
+SET_STATUS_URL = 'http://192.168.48.2:8082/jeecg-boot/compile/devopsCompile/setStatusJenkins'
 
 
 if __name__ == "__main__":

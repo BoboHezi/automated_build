@@ -4,7 +4,7 @@
   <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.19">
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.20">
       <gitLabConnection></gitLabConnection>
       <jobCredentialId></jobCredentialId>
       <useAlternativeCredential>false</useAlternativeCredential>
@@ -23,18 +23,18 @@
         <hudson.model.PasswordParameterDefinition>
           <name>devops_password</name>
           <description>do not edit</description>
-          <defaultValue>{AQAAABAAAAAQoZUuaaPczshhx6PUxUFgSPC2NZdDzyvhK8n3ykKUEDc=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQEugMxbWIVPIxjL9QclnYeMnkRtWl985dWMEVHVl3UAw=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>devops_backend_url</name>
           <description>do not edit</description>
-          <defaultValue>192.168.48.105:8080</defaultValue>
+          <defaultValue>192.168.48.2:8082</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>devops_forntend_url</name>
           <description></description>
-          <defaultValue>192.168.48.105:3000</defaultValue>
+          <defaultValue>192.168.48.2:8081</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
@@ -47,7 +47,7 @@
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers>
     <hudson.triggers.TimerTrigger>
-      <spec>0 1 * * *</spec>
+      <spec>H 1 * * *</spec>
     </hudson.triggers.TimerTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
