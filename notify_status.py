@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os
 import sys
+import codecs
 from os import system as execulte
 
 import utils
@@ -11,6 +12,8 @@ except Exception as e:
     print(e)
     execulte('pip install mysql-connector')
     import mysql.connector
+
+sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
 
 
 def select_status(cursor, id):
