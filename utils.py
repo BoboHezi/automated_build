@@ -190,6 +190,24 @@ def post(url, data, headers=common_headers):
         return 0, None
 
 
+def get(url, data, headers=common_headers):
+    if isempty(url):
+        return
+    if not headers or headers is common_headers:
+        headers = common_headers.copy()
+
+    if data:
+        data_str = data if isinstance(data, str) else json.dumps(data)
+        headers['Content-Length'] = str(len(data_str))
+
+    try:
+        r = requests.get(url, data=data, headers=headers)
+        return r.status_code, json.loads(r.text)
+    except Exception as e:
+        print('utils.get Exception: %s' % e)
+        return 0, None
+
+
 def removedirs(file):
     if isempty(file) or not path.exists(file):
         return False

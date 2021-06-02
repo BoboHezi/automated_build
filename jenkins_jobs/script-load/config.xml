@@ -4,7 +4,7 @@
   <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.19">
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.20">
       <gitLabConnection></gitLabConnection>
       <jobCredentialId></jobCredentialId>
       <useAlternativeCredential>false</useAlternativeCredential>
@@ -13,7 +13,7 @@
       <giteeConnection>Gitee</giteeConnection>
     </com.gitee.jenkins.connection.GiteeConnectionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.7.0">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.7.1">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -46,18 +46,15 @@
       <command>#!/usr/bin/env bash
 
 pwd
-path=&apos;/home/server/.jenkins/workspace/script-load&apos;
-cd $path
-pwd
 
 script_files=`find -type f -regex &apos;.*\.sh\|.*\.py&apos;`
 
 echo &quot;script_files=$script_files&quot;
 
-mkdir -p /home/server/.jenkins/script/
+mkdir -p $LOCAL_SCRIPT_PATH
 for file in $script_files; do
-	cp $file /home/server/.jenkins/script/
-    echo &quot;cp $file /home/server/.jenkins/script/&quot;
+    cp $file $LOCAL_SCRIPT_PATH
+    echo &quot;cp $file $LOCAL_SCRIPT_PATH&quot;
 done
 </command>
       <configuredLocalRules/>

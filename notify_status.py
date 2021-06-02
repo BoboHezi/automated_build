@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import os
 import sys
 from os import system as execulte
 
@@ -49,6 +50,8 @@ STATUS_CODE = {
     'sv_failed': 11,
 }
 
+SET_STATUS_URL = 'http://192.168.48.105:8080/jeecg-boot/compile/devopsCompile/setStatusJenkins'
+
 
 if __name__ == "__main__":
     utils.star_log('notify_status start', 60)
@@ -87,6 +90,27 @@ if __name__ == "__main__":
 
     if check:
         _exit(0)
+
+    # update by http
+    devops_token = os.getenv('DEVOPS_TOKEN')
+    print('notify_status: devops_token: %s' % devops_token)
+    if not utils.isempty(devops_token):
+        url = SET_STATUS_URL + ('?id=%s&status=%s' % (compile_id, code))
+        headers = {
+            'X-Access-Token': devops_token
+        }
+        http_code, response = utils.get(url, None, headers=headers)
+        if http_code == 200:
+            try:
+                code = response['code']
+                success = response['success']
+                if code == 200 and success:
+                    print('notify_status: update "%s" success' % status)
+                    _exit(0)
+            except Exception as e:
+                print('notify_status: Exception %s' % e)
+        else:
+            print('notify_status: http_code: %s, response:\n%s' % (http_code, response))
 
     # update
     update_sql = ('UPDATE devops_compile SET compile_status = %s WHERE id = \'%s\'' % (code, compile_id))

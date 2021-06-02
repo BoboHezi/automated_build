@@ -12,7 +12,7 @@
   <description>编译线</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.19">
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.20">
       <gitLabConnection></gitLabConnection>
       <jobCredentialId></jobCredentialId>
       <useAlternativeCredential>false</useAlternativeCredential>
@@ -121,12 +121,6 @@
           <description>是否用来测试主机</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>script_path</name>
-          <description>do not edit</description>
-          <defaultValue>/home/server/.jenkins/script</defaultValue>
-          <trim>false</trim>
-        </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sign_ftp_url</name>
           <description>签名包上传地址（请勿编辑）</description>
@@ -238,7 +232,6 @@
                     println &quot;is_new_project: ${is_new_project}&quot;
                     println &quot;test_pipeline: ${test_pipeline}&quot;
                     println &quot;test_host: ${test_host}&quot;
-                    println &quot;script_path: ${script_path}&quot;
                     println &quot;sign_ftp_url: ${sign_ftp_url}&quot;
                     println &quot;sign_ftp_upload_username: ${sign_ftp_upload_username}&quot;
                     println &quot;sign_ftp_upload_passwd: ${sign_ftp_upload_passwd}&quot;
@@ -253,6 +246,8 @@
                     println &quot;sv_platform_cclist: ${sv_platform_cclist}&quot;
                     println &quot;sv_verity_purpose: ${sv_verity_purpose}&quot;
                     println &quot;publish_username: ${publish_username}&quot;
+                    println &quot;LOCAL_SCRIPT_PATH: ${LOCAL_SCRIPT_PATH}&quot;
+                    println &quot;REMOTE_SCRIPT_PATH: ${REMOTE_SCRIPT_PATH}&quot;
                 }
             }
         }
@@ -289,11 +284,11 @@ EOF
                 sh &apos;&apos;&apos;
                 sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
 
-                if [ ! -d ~/.jenkins/script ]; then
-                    echo -e &quot;\ncreate path ~/.jenkins/script&quot;
-                    mkdir -p ~/.jenkins/script
+                if [ ! -d $REMOTE_SCRIPT_PATH ]; then
+                    echo -e &quot;\ncreate path $REMOTE_SCRIPT_PATH&quot;
+                    mkdir -p $REMOTE_SCRIPT_PATH
                 fi
-                cd ~/.jenkins/script
+                cd $REMOTE_SCRIPT_PATH
                 pwd
                 &apos;&apos;&apos;
             }
@@ -303,10 +298,10 @@ EOF
                 script {
                     sh &apos;&apos;&apos;
                     set +e
-                    sshpass -p &quot;$server_passwd&quot; scp -r $script_path &quot;$server_hostname@$server_ip_address&quot;:~/.jenkins &gt; /dev/null 2&gt;&amp;1
+                    sshpass -p &quot;$server_passwd&quot; scp -r $LOCAL_SCRIPT_PATH* &quot;$server_hostname@$server_ip_address&quot;:$REMOTE_SCRIPT_PATH &gt; /dev/null 2&gt;&amp;1
                     
                     sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
-                    cd ~/.jenkins/script
+                    cd $REMOTE_SCRIPT_PATH
                     pwd
                     ./link.sh $code_dir
                     
@@ -318,7 +313,14 @@ EOF
         stage(&apos;build&apos;) {
             steps {
                 sh &apos;&apos;&apos;
+                devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+                
                 sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
+                
+                # export devops_token
+                echo &quot;devops_token: $devops_token&quot;
+                export DEVOPS_TOKEN=$devops_token
+                readonly DEVOPS_TOKEN
                 
                 if [ ! -d &quot;$code_dir&quot; ]; then
                     echo &quot;Project code directory does not exist!!!&quot;
@@ -350,7 +352,15 @@ EOF
         stage(&apos;file-upload&apos;) {
             steps {
                 sh &apos;&apos;&apos;
+                devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+                
                 sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
+                
+                # export devops_token
+                echo &quot;devops_token: $devops_token&quot;
+                export DEVOPS_TOKEN=$devops_token
+                readonly DEVOPS_TOKEN
+                
                 if [ ! -d &quot;$code_dir&quot; ]; then
                     echo &quot;Project code directory does not exist!!!&quot;
                     exit -1;
@@ -383,7 +393,15 @@ EOF
         stage(&apos;sign-verity&apos;) {
             steps {
                 sh &apos;&apos;&apos;
+                devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+                
                 sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
+                
+                # export devops_token
+                echo &quot;devops_token: $devops_token&quot;
+                export DEVOPS_TOKEN=$devops_token
+                readonly DEVOPS_TOKEN
+                
                 if [ ! -d &quot;$code_dir&quot; ]; then
                     echo &quot;Project code directory does not exist!!!&quot;
                     exit -1;
@@ -418,12 +436,18 @@ EOF
             echo &apos;this build was aborted&apos;
             sh &apos;&apos;&apos;
             set +e
-            cd $script_path
+            devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+            # export devops_token
+            echo &quot;devops_token: $devops_token&quot;
+            export DEVOPS_TOKEN=$devops_token
+            readonly DEVOPS_TOKEN
+            
+            cd $LOCAL_SCRIPT_PATH
             
             # compile status: 7(stoped)
             echo &quot;./notify_status.py $devops_compile_id task_stopped&quot;
             python3 notify_status.py $devops_compile_id task_stopped
-
+            
             # devops_server server status 0(idle)
             echo &quot;./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id&quot;
             python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
@@ -440,8 +464,14 @@ EOF
             echo &apos;this build was failed&apos;
             sh &apos;&apos;&apos;
             set +e
-            cd $script_path
-
+            devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+            # export devops_token
+            echo &quot;devops_token: $devops_token&quot;
+            export DEVOPS_TOKEN=$devops_token
+            readonly DEVOPS_TOKEN
+            
+            cd $LOCAL_SCRIPT_PATH
+            
             # check compile status is 2(init) or 5(compiling)
             python3 notify_status.py $devops_compile_id connecting check
             is_init=$?
@@ -452,7 +482,7 @@ EOF
                 echo &quot;./notify_status.py $devops_compile_id build_failed&quot;
                 python3 notify_status.py $devops_compile_id build_failed
             fi
-
+            
             # devops_server server status 0(idle)
             echo &quot;./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id&quot;
             python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
