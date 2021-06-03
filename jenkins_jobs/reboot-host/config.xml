@@ -107,6 +107,9 @@ if [[ $booted_time != &quot;&quot; ]]; then
     sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
     who -b
 EOF
+else
+    # mark server_status 6
+    python3 update_db.py -t devops_server -k server_status -v 6 -w id -e $devops_host_id
 fi
 </command>
       <configuredLocalRules/>
