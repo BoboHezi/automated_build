@@ -1,0 +1,117 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>重启主机</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.19">
+      <gitLabConnection></gitLabConnection>
+      <jobCredentialId></jobCredentialId>
+      <useAlternativeCredential>false</useAlternativeCredential>
+    </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.5">
+      <giteeConnection>Gitee</giteeConnection>
+    </com.gitee.jenkins.connection.GiteeConnectionProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>devops_host_id</name>
+          <description>主机ID（DevOps）</description>
+          <defaultValue>1388020874956816385</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>server_ip_address</name>
+          <description>主机IP地址</description>
+          <defaultValue>192.168.151.190</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>server_hostname</name>
+          <description>主机用户名</description>
+          <defaultValue>server</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.PasswordParameterDefinition>
+          <name>server_passwd</name>
+          <description>主机密码</description>
+          <defaultValue>{AQAAABAAAAAQSyYlrzPKwm7YlBGiLqXWVR5iA2Y0VguzeUjEsQH18Zg=}</defaultValue>
+        </hudson.model.PasswordParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/usr/bin/env bash
+
+echo -e &quot;\nserver_ip_address: $server_ip_address, server_hostname: $server_hostname\n&quot;
+
+# connect &amp; reboot
+sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
+sudo -S reboot &lt;&lt; END
+$server_passwd
+END
+EOF
+rst=$?
+
+cd $LOCAL_SCRIPT_PATH
+echo -e &quot;\nrst: $rst, current workspace: `pwd`&quot;
+
+if [[ $rst -ne 0 ]]; then
+    echo -e &quot;\nhost can not reach&quot;
+    # mark server_status 6
+    python3 update_db.py -t devops_server -k server_status -v 6 -w id -e $devops_host_id
+    exit 1
+fi
+
+# waitting...
+echo -e &quot;\nhost shutdown, waitting for boot&quot;
+
+sleep 20s
+
+time=0
+booted_time=&apos;&apos;
+while [ $time -lt 10 ]; do
+    echo -e &quot;time: $time, try ping $server_ip_address&quot;
+    ping -c 1 $server_ip_address &gt;/dev/null
+
+    if [[ $? -eq 0 ]]; then
+        echo -e &quot;\tping success, try ssh $server_ip_address&quot;
+
+        rst=$(echo &quot;&quot; | telnet $server_ip_address 22)
+        echo $rst | grep &quot;Connected&quot;
+        if [[ $? -eq 0 ]]; then
+            echo -e &quot;\tssh success&quot;
+            booted_time=`date &quot;+%Y-%m-%d %H:%M:%S&quot;`
+            break
+        fi
+    fi
+    echo -e &quot;\tfailed&quot;
+    sleep 10s
+    let &quot;time++&quot;
+done
+
+echo -e &quot;\nbooted_time: $booted_time&quot;
+
+if [[ $booted_time != &quot;&quot; ]]; then
+    # mark server_status 0 &amp; update_time
+    python3 update_db.py -t devops_server -k update_time,server_status -v &quot;$booted_time,0&quot; -w id -e $devops_host_id
+
+    sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
+    who -b
+EOF
+fi
+</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

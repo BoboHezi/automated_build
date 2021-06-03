@@ -136,7 +136,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>sign_ftp_upload_passwd</name>
           <description>签名包上传用户密码</description>
-          <defaultValue>{AQAAABAAAAAgSGjvO9hg4x7np2R8oOu021sfJoAx8axvhjYDAfxKwNEkXobhSLzoSxczyYgZeTlJ}</defaultValue>
+          <defaultValue>{AQAAABAAAACQfBkfpsYLKZidR91msY0Hjw+HCUh3TG0pbjJmcFXMZvmOte50c4SG6scU8pDn6ly+yNzy7iBopR0KFjPlV1EjmeEvCLoWX1Bntc2r7yAPcjN4gDAKWWpslHKFwKb53xHXp1V+cjkKvY2bXnnEM7SPyr7mWPVrqXrkSuDzSW26o+nXfmfH+SonAXn6RY7iewUxIhPmna8yiAdYui+pyIhAUw==}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_url</name>
@@ -153,7 +153,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>sv_platform_passwd</name>
           <description>签名验收后台登录用户密码</description>
-          <defaultValue>{AQAAABAAAAAgBYhKd0C2BhQFKC9yz7IfijthL36bXguWoToU2L08ICVAjZUQLx5CCSVNLXKvN9yf}</defaultValue>
+          <defaultValue>{AQAAABAAAACQyDpbEzRAGhqy3+QqHljzi3n0Uq7TMyTzPphH7gucUiZ88KFuSl2Sf7RKPhzgEtSk4gDUHSzgrP/R5/pj0ejyLH6srcpxtudeeRMiH0g2Lj7RiaTkBf9g2mjuCs4lQlX5gSrmlpCexJTSoiXEDgamqpNXJpq0Czya/IIQsdbPrKaVzLbaKCv5pKFiRtokLLLduBoRtC+d82aRwFrwcLaIbA==}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_terrace</name>
