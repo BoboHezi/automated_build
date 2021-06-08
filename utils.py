@@ -2,12 +2,13 @@
 import getopt
 import json
 import os
-import requests
 import sys
 from os import getcwd
 from os import path
 from os import readlink
 from re import match
+
+import requests
 
 common_headers = {
     'Accept': 'application/json, text/plain, */*',

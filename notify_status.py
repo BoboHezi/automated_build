@@ -1,7 +1,7 @@
 #!/usr/bin/python3
+import codecs
 import os
 import sys
-import codecs
 from os import system as execulte
 
 import utils
@@ -54,7 +54,6 @@ STATUS_CODE = {
 }
 
 SET_STATUS_URL = 'http://192.168.48.105:8080/jeecg-boot/compile/devopsCompile/setStatusJenkins'
-
 
 if __name__ == "__main__":
     utils.star_log('notify_status start', 60)
