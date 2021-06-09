@@ -221,7 +221,6 @@
                     println &quot;code_dir: ${code_dir}&quot;
                     println &quot;server_ip_address: ${server_ip_address}&quot;
                     println &quot;server_hostname: ${server_hostname}&quot;
-                    println &quot;server_passwd: ${server_passwd}&quot;
                     println &quot;build_variant: ${build_variant}&quot;
                     println &quot;build_sign: ${build_sign}&quot;
                     println &quot;build_action: ${build_action}&quot;
