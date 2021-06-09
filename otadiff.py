@@ -207,9 +207,7 @@ if __name__ == '__main__':
         _exit(1)
 
     # download target files
-    # before, after = download()
-    before = '/home/server/ota/R40D1-PA508DDR-MATE-128-XLJ-JX-0508-V1101_signed_verified_target_files.zip'
-    after = '/home/server/ota/R40D1-PA508DDR-MATE-128-XLJ-JX-0527-V1102_signed_verified_target_files.zip'
+    before, after = download()
     if utils.isempty(before) or utils.isempty(after):
         print('\notadiff download failed.')
         _exit(2)
