@@ -34,6 +34,9 @@ PLATFORM_CMD = {
     'SPRD_9832r': 'android_out_host/linux-x86/bin/ota_from_target_files -i $before $after update.zip'
 }
 
+BEFORE_FTP = None
+AFTER_FTP = None
+
 
 def _exit(code=0, ftp=None):
     utils.star_log('otadiff end', 60)
@@ -56,26 +59,23 @@ def dump_url(ftp_url):
 
 # download before & after target file
 def download():
-    before_ftp = dump_url(BEFORE_TARGET_FILE)
-    after_ftp = dump_url(AFTER_TARGET_FILE)
-
     # before ftp connect & login
     ftp = FTP()
-    ftp.connect(before_ftp['host'], before_ftp['port'], 30)
+    ftp.connect(BEFORE_FTP['host'], BEFORE_FTP['port'], 30)
     try:
         ftp.login(BEFORE_FTP_USERNAME, BEFORE_FTP_PASSWD)
-        print('\notadiff %s login success' % before_ftp['host'])
+        print('\notadiff %s login success' % BEFORE_FTP['host'])
     except Exception as e:
         print('\notadiff %s login failed: %s' % (BEFORE_FTP_USERNAME, e))
         return None, None
 
     # download before target file
     try:
-        ftp.cwd(before_ftp['path'])
-        before_local_file = open(before_ftp['name'], "wb")
-        print('\notadiff %s downloading...' % before_ftp['name'])
-        ftp.retrbinary('RETR %s' % before_ftp['name'], before_local_file.write)
-        print('\notadiff %s download success' % before_ftp['name'])
+        ftp.cwd(BEFORE_FTP['path'])
+        before_local_file = open(BEFORE_FTP['name'], "wb")
+        print('\notadiff %s downloading...' % BEFORE_FTP['name'])
+        ftp.retrbinary('RETR %s' % BEFORE_FTP['name'], before_local_file.write)
+        print('\notadiff %s download success' % BEFORE_FTP['name'])
     except Exception as e:
         print('\notadiff download failed: %s\n' % e)
         ftp.quit()
@@ -84,26 +84,26 @@ def download():
         before_local_file.close()
 
     # after ftp connect & login
-    if before_ftp['host'] != after_ftp['host'] or before_ftp['port'] != after_ftp[
+    if BEFORE_FTP['host'] != AFTER_FTP['host'] or BEFORE_FTP['port'] != AFTER_FTP[
         'port'] or BEFORE_FTP_USERNAME != AFTER_FTP_USERNAME or BEFORE_FTP_PASSWD != AFTER_FTP_PASSWD:
         ftp.quit()
-        ftp.connect(after_ftp['host'], after_ftp['port'], 30)
+        ftp.connect(AFTER_FTP['host'], AFTER_FTP['port'], 30)
         try:
             ftp.login(AFTER_FTP_USERNAME, AFTER_FTP_PASSWD)
-            print('\notadiff %s login success' % after_ftp['host'])
+            print('\notadiff %s login success' % AFTER_FTP['host'])
         except Exception as e:
             print('\notadiff %s login failed: %s' % (AFTER_FTP_USERNAME, e))
             return None, None
 
     # download after target file
     try:
-        ftp.cwd(after_ftp['path'])
-        print('\notadiff %s downloading...' % after_ftp['name'])
-        after_local_file = open(after_ftp['name'], "wb")
-        ftp.retrbinary('RETR %s' % after_ftp['name'], after_local_file.write)
-        print('\notadiff %s download success' % after_ftp['name'])
+        ftp.cwd(AFTER_FTP['path'])
+        print('\notadiff %s downloading...' % AFTER_FTP['name'])
+        after_local_file = open(AFTER_FTP['name'], "wb")
+        ftp.retrbinary('RETR %s' % AFTER_FTP['name'], after_local_file.write)
+        print('\notadiff %s download success' % AFTER_FTP['name'])
     except Exception as e:
-        print('\notadiff %s download failed: %s\n' % (after_ftp['name'], e))
+        print('\notadiff %s download failed: %s\n' % (AFTER_FTP['name'], e))
         return None, None
     finally:
         after_local_file.close()
@@ -112,25 +112,22 @@ def download():
 
 
 def upload_package():
-    before_ftp = dump_url(BEFORE_TARGET_FILE)
-    after_ftp = dump_url(AFTER_TARGET_FILE)
-
     # after ftp connect & login
     ftp = FTP()
-    ftp.connect(after_ftp['host'], after_ftp['port'], 30)
+    ftp.connect(AFTER_FTP['host'], AFTER_FTP['port'], 30)
     try:
         ftp.login(AFTER_FTP_USERNAME, AFTER_FTP_PASSWD)
-        print('\notadiff %s login success' % after_ftp['host'])
+        print('\notadiff %s login success' % AFTER_FTP['host'])
     except Exception as e:
         print('\notadiff %s login failed: %s' % (BEFORE_FTP_USERNAME, e))
         return None
 
-    before_verno = before_ftp['name'][0: before_ftp['name'].find('_signed_verified_target_files.zip')]
-    after_verno = after_ftp['name'][0: after_ftp['name'].find('_signed_verified_target_files.zip')]
-    upload_path = '%s%s--%s' % (after_ftp['path'], before_verno, after_verno)
+    before_verno = BEFORE_FTP['name'][0: BEFORE_FTP['name'].find('_signed_verified_target_files.zip')]
+    after_verno = AFTER_FTP['name'][0: AFTER_FTP['name'].find('_signed_verified_target_files.zip')]
+    upload_path = '%s%s--%s' % (AFTER_FTP['path'], before_verno, after_verno)
     # mkd and enter
     try:
-        if upload_path not in ftp.nlst(after_ftp['path']):
+        if upload_path not in ftp.nlst(AFTER_FTP['path']):
             ftp.mkd(upload_path)
         ftp.cwd(upload_path)
         print('\notadiff now in %s' % upload_path)
@@ -147,7 +144,7 @@ def upload_package():
         ftp.storbinary('STOR ' + path.basename(package_zip), open('package.zip', 'rb'), 1024)
         ftp.storbinary('STOR ' + path.basename(update_zip), open('update.zip', 'rb'), 1024)
         print('\notadiff upload success')
-        return 'ftp://%s@%s%s/%s' % (AFTER_FTP_USERNAME, after_ftp['host'], upload_path, package_zip)
+        return 'ftp://%s@%s%s/%s' % (AFTER_FTP_USERNAME, AFTER_FTP['host'], upload_path, package_zip)
     except Exception as e:
         print('\notadiff upload failed: %s' % e)
         return None
@@ -206,6 +203,10 @@ if __name__ == '__main__':
         print("otadiff wrong parameter")
         _exit(1)
 
+    # dump ftp url
+    BEFORE_FTP = dump_url(BEFORE_TARGET_FILE)
+    AFTER_FTP = dump_url(AFTER_TARGET_FILE)
+
     # download target files
     before, after = download()
     if utils.isempty(before) or utils.isempty(after):
@@ -242,6 +243,10 @@ if __name__ == '__main__':
     if rst != 0:
         print('\notadiff ota cmd failed' % cmd)
         _exit(5)
+
+    # remove target files
+    utils.removedirs('../%s' % BEFORE_FTP['name'])
+    utils.removedirs('../%s' % AFTER_FTP['name'])
 
     if path.isfile('package.zip') and path.isfile('update.zip'):
         package_zip_stat = os.stat('package.zip')
