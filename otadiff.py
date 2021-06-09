@@ -1,9 +1,10 @@
 #!/usr/bin/python3
+import os
 import sys
+import time
 from ftplib import FTP
 from os import path, chdir, getcwd
 from re import match
-from subprocess import Popen, PIPE, STDOUT
 
 import utils
 
@@ -110,14 +111,46 @@ def download():
     return path.abspath(before_local_file.name), path.abspath(after_local_file.name)
 
 
-def async_command(command):
-    # print(command)
-    process = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True)
-    with process.stdout:
-        for line in iter(process.stdout.readline, b''):
-            print(line.decode().strip())
-    exitcode = process.wait()
-    return process, exitcode
+def upload_package():
+    before_ftp = dump_url(BEFORE_TARGET_FILE)
+    after_ftp = dump_url(AFTER_TARGET_FILE)
+
+    # after ftp connect & login
+    ftp = FTP()
+    ftp.connect(after_ftp['host'], after_ftp['port'], 30)
+    try:
+        ftp.login(AFTER_FTP_USERNAME, AFTER_FTP_PASSWD)
+        print('\notadiff %s login success' % after_ftp['host'])
+    except Exception as e:
+        print('\notadiff %s login failed: %s' % (BEFORE_FTP_USERNAME, e))
+        return None
+
+    before_verno = before_ftp['name'][0: before_ftp['name'].find('_signed_verified_target_files.zip')]
+    after_verno = after_ftp['name'][0: after_ftp['name'].find('_signed_verified_target_files.zip')]
+    upload_path = '%s%s--%s' % (after_ftp['path'], before_verno, after_verno)
+    # mkd and enter
+    try:
+        if upload_path not in ftp.nlst(after_ftp['path']):
+            ftp.mkd(upload_path)
+        ftp.cwd(upload_path)
+        print('\notadiff now in %s' % upload_path)
+    except Exception as e:
+        print('\notadiff mkd failed: %s' % e)
+        ftp.quit()
+        return None
+
+    # upload
+    try:
+        time_mark = time.strftime('%m_%d_%H_%M', time.localtime())
+        package_zip = '%s_%s' % (time_mark, 'package.zip')
+        update_zip = '%s_%s' % (time_mark, 'update.zip')
+        ftp.storbinary('STOR ' + path.basename(package_zip), open('package.zip', 'rb'), 1024)
+        ftp.storbinary('STOR ' + path.basename(update_zip), open('update.zip', 'rb'), 1024)
+        print('\notadiff upload success')
+        return 'ftp://%s@%s%s/%s' % (AFTER_FTP_USERNAME, after_ftp['host'], upload_path, package_zip)
+    except Exception as e:
+        print('\notadiff upload failed: %s' % e)
+        return None
 
 
 if __name__ == '__main__':
@@ -167,12 +200,16 @@ if __name__ == '__main__':
 
     if utils.isempty(BEFORE_TARGET_FILE) or utils.isempty(BEFORE_FTP_USERNAME) or utils.isempty(BEFORE_FTP_PASSWD) or \
             utils.isempty(AFTER_TARGET_FILE) or utils.isempty(AFTER_FTP_USERNAME) or \
-            utils.isempty(AFTER_FTP_PASSWD) or utils.isempty(SV_PLATFORM_TERRACE):
+            utils.isempty(AFTER_FTP_PASSWD) or utils.isempty(SV_PLATFORM_TERRACE) or \
+            not BEFORE_TARGET_FILE.endswith('_signed_verified_target_files.zip') or \
+            not AFTER_TARGET_FILE.endswith('_signed_verified_target_files.zip'):
         print("otadiff wrong parameter")
         _exit(1)
 
     # download target files
-    before, after = download()
+    # before, after = download()
+    before = '/home/server/ota/R40D1-PA508DDR-MATE-128-XLJ-JX-0508-V1101_signed_verified_target_files.zip'
+    after = '/home/server/ota/R40D1-PA508DDR-MATE-128-XLJ-JX-0527-V1102_signed_verified_target_files.zip'
     if utils.isempty(before) or utils.isempty(after):
         print('\notadiff download failed.')
         _exit(2)
@@ -193,10 +230,34 @@ if __name__ == '__main__':
         print('\notadiff folder cmd not found!')
         _exit(4)
 
+    # remove package.zip & update.zip
+    utils.removedirs('package.zip')
+    utils.removedirs('update.zip')
+
     # execute
     cmd = cmd.replace('$before', before, 1).replace('$after', after, 1)
     print('\notadiff cmd: %s\n' % cmd)
-    process, rst = async_command(cmd)
+    utils.star_log('make ota start', 60)
+    process, rst = utils.async_command(cmd)
     # rst, msg = utils.execute(cmd)
+    utils.star_log('make ota end', 60)
+    if rst != 0:
+        print('\notadiff ota cmd failed' % cmd)
+        _exit(5)
 
-    print('\notadiff rst: %d' % rst)
+    if path.isfile('package.zip') and path.isfile('update.zip'):
+        package_zip_stat = os.stat('package.zip')
+        update_zip_stat = os.stat('update.zip')
+        current_time = time.time()
+
+        print('''
+        otadiff package.zip modify time: %s
+        otadiff update.zip modify time:  %s
+        otadiff current_time:            %s
+        ''' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(package_zip_stat.st_mtime)),
+               time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(update_zip_stat.st_mtime)),
+               time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_time))))
+
+        if current_time - package_zip_stat.st_mtime < 60 and current_time - update_zip_stat.st_mtime < 60:
+            package_zip_url = upload_package()
+            print('\notadiff %s' % package_zip_url)
