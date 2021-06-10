@@ -18,6 +18,8 @@ AFTER_FTP_PASSWD = 'Freeme*@HRF1012'
 
 SV_PLATFORM_TERRACE = 'SPRD_T310p_xiaolajiao_heruifeng'
 
+DEVOPS_OTA_TASK_ID = None
+
 PLATFORM_CMD = {
     'MTK_mt6737m': 'build/tools/releasetools/ota_from_target_files -s device/mediatek/build/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
     'MTK_mt6739n': 'build/tools/releasetools/ota_from_target_files -s device/mediatek/build/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
@@ -36,13 +38,37 @@ PLATFORM_CMD = {
 
 BEFORE_FTP = None
 AFTER_FTP = None
+OTA_URL = None
 
 
 def _exit(code=0, ftp=None):
+    http_notify(DEVOPS_OTA_TASK_ID, 3 if code else 0, '' if code else OTA_URL)
     utils.star_log('otadiff end', 60)
     if ftp:
         ftp.quit()
     exit(code)
+
+
+def http_notify(id, status, otaDir):
+    token = os.getenv('DEVOPS_TOKEN')
+    if not utils.isempty(token):
+        url = 'http://192.168.48.105:8080/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id=%s&status=%s&otaDir=%s' %\
+              (id, status, otaDir)
+        print('\notadiff url: %s' % url)
+        headers = {
+            'X-Access-Token': token
+        }
+        http_code, response = utils.get(url, None, headers=headers)
+        if http_code == 200:
+            try:
+                code = response['code']
+                success = response['success']
+                if code == 200 and success:
+                    print('otadiff: update "%s" success' % status)
+            except Exception as e:
+                print('otadiff: Exception %s' % e)
+        else:
+            print('otadiff: http_code: %s, response:\n%s' % (http_code, response))
 
 
 # dump info from url
@@ -160,6 +186,7 @@ if __name__ == '__main__':
     option_str += ',s-auser:'  # AFTER_FTP_USERNAME
     option_str += ',a-apasswd:'  # AFTER_FTP_PASSWD
     option_str += ',t-terrace:'  # SV_PLATFORM_TERRACE
+    option_str += ',d-id:'  # DEVOPS_OTA_TASK_ID
 
     opts = utils.dump(sys.argv[1:], option_str)
 
@@ -182,6 +209,8 @@ if __name__ == '__main__':
         AFTER_FTP_PASSWD = opts.get('-a') if opts.get('-a') else opts.get('--apasswd')
     if '-t' in opts or '--terrace' in opts:
         SV_PLATFORM_TERRACE = opts.get('-t') if opts.get('-t') else opts.get('--terrace')
+    if '-d' in opts or '--id' in opts:
+        DEVOPS_OTA_TASK_ID = opts.get('-d') if opts.get('-d') else opts.get('--id')
 
     print(
         """
@@ -192,8 +221,9 @@ if __name__ == '__main__':
         AFTER_FTP_USERNAME:    %s
         AFTER_FTP_PASSWD:      %s
         SV_PLATFORM_TERRACE:   %s
+        DEVOPS_OTA_TASK_ID:    %s
         """ % (BEFORE_TARGET_FILE, BEFORE_FTP_USERNAME, BEFORE_FTP_PASSWD, AFTER_TARGET_FILE, AFTER_FTP_USERNAME,
-               AFTER_FTP_PASSWD, SV_PLATFORM_TERRACE))
+               AFTER_FTP_PASSWD, SV_PLATFORM_TERRACE, DEVOPS_OTA_TASK_ID))
 
     if utils.isempty(BEFORE_TARGET_FILE) or utils.isempty(BEFORE_FTP_USERNAME) or utils.isempty(BEFORE_FTP_PASSWD) or \
             utils.isempty(AFTER_TARGET_FILE) or utils.isempty(AFTER_FTP_USERNAME) or \
@@ -262,5 +292,7 @@ if __name__ == '__main__':
                time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_time))))
 
         if current_time - package_zip_stat.st_mtime < 60 and current_time - update_zip_stat.st_mtime < 60:
-            package_zip_url = upload_package()
-            print('\notadiff %s' % package_zip_url)
+            OTA_URL = upload_package()
+            print('\notadiff %s' % OTA_URL)
+            _exit(0)
+    _exit(6)
