@@ -10,7 +10,7 @@ import sys
 import RepoParser
 from fuzzywuzzy import fuzz
 from git import *
-from re import search
+from re import match, search
 from RepoParser import *
 from utils import dump
 from utils import execute
@@ -50,9 +50,15 @@ def sync():
         for line in text.split('\n'):
             if line.startswith('error:'):
                 try:
-                    error_git = ORIGIN_WORK_DIRECTORY + os.sep + line.split(': ')[1]
-                    error_reason = line.split(': ')[2]
-                    sync_errors[error_git] = error_reason
+                    ptn1 = 'error:[\s]([^:]*):[\s](.*)'
+                    ptn2 = 'error:[\s]Cannot[\s]fetch[\s]([\S]*)[\s]from[\s](.*)'
+                    mth = match(ptn1, line)
+                    mth = mth if mth else match(ptn2, line)
+                    if mth:
+                        error_git = ORIGIN_WORK_DIRECTORY + os.sep + mth.group(1)
+                        error_reason = mth.group(2)
+                        sync_errors[error_git] = error_reason
+                        continue
                 except Exception as e:
                     print('%s\nexception: %s' % (line, e))
         # print(sync_errors)
@@ -83,7 +89,10 @@ def handle_sync():
             node = dump_node(repo.git.status())
             reset(repo, node[0] if isinstance(node, list) else node)
             # pull
-            repo.remotes.origin.pull()
+            try:
+                repo.remotes.origin.pull()
+            except Exception as e:
+                print('pull exception: %s' % e)
         handle_sync()
     else:
         print('sync success')
