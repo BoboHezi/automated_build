@@ -77,6 +77,12 @@
           <defaultValue>/home/server/ota</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>id</name>
+          <description>devops task id</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -91,19 +97,31 @@
     <hudson.tasks.Shell>
       <command>#!/usr/bin/env bash
 
+set +e
+
+devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+
+# copy script to host
 sshpass -p &quot;$ota_factory_host_pwd&quot; scp -r $LOCAL_SCRIPT_PATH/otadiff.py $LOCAL_SCRIPT_PATH/utils.py \
 	&quot;$ota_factory_host_user@$ota_factory_host_ip&quot;:$ota_factory_host_path
 
+# ssh connect
 sshpass -p &quot;$ota_factory_host_pwd&quot; ssh -o StrictHostKeyChecking=no &quot;$ota_factory_host_user@$ota_factory_host_ip&quot; &lt;&lt; EOF
+
+echo &quot;devops_token: $devops_token&quot;
+export DEVOPS_TOKEN=$devops_token
+readonly DEVOPS_TOKEN
 
 cd $ota_factory_host_path
 
 pwd
 
 python3 otadiff.py --bfile=&quot;$before_target_file&quot; --buser=&quot;$before_ftp_username&quot; --bpasswd=&quot;$before_ftp_passwd&quot; \
-	--afile=&quot;$after_target_file&quot; --auser=&quot;$after_ftp_username&quot; --apasswd=&quot;$after_ftp_passwd&quot; --terrace=&quot;$sv_platform_terrace&quot;
+	--afile=&quot;$after_target_file&quot; --auser=&quot;$after_ftp_username&quot; --apasswd=&quot;$after_ftp_passwd&quot; \
+    --terrace=&quot;$sv_platform_terrace&quot; --id=&quot;$id&quot;
 
-EOF</command>
+EOF
+</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>
