@@ -78,7 +78,7 @@ sleep 20s
 
 time=0
 booted_time=&apos;&apos;
-while [ $time -lt 10 ]; do
+while [ $time -lt 20 ]; do
     echo -e &quot;time: $time, try ping $server_ip_address&quot;
     ping -c 1 $server_ip_address &gt;/dev/null
 

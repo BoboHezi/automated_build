@@ -44,13 +44,13 @@ if __name__ == '__main__':
         FTP_PWD = ftp_pwd if ftp_pwd else FTP_PWD
 
     print(
-            """
-            PROJECT_NAME: %s
-            ZIP_FILE:     %s
-            FTP_HOST:     %s
-            FTP_USER:     %s
-            FTP_PWD:      %s
-            """ % (PROJECT_NAME, ZIP_FILE, FTP_HOST, FTP_USER, FTP_PWD))
+        """
+        PROJECT_NAME: %s
+        ZIP_FILE:     %s
+        FTP_HOST:     %s
+        FTP_USER:     %s
+        FTP_PWD:      %s
+        """ % (PROJECT_NAME, ZIP_FILE, FTP_HOST, FTP_USER, FTP_PWD))
 
     if not PROJECT_NAME:
         print('upload_ftp must specify project(use -p or --project)\n')

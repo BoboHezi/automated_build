@@ -8,7 +8,6 @@ pipeline {
                     println "code_dir: ${code_dir}"
                     println "server_ip_address: ${server_ip_address}"
                     println "server_hostname: ${server_hostname}"
-                    println "server_passwd: ${server_passwd}"
                     println "build_variant: ${build_variant}"
                     println "build_sign: ${build_sign}"
                     println "build_action: ${build_action}"

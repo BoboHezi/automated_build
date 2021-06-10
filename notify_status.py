@@ -1,7 +1,7 @@
 #!/usr/bin/python3
+import codecs
 import os
 import sys
-import codecs
 from os import system as execulte
 
 import utils

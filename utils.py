@@ -2,12 +2,14 @@
 import getopt
 import json
 import os
-import requests
 import sys
 from os import getcwd
 from os import path
 from os import readlink
 from re import match
+from subprocess import Popen, PIPE, STDOUT
+
+import requests
 
 common_headers = {
     'Accept': 'application/json, text/plain, */*',
@@ -32,6 +34,16 @@ def getstatusoutput(cmd):
     if sts is None: sts = 0
     if text[-1:] == '\n': text = text[:-1]
     return sts, text
+
+
+def async_command(command):
+    # print(command)
+    process = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True)
+    with process.stdout:
+        for line in iter(process.stdout.readline, b''):
+            print(line.decode().strip())
+    exitcode = process.wait()
+    return process, exitcode
 
 
 class ProjectInfo(object):
