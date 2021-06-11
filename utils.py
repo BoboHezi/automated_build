@@ -147,18 +147,20 @@ def dump_platform(folder=getcwd()):
         return None
     # check MTK or SPRD
     manifest = folder + '/.repo/manifest.xml'
-    if not (path.exists(manifest) and path.islink(manifest)):
+    if not path.exists(manifest):
         return None
-    source = readlink(manifest)
     PLATFORM = None
-    if 'SPRD' in source:
-        PLATFORM = 'SPRD'
-    elif 'MTK' in source:
-        PLATFORM = 'MTK'
-    elif path.exists(folder + '/vendor/sprd'):
-        PLATFORM = 'SPRD'
-    elif path.exists(folder + '/vendor/mediatek'):
-        PLATFORM = 'MTK'
+    if path.islink(manifest):
+        source = readlink(manifest)
+        if 'SPRD' in source:
+            PLATFORM = 'SPRD'
+        elif 'MTK' in source:
+            PLATFORM = 'MTK'
+    if not PLATFORM:
+        if path.exists(folder + '/vendor/sprd'):
+            PLATFORM = 'SPRD'
+        elif path.exists(folder + '/vendor/mediatek'):
+            PLATFORM = 'MTK'
     return PLATFORM
 
 
