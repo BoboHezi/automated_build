@@ -510,8 +510,6 @@ if __name__ == '__main__':
         -v "%s,%s,%s" \
         -w id -e %s' % (SV_FTP_PATH, sign_task_data['id'], verity_task_id, DEVOPS_COMPILE_ID)
     print('commit_sign_verify update_db cmd:\n%s\n' % cmd)
-    rst, msg = utils.execute(cmd)
-    utils.star_log('', 100)
-    print('rst: %s, msg:\n%s' % (rst, msg))
-    utils.star_log('', 100)
+    process, rst = utils.async_command(cmd)
+    print('commit_sign_verify rst: %s' % rst)
     _exit(0)
