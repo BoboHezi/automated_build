@@ -99,8 +99,8 @@ def download():
 
     # download before target file
     try:
-        ftp.cwd(BEFORE_FTP['path'])
         before_local_file = open(BEFORE_FTP['name'], "wb")
+        ftp.cwd(BEFORE_FTP['path'])
         print('\notadiff %s downloading...' % BEFORE_FTP['name'])
         ftp.retrbinary('RETR %s' % BEFORE_FTP['name'], before_local_file.write)
         print('\notadiff %s download success' % BEFORE_FTP['name'])
@@ -125,9 +125,9 @@ def download():
 
     # download after target file
     try:
+        after_local_file = open(AFTER_FTP['name'], "wb")
         ftp.cwd(AFTER_FTP['path'])
         print('\notadiff %s downloading...' % AFTER_FTP['name'])
-        after_local_file = open(AFTER_FTP['name'], "wb")
         ftp.retrbinary('RETR %s' % AFTER_FTP['name'], after_local_file.write)
         print('\notadiff %s download success' % AFTER_FTP['name'])
     except Exception as e:

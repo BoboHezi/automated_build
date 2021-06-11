@@ -187,3 +187,4 @@ sudo pip install pycryptodome
 
 
 8. 编译OTA(0603)
+* done(0611)
