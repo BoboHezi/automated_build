@@ -44,6 +44,8 @@ SV_BUILD_VERITY = False
 SV_FTP_PUBLISH_USERNAME = None
 # 验收用途
 SV_VERITY_PURPOSE = 'official'
+# 编译任务ID
+DEVOPS_COMPILE_ID = None
 
 TOKEN = None
 
@@ -297,6 +299,7 @@ if __name__ == '__main__':
     option_str += ',v-verity'  # SV_BUILD_VERITY
     option_str += ',i-publish:'  # SV_FTP_PUBLISH_USERNAME
     option_str += ',e-purpose:'  # SV_VERITY_PURPOSE
+    option_str += ',d-id:'  # DEVOPS_COMPILE_ID
     opts = utils.dump(sys.argv[1:], option_str)
     # print(opts)
 
@@ -332,6 +335,8 @@ if __name__ == '__main__':
         SV_FTP_PUBLISH_USERNAME = opts.get('-i') if opts.get('-i') else opts.get('--publish')
     if '-e' in opts or '--purpose' in opts:
         SV_VERITY_PURPOSE = opts.get('-e') if opts.get('-e') else opts.get('--purpose')
+    if '-d' in opts or '--id' in opts:
+        DEVOPS_COMPILE_ID = opts.get('-d') if opts.get('-d') else opts.get('--id')
 
     print('''
     PROJECT_NAME:            %s
@@ -347,9 +352,10 @@ if __name__ == '__main__':
     SV_ODM_CUSTOMER:         %s
     SV_BUILD_VERITY:         %s
     SV_FTP_PUBLISH_USERNAME: %s
+    DEVOPS_COMPILE_ID:       %s
     ''' % (PROJECT_NAME, SV_FTP_PATH, SV_URL, SV_USERNAME, SV_PASSWD,
            SV_PLATFORM, SV_BOARD, SV_CCLIST, SV_MODEL, SV_BRAND_CUSTOMER,
-           SV_ODM_CUSTOMER, SV_BUILD_VERITY, SV_FTP_PUBLISH_USERNAME))
+           SV_ODM_CUSTOMER, SV_BUILD_VERITY, SV_FTP_PUBLISH_USERNAME, DEVOPS_COMPILE_ID))
 
     if not (PROJECT_NAME and SV_FTP_PATH):
         print('commit_sign_verify miss importent parameter\n')
@@ -498,4 +504,12 @@ if __name__ == '__main__':
 
         if start_status == 200 and start_response['code'] == 1000 and start_response['msg'] == 'SUCCESS':
             print('commit_sign_verify sign task %s started!\n' % sign_task_data['id'])
+
+    cmd = 'python3 update_db.py -t devops_compile \
+        -k "compile_sign_ftp_url,compile_sign_id,compile_verity_id" \
+        -v "%s,%s,%s" \
+        -w id -e %s' % (SV_FTP_PATH, sign_task_data['id'], verity_task_id, DEVOPS_COMPILE_ID)
+    print('commit_sign_verify update_db cmd:\n%s\n' % cmd)
+    process, rst = utils.async_command(cmd)
+    print('commit_sign_verify rst: %s' % rst)
     _exit(0)

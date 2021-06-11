@@ -424,7 +424,7 @@ EOF
                     exit -2
                 fi
                 
-                bash sign_verify.sh &quot;$project_name&quot; &quot;$sv_platform_url&quot; &quot;$sv_platform_username&quot; &quot;$sv_platform_passwd&quot; &quot;$sv_platform_terrace&quot; &quot;$sv_platform_board&quot; &quot;$sv_platform_cclist&quot; &quot;$sv_platform_model&quot; &quot;$sv_platform_brand&quot; &quot;$sv_platform_odm&quot; &quot;$publish_username&quot; &quot;$build_verity&quot; &quot;$sv_verity_purpose&quot;
+                bash sign_verify.sh &quot;$project_name&quot; &quot;$sv_platform_url&quot; &quot;$sv_platform_username&quot; &quot;$sv_platform_passwd&quot; &quot;$sv_platform_terrace&quot; &quot;$sv_platform_board&quot; &quot;$sv_platform_cclist&quot; &quot;$sv_platform_model&quot; &quot;$sv_platform_brand&quot; &quot;$sv_platform_odm&quot; &quot;$publish_username&quot; &quot;$build_verity&quot; &quot;$sv_verity_purpose&quot; &quot;$devops_compile_id&quot;
                 &apos;&apos;&apos;
             }
         }

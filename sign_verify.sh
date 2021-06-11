@@ -13,6 +13,7 @@ sv_platform_odm=${10}
 publish_username=${11}
 build_verity=${12}
 sv_verity_purpose=${13}
+devops_compile_id=${14}
 
 if [ -f ftp_url.txt ]; then
     ftp_url=$(cat ftp_url.txt)
@@ -23,7 +24,7 @@ if [ -f ftp_url.txt ]; then
     -t \"$sv_platform_terrace\" -b \"$sv_platform_board\" \
     -l \"$sv_platform_cclist\" -m \"$sv_platform_model\" \
     -r \"$sv_platform_brand\" -o \"$sv_platform_odm\" \
-    -i \"$publish_username\" -e \"$sv_verity_purpose\""
+    -i \"$publish_username\" -e \"$sv_verity_purpose\" -d \"$devops_compile_id\""
 
     if [ "$build_verity" == "true" ]; then
         argv="$argv -v"
