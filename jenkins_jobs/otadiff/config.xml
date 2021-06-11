@@ -29,7 +29,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>before_ftp_passwd</name>
           <description>起始包登录密码</description>
-          <defaultValue>{AQAAABAAAAAQeNGhbqzUuRlia4VOZ7ppVmuxUMn7C8dHwRJb4ZvIwDE=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQyiySVoKS95bcR7j58KtSoT3X6K+MgGIzGalq4Zkc08s=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>after_target_file</name>
@@ -121,6 +121,15 @@ python3 otadiff.py --bfile=&quot;$before_target_file&quot; --buser=&quot;$before
     --terrace=&quot;$sv_platform_terrace&quot; --id=&quot;$id&quot;
 
 EOF
+
+rst=$?
+
+echo &quot;rst: $rst&quot;
+
+if [[ $rst != 0 ]]; then
+	curl -H X-Access-Token:&quot;$devops_token&quot; -X GET \
+    	http://192.168.48.105:8080/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id\=$id\&amp;status\=3\&amp;otaDir\=
+fi
 </command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
