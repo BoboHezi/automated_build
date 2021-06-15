@@ -73,16 +73,17 @@ def http_notify(id, status, otaDir):
 
 # dump info from url
 def dump_url(ftp_url):
-    ftp_url_ptn = '^ftp://([^/|^:]*)(:[\d]*)?/(.*/)?(.*\.zip)'
+    ftp_url_ptn = '^ftp://([^/|^:]*)(:[\d]+)?/(.*/)?(.*\.zip)'
     matchObj = match(ftp_url_ptn, ftp_url)
-    host = matchObj.group(1) if matchObj else None
-    if '@' in host:
-        host = host.split('@')[1]
-    port = int(matchObj.group(2)) if matchObj.group(2) else 21 if matchObj else 21
-    path = matchObj.group(3) if matchObj.group(3) else None if matchObj else None
-    name = matchObj.group(4) if matchObj.group(4) else None if matchObj else None
-    path = '/' if utils.isempty(path) else '/%s' % path
-    return {'host': host, 'port': port, 'path': path, "name": name}
+    if matchObj:
+        host = matchObj.group(1) if matchObj.group(1) else None
+        if host and '@' in host:
+            host = host.split('@')[1]
+        port = int(matchObj.group(2)[1:]) if matchObj.group(2) and len(matchObj.group(2)) > 1 else 21
+        path = matchObj.group(3) if matchObj.group(3) else None
+        path = '/' if utils.isempty(path) else '/%s' % path
+        name = matchObj.group(4) if matchObj.group(4) else None
+        return {'host': host, 'port': port, 'path': path, "name": name}
 
 
 # download before & after target file
