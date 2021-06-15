@@ -230,8 +230,8 @@ if __name__ == '__main__':
     if utils.isempty(BEFORE_TARGET_FILE) or utils.isempty(BEFORE_FTP_USERNAME) or utils.isempty(BEFORE_FTP_PASSWD) or \
             utils.isempty(AFTER_TARGET_FILE) or utils.isempty(AFTER_FTP_USERNAME) or \
             utils.isempty(AFTER_FTP_PASSWD) or utils.isempty(SV_PLATFORM_TERRACE) or \
-            not BEFORE_TARGET_FILE.endswith('_signed_verified_target_files.zip') or \
-            not AFTER_TARGET_FILE.endswith('_signed_verified_target_files.zip'):
+            not BEFORE_TARGET_FILE.endswith('_target_files.zip') or \
+            not AFTER_TARGET_FILE.endswith('_target_files.zip'):
         print("otadiff wrong parameter")
         _exit(1)
 
