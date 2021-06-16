@@ -26,6 +26,7 @@ PLATFORM_CMD = {
     'MTK_mt6750n': 'build/tools/releasetools/ota_from_target_files -s device/mediatek/build/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
     'MTK_mt6758n': 'build/tools/releasetools/ota_from_target_files -s device/mediatek/build/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
     'MTK_mt6763o': 'build/tools/releasetools/ota_from_target_files -s vendor/mediatek/proprietary/scripts/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
+    'MTK_mt6757p': 'build/tools/releasetools/ota_from_target_files --block -i $before $after update.zip',
     'MTK_mt6761p': 'build/tools/releasetools/ota_from_target_files --block -i $before $after update.zip',
     'SPRD_T310p': 'build/tools/releasetools/ota_from_target_files --block -i $before $after update.zip',
     'SPRD_T7510p': 'build/tools/releasetools/ota_from_target_files --block -i $before $after update.zip',
