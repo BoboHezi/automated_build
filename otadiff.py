@@ -53,8 +53,8 @@ def _exit(code=0, ftp=None):
 def http_notify(id, status, otaDir):
     token = os.getenv('DEVOPS_TOKEN')
     if not utils.isempty(token):
-        url = 'http://192.168.48.2:8082/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id=%s&status=%s&otaDir=%s' %\
-              (id, status, otaDir)
+        url = '%s%s?id=%s&status=%s&otaDir=%s' %\
+              (utils.DEVOPS_HTTP_URL, utils.OTA_STATUS_PATH, id, status, otaDir)
         print('\notadiff url: %s' % url)
         headers = {
             'X-Access-Token': token
@@ -152,8 +152,16 @@ def upload_package():
         print('\notadiff %s login failed: %s' % (BEFORE_FTP_USERNAME, e))
         return None
 
-    before_verno = BEFORE_FTP['name'][0: BEFORE_FTP['name'].find('_signed_verified_target_files.zip')]
-    after_verno = AFTER_FTP['name'][0: AFTER_FTP['name'].find('_signed_verified_target_files.zip')]
+    suf_index = BEFORE_FTP['name'].find('_signed_verified_target_files.zip')
+    suf_index = suf_index if suf_index != -1 else BEFORE_FTP['name'].find('_signed_target_files.zip')
+    suf_index = suf_index if suf_index != -1 else BEFORE_FTP['name'].find('_target_files.zip')
+    suf_index = suf_index if suf_index != -1 else len(BEFORE_FTP['name'])
+    before_verno = BEFORE_FTP['name'][0: suf_index]
+    suf_index = AFTER_FTP['name'].find('_signed_verified_target_files.zip')
+    suf_index = suf_index if suf_index != -1 else AFTER_FTP['name'].find('_signed_target_files.zip')
+    suf_index = suf_index if suf_index != -1 else AFTER_FTP['name'].find('_target_files.zip')
+    suf_index = suf_index if suf_index != -1 else len(AFTER_FTP['name'])
+    after_verno = AFTER_FTP['name'][0: suf_index]
     upload_path = '%s%s--%s' % (AFTER_FTP['path'], before_verno, after_verno)
     # mkd and enter
     try:

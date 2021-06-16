@@ -2,6 +2,7 @@
 import sys
 from os import system as execulte
 
+import utils
 from utils import dump
 
 try:
@@ -34,12 +35,7 @@ def _exit(code, cursor=None):
     exit(code)
 
 
-HOST = "192.168.1.23"
-PORT = 3306
-USER = "root"
-PASSWORD = "root"
-
-DATABASE = "jeecg-boot242"
+DATABASE = utils.DB_DATABASE
 TABLE = None
 KEYS = None
 VALUES = None
@@ -115,10 +111,10 @@ if __name__ == "__main__":
 
     # sql connect
     db_connect = mysql.connector.connect(
-        host=HOST,
-        port=PORT,
-        user=USER,
-        passwd=PASSWORD,
+        host=utils.DB_HOST,
+        port=utils.DB_PORT,
+        user=utils.DB_USER,
+        passwd=utils.DB_PASSWORD,
         database=DATABASE
     )
     cursor = db_connect.cursor()

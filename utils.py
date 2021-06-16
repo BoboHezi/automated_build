@@ -11,6 +11,17 @@ from subprocess import Popen, PIPE, STDOUT
 
 import requests
 
+# url
+DEVOPS_HTTP_URL = 'http://192.168.48.2:8082'
+COMPILE_STATUS_PATH = '/jeecg-boot/compile/devopsCompile/setStatusJenkins'
+OTA_STATUS_PATH = '/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus'
+# database
+DB_HOST = "192.168.1.23"
+DB_PORT = 3306
+DB_USER = "root"
+DB_PASSWORD = "root"
+DB_DATABASE = "jeecg-boot242"
+
 common_headers = {
     'Accept': 'application/json, text/plain, */*',
     'Accept-Encoding': 'gzip, deflate',
