@@ -29,7 +29,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>before_ftp_passwd</name>
           <description>起始包登录密码</description>
-          <defaultValue>{AQAAABAAAABAd/I0/pp03KEQtIBv3LLnshPvKV1CJzEtI3fxPE2wR0yANLhYHWIFtw/JZl6k3V/Pdy0JrMCcilZ8PccWBflWjWvkoNlJtadhE+nh6jdSysg=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQYx928/QXyWSFoBsDKm0XAOUwe066dycYSVXwtQf9XiY=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>after_target_file</name>
@@ -46,7 +46,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>after_ftp_passwd</name>
           <description>目标包登录密码</description>
-          <defaultValue>{AQAAABAAAABAojp+4HI/cYImmudONRKlqeC/pPS837Pi59SJw886fR0xE68OpMEXb30bUpMouVbXEKPNH6lRQEnrHbO67U/ISfhSrlzN9EbL0XDORd1H83w=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQBOaby77ckTan9aXH9oSFZQmZ2Sm7NSjQVLc7ZdNmTmo=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_terrace</name>
@@ -69,7 +69,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>ota_factory_host_pwd</name>
           <description>do not edit</description>
-          <defaultValue>{AQAAABAAAAAQv6gkQP9HLdfCStbbCYXQOX00e63otmTheG4MMjLNPfw=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQS/A91WMPTTIVlzGUXB/Hbs3GPemCKaVeYCxin/00VZ8=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>ota_factory_host_path</name>

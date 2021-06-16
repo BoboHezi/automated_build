@@ -35,7 +35,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>server_passwd</name>
           <description>主机密码</description>
-          <defaultValue>{AQAAABAAAAAQGvFwL+eP6FH/5ZCPLQ2fsRV36WJPpomX/yzY8Ngn+YM=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQfuofLuSe4o3j7Pm8kg9Quv7XS/gjb7kwZELYCRx5E0o=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>

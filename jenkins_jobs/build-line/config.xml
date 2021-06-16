@@ -49,7 +49,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>server_passwd</name>
           <description>编译服务器，SSH密码</description>
-          <defaultValue>{AQAAABAAAAAQc0jBGdWAQQVYAZKAArCjENR/rZc2G48vg32ptE0IP3Y=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQ5pw93DNtTXAnh/GGikbDLFlD5fUXrD8jqFmhYRRrykM=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>build_variant</name>
@@ -136,7 +136,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>sign_ftp_upload_passwd</name>
           <description>签名包上传用户密码</description>
-          <defaultValue>{AQAAABAAAAAgSGjvO9hg4x7np2R8oOu021sfJoAx8axvhjYDAfxKwNEkXobhSLzoSxczyYgZeTlJ}</defaultValue>
+          <defaultValue>{AQAAABAAAAAgL5ZcOCzLL1ddb+3P8wijuJwb6EI5mi5sbD9G0jBnTcj9Z933VdNKNcWKqi5kLAGX}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_url</name>
@@ -153,7 +153,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>sv_platform_passwd</name>
           <description>签名验收后台登录用户密码</description>
-          <defaultValue>{AQAAABAAAAAgBYhKd0C2BhQFKC9yz7IfijthL36bXguWoToU2L08ICVAjZUQLx5CCSVNLXKvN9yf}</defaultValue>
+          <defaultValue>{AQAAABAAAAAgP/lMaSV+qJ3jQ0SUZrlUoy4YjNAoQtyu/1IG3ELIfSwdSI6vp5+rvJ9SfscPBJtH}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_terrace</name>

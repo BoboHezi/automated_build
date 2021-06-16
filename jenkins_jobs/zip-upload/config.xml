@@ -49,7 +49,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>server_passwd</name>
           <description>编译服务器，SSH密码</description>
-          <defaultValue>{AQAAABAAAAAQYnx5THBHrqMujklv1jY4rvzkeYU+nsJbuhZYOOjjc/0=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQUAe+yE7L+/diu6VPLob1t/u4P/e8qDV+oOu1qN3U93w=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>zip_file</name>
@@ -72,7 +72,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>ftp_user_passwd</name>
           <description>指定上传ftp用户密码</description>
-          <defaultValue>{AQAAABAAAAAgp2o2QhGX00s1gG3ArmSPtm0dAvc8YjPg8+QR4ZYPesFl1qJsJvP8Eji44J6t6RV+}</defaultValue>
+          <defaultValue>{AQAAABAAAAAghqzlK+sR5HtYA/rpFMERRBoNGlfYnKsRH35QBrnc4WyMg20ubWHohmgpLSIUK/n8}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>script_path</name>
