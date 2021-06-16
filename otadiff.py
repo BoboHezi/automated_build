@@ -26,6 +26,7 @@ PLATFORM_CMD = {
     'MTK_mt6750n': 'build/tools/releasetools/ota_from_target_files -s device/mediatek/build/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
     'MTK_mt6758n': 'build/tools/releasetools/ota_from_target_files -s device/mediatek/build/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
     'MTK_mt6763o': 'build/tools/releasetools/ota_from_target_files -s vendor/mediatek/proprietary/scripts/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
+    'MTK_mt6757p': 'build/tools/releasetools/ota_from_target_files --block -i $before $after update.zip',
     'MTK_mt6761p': 'build/tools/releasetools/ota_from_target_files --block -i $before $after update.zip',
     'SPRD_T310p': 'build/tools/releasetools/ota_from_target_files --block -i $before $after update.zip',
     'SPRD_T7510p': 'build/tools/releasetools/ota_from_target_files --block -i $before $after update.zip',
@@ -151,8 +152,16 @@ def upload_package():
         print('\notadiff %s login failed: %s' % (BEFORE_FTP_USERNAME, e))
         return None
 
-    before_verno = BEFORE_FTP['name'][0: BEFORE_FTP['name'].find('_signed_verified_target_files.zip')]
-    after_verno = AFTER_FTP['name'][0: AFTER_FTP['name'].find('_signed_verified_target_files.zip')]
+    suf_index = BEFORE_FTP['name'].find('_signed_verified_target_files.zip')
+    suf_index = suf_index if suf_index != -1 else BEFORE_FTP['name'].find('_signed_target_files.zip')
+    suf_index = suf_index if suf_index != -1 else BEFORE_FTP['name'].find('_target_files.zip')
+    suf_index = suf_index if suf_index != -1 else len(BEFORE_FTP['name'])
+    before_verno = BEFORE_FTP['name'][0: suf_index]
+    suf_index = AFTER_FTP['name'].find('_signed_verified_target_files.zip')
+    suf_index = suf_index if suf_index != -1 else AFTER_FTP['name'].find('_signed_target_files.zip')
+    suf_index = suf_index if suf_index != -1 else AFTER_FTP['name'].find('_target_files.zip')
+    suf_index = suf_index if suf_index != -1 else len(AFTER_FTP['name'])
+    after_verno = AFTER_FTP['name'][0: suf_index]
     upload_path = '%s%s--%s' % (AFTER_FTP['path'], before_verno, after_verno)
     # mkd and enter
     try:
