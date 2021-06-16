@@ -52,8 +52,8 @@ def _exit(code=0, ftp=None):
 def http_notify(id, status, otaDir):
     token = os.getenv('DEVOPS_TOKEN')
     if not utils.isempty(token):
-        url = 'http://192.168.48.105:8080/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id=%s&status=%s&otaDir=%s' %\
-              (id, status, otaDir)
+        url = '%s%s?id=%s&status=%s&otaDir=%s' %\
+              (utils.DEVOPS_HTTP_URL, utils.OTA_STATUS_PATH, id, status, otaDir)
         print('\notadiff url: %s' % url)
         headers = {
             'X-Access-Token': token

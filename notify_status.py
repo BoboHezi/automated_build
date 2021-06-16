@@ -31,12 +31,6 @@ def _exit(code, cursor=None):
     exit(code)
 
 
-HOST = "192.168.48.105"
-PORT = 3306
-USER = "root"
-PASSWORD = "yun764946"
-DATABASE = "jeecg-boot242"
-
 STATUS_CODE = {
     'queue_up': -1,
     'success': 0,
@@ -53,7 +47,7 @@ STATUS_CODE = {
     'sv_failed': 11,
 }
 
-SET_STATUS_URL = 'http://192.168.48.105:8080/jeecg-boot/compile/devopsCompile/setStatusJenkins'
+SET_STATUS_URL = '%s%s' % (utils.DEVOPS_HTTP_URL, utils.COMPILE_STATUS_PATH)
 
 
 if __name__ == "__main__":
@@ -74,11 +68,11 @@ if __name__ == "__main__":
 
     # sql connect
     dev_ops_db = mysql.connector.connect(
-        host=HOST,
-        port=PORT,
-        user=USER,
-        passwd=PASSWORD,
-        database=DATABASE
+        host=utils.DB_HOST,
+        port=utils.DB_PORT,
+        user=utils.DB_USER,
+        passwd=utils.DB_PASSWORD,
+        database=utils.DB_DATABASE
     )
     cursor = dev_ops_db.cursor()
 
