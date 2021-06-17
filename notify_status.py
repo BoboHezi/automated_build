@@ -45,6 +45,8 @@ STATUS_CODE = {
     'cp_failed': 9,
     'upload_failed': 10,
     'sv_failed': 11,
+    'repo_processing': 12,
+    'prepare_failed': 13,
 }
 
 SET_STATUS_URL = '%s%s' % (utils.DEVOPS_HTTP_URL, utils.COMPILE_STATUS_PATH)
@@ -61,6 +63,11 @@ if __name__ == "__main__":
     status = sys.argv[2]
     check = True if len(sys.argv) > 3 and sys.argv[3] == 'check' else False
 
+    if status not in STATUS_CODE:
+        for k, v in STATUS_CODE.items():
+            if status == str(v):
+                status = k
+                break
     if status not in STATUS_CODE:
         print('wrong status')
         _exit(1)

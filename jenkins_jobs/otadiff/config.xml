@@ -45,7 +45,7 @@
         </hudson.model.StringParameterDefinition>
         <hudson.model.PasswordParameterDefinition>
           <name>after_ftp_passwd</name>
-          <description>起始包登录密码</description>
+          <description>目标包登录密码</description>
           <defaultValue>{AQAAABAAAAAQRCPgf7J0edHWbSDHMf16423FvlvDR3BVKp979SA/Mqw=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
