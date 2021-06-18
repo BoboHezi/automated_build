@@ -413,6 +413,7 @@ EOF
                     }
                     sv_rst = sh(returnStatus: true, script: &apos;&apos;&apos;
                     devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+                    verity=`[ &quot;$build_verity&quot; = &quot;true&quot; ] &amp;&amp; echo &quot;-v&quot; || echo &apos;&apos;`
 
                     sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
 
@@ -446,11 +447,6 @@ EOF
 
                     ftp_url=$(cat ftp_url.txt)
                     echo -e &quot;\nftp_url: $ftp_url\n&quot;
-
-                    verity=&apos;&apos;
-                    if [ &quot;$build_verity&quot; == &quot;true&quot; ]; then
-                        verity=&quot;-v&quot;
-                    fi
 
                     echo &quot;./commit_sign_verify.py -p \&quot;$project_name\&quot; -f \&quot;ftp_url.txt\&quot; -u \&quot;$sv_platform_url\&quot; \
                         -s \&quot;$sv_platform_username\&quot; -c \&quot;$sv_platform_passwd\&quot; -t \&quot;$sv_platform_terrace\&quot; \
