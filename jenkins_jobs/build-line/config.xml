@@ -452,11 +452,17 @@ EOF
                         verity=&quot;-v&quot;
                     fi
 
-                    python3 commit_sign_verify.py -p &quot;$project_name&quot; -f &quot;$ftp_url&quot; -u &quot;$sv_platform_url&quot; \
-                        -s &quot;$sv_platform_username&quot; -c &quot;$sv_platform_passwd&quot; -t &quot;$sv_platform_terrace&quot; \
-                        -b &quot;$sv_platform_board&quot; -l &quot;$sv_platform_cclist&quot; -m &quot;$sv_platform_model&quot; \
-                        -r &quot;$sv_platform_brand&quot; -o &quot;$sv_platform_odm&quot; -i &quot;$publish_username&quot; \
-                        -e &quot;$sv_verity_purpose&quot; -d &quot;$devops_compile_id&quot; &quot;$verity&quot;
+                    echo &quot;./commit_sign_verify.py -p \&quot;$project_name\&quot; -f \&quot;ftp_url.txt\&quot; -u \&quot;$sv_platform_url\&quot; \
+                        -s \&quot;$sv_platform_username\&quot; -c \&quot;$sv_platform_passwd\&quot; -t \&quot;$sv_platform_terrace\&quot; \
+                        -b \&quot;$sv_platform_board\&quot; -l \&quot;$sv_platform_cclist\&quot; -m \&quot;$sv_platform_model\&quot; \
+                        -r \&quot;$sv_platform_brand\&quot; -o \&quot;$sv_platform_odm\&quot; -i \&quot;$publish_username\&quot; \
+                        -e \&quot;$sv_verity_purpose\&quot; -d \&quot;$devops_compile_id\&quot; \&quot;$verity\&quot;&quot;
+
+                    python3 commit_sign_verify.py -p \&quot;$project_name\&quot; -f \&quot;ftp_url.txt\&quot; -u \&quot;$sv_platform_url\&quot; \
+                        -s \&quot;$sv_platform_username\&quot; -c \&quot;$sv_platform_passwd\&quot; -t \&quot;$sv_platform_terrace\&quot; \
+                        -b \&quot;$sv_platform_board\&quot; -l \&quot;$sv_platform_cclist\&quot; -m \&quot;$sv_platform_model\&quot; \
+                        -r \&quot;$sv_platform_brand\&quot; -o \&quot;$sv_platform_odm\&quot; -i \&quot;$publish_username\&quot; \
+                        -e \&quot;$sv_verity_purpose\&quot; -d \&quot;$devops_compile_id\&quot; \&quot;$verity\&quot;
                     &apos;&apos;&apos;)
                     sh &quot;&quot;&quot;exit $sv_rst&quot;&quot;&quot;
                 }

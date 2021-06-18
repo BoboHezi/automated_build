@@ -211,7 +211,6 @@ def post(url, data, headers=common_headers):
         r = requests.post(url, data=data_str, headers=headers)
         return r.status_code, json.loads(r.text)
     except Exception as e:
-        print('util.post status_code: %s, test:\n%s\n' % (r.status_code, r.text))
         print('util.post Exception: %s' % e)
         return 0, None
 
