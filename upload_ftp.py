@@ -98,7 +98,6 @@ if __name__ == '__main__':
         elif PLATFORM == 'SPRD':
             ZIP_FILE = '%s/bin/%s.zip' % (publish_out, verno_internal)
 
-    ZIP_FILE = ''
     if not (path.exists(ZIP_FILE) and path.isfile(ZIP_FILE)):
         print('upload_ftp check ZIP_FILE: %s failed\n' % ZIP_FILE)
         _exit(7)

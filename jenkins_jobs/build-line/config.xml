@@ -367,7 +367,7 @@ EOF
         stage(&apos;file-upload&apos;) {
             steps {
                 script {
-                    if (&quot;${build_sign}&quot; == &quot;true&quot;) {
+                    if (&quot;${build_sign}&quot; != &quot;true&quot;) {
                         echo &quot;\ndo not sign, exit file-upload!\n&quot;
                         return
                     }
@@ -407,7 +407,7 @@ EOF
         stage(&apos;sign-verity&apos;) {
             steps {
                 script {
-                    if (&quot;${build_sign}&quot; == &quot;true&quot;) {
+                    if (&quot;${build_sign}&quot; != &quot;true&quot;) {
                         echo &quot;\ndo not sign, exit sign-verity!\n&quot;
                         return
                     }
