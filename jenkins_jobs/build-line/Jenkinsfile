@@ -154,6 +154,10 @@ EOF
         stage('file-upload') {
             steps {
                 script {
+                    if ("${build_sign}" == "true") {
+                        echo "\ndo not sign, exit file-upload!\n"
+                        return
+                    }
                     upload_rst = sh(returnStatus: true, script: '''
                     devops_token=`cat $DEVOPS_TOKEN_FILE || echo ""`
 
@@ -176,10 +180,6 @@ EOF
                     pwd
                     echo -------------------------------------------------
                     echo ""
-                    if [ "$build_sign" != "true" ]; then
-                        echo -e "\ndo not sign, exit!\n"
-                        exit 0
-                    fi
 
                     # upload file
                     echo -e '\n./upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"\n'
@@ -190,10 +190,14 @@ EOF
                 }
             }
         }
-        
+
         stage('sign-verity') {
             steps {
                 script {
+                    if ("${build_sign}" == "true") {
+                        echo "\ndo not sign, exit sign-verity!\n"
+                        return
+                    }
                     sv_rst = sh(returnStatus: true, script: '''
                     devops_token=`cat $DEVOPS_TOKEN_FILE || echo ""`
 
@@ -216,18 +220,6 @@ EOF
                     pwd
                     echo -------------------------------------------------
                     echo ""
-
-                    if [ "$build_sign" != "true" ]; then
-                        echo -e "\ndo not sign, exit!\n"
-                        exit 0
-                    fi
-
-                    if [ ! -f sign_verify.sh ]; then
-                        echo -e "File sign_verify.sh does not exist!!!"
-                        exit -2
-                    fi
-
-                    bash sign_verify.sh "$project_name" "$sv_platform_url" "$sv_platform_username" "$sv_platform_passwd" "$sv_platform_terrace" "$sv_platform_board" "$sv_platform_cclist" "$sv_platform_model" "$sv_platform_brand" "$sv_platform_odm" "$publish_username" "$build_verity" "$sv_verity_purpose" "$devops_compile_id"
 
                     if [ ! -f commit_sign_verify.py ]; then
                         echo -e "File commit_sign_verify.py does not exist!!!"
@@ -258,10 +250,10 @@ EOF
             }
         }
     }
-    
+
     post {
         always {
-            echo 'this build was stopped'
+            echo 'always call'
             sh '''
             set +e
             devops_token=`cat $DEVOPS_TOKEN_FILE || echo ""`
@@ -281,6 +273,8 @@ EOF
             python3 update_db.py -t devops_compile \
                 -k compile_build_finish_time -v "$build_finish_time" \
                 -w id -e $devops_compile_id
+
+            echo "complete"
             '''
         }
         success {

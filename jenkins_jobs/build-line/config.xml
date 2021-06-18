@@ -211,7 +211,14 @@
     </hudson.model.ParametersDefinitionProperty>
   </properties>
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.90">
-    <script>pipeline {
+    <script>
+def devops_token_extra = &apos;&apos;
+def prepare_rst = &apos;&apos;
+def build_rst = &apos;&apos;
+def upload_rst = &apos;&apos;
+def sv_rst = &apos;&apos;
+
+pipeline {
     agent &apos;any&apos;
     stages {
         stage(&apos;prepare&apos;) {
@@ -247,13 +254,14 @@
                     println &quot;publish_username: ${publish_username}&quot;
                     println &quot;LOCAL_SCRIPT_PATH: ${LOCAL_SCRIPT_PATH}&quot;
                     println &quot;REMOTE_SCRIPT_PATH: ${REMOTE_SCRIPT_PATH}&quot;
+                    devops_token_extra = sh(returnStdout: true, script: &apos;cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;&apos;)
                 }
             }
         }
         stage(&apos;prepare-jenkins-server&apos;) {
             steps {
                 script {
-                    sh &apos;&apos;&apos;
+                    prepare_rst = sh(returnStatus: true, script: &apos;&apos;&apos;
                     if ! type sshpass &gt;/dev/null 2&gt;&amp;1; then
                         echo -e &quot;\nprepare-jenkins-server: install sshpass&quot;
                         if type apt-get &gt;/dev/null 2&gt;&amp;1; then
@@ -274,165 +282,191 @@ EOF
                             yum install python-pip3 -y
                         fi
                     fi
-                    &apos;&apos;&apos;
+                    &apos;&apos;&apos;)
+                    sh &quot;&quot;&quot;exit $prepare_rst&quot;&quot;&quot;
                 }
             }
         }
         stage(&apos;prepare-host-mkdir&apos;) {
             steps {
-                sh &apos;&apos;&apos;
-                sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
+                script {
+                    prepare_rst = sh(returnStatus: true, script: &apos;&apos;&apos;
+                    sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
 
-                if [ ! -d $REMOTE_SCRIPT_PATH ]; then
-                    echo -e &quot;\ncreate path $REMOTE_SCRIPT_PATH&quot;
-                    mkdir -p $REMOTE_SCRIPT_PATH
-                fi
-                cd $REMOTE_SCRIPT_PATH
-                pwd
-                &apos;&apos;&apos;
+                    if [ ! -d $REMOTE_SCRIPT_PATH ]; then
+                        echo -e &quot;\ncreate path $REMOTE_SCRIPT_PATH&quot;
+                        mkdir -p $REMOTE_SCRIPT_PATH
+                    fi
+                    cd $REMOTE_SCRIPT_PATH
+                    pwd
+                    &apos;&apos;&apos;)
+                    sh &quot;&quot;&quot;exit $prepare_rst&quot;&quot;&quot;
+                }
             }
         }
         stage(&apos;prepare-host-upload-script&apos;) {
             steps {
                 script {
-                    sh &apos;&apos;&apos;
+                    prepare_rst = sh(returnStatus: true, script: &apos;&apos;&apos;
                     set +e
                     sshpass -p &quot;$server_passwd&quot; scp -r $LOCAL_SCRIPT_PATH* &quot;$server_hostname@$server_ip_address&quot;:$REMOTE_SCRIPT_PATH &gt; /dev/null 2&gt;&amp;1
-
+                    
                     sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
                     cd $REMOTE_SCRIPT_PATH
                     pwd
                     ./link.sh $code_dir
-
-                    echo &quot;$cherry_picks&quot; &gt; ~/.jenkins/script/cps
-                    &apos;&apos;&apos;
+                    
+                    echo &quot;$cherry_picks&quot; &gt; cps 
+                    &apos;&apos;&apos;)
+                    sh &quot;&quot;&quot;exit $prepare_rst&quot;&quot;&quot;
                 }
             }
         }
         stage(&apos;build&apos;) {
             steps {
-                sh &apos;&apos;&apos;
-                devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
-                
-                sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
-                
-                # export devops_token
-                echo &quot;devops_token: $devops_token&quot;
-                export DEVOPS_TOKEN=$devops_token
-                readonly DEVOPS_TOKEN
+                script {
+                    build_rst = sh(returnStatus: true, script: &apos;&apos;&apos;
+                    devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
 
-                if [ ! -d &quot;$code_dir&quot; ]; then
-                    echo &quot;Project code directory does not exist!!!&quot;
-                    exit -1;
-                fi
+                    sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
 
-                cd &quot;$code_dir&quot;
-                echo &quot;&quot;
-                echo -------------------------------------------------
-                echo code_dir: 
-                pwd
-                echo -------------------------------------------------
-                echo &quot;&quot;
+                    # export devops_token
+                    echo &quot;devops_token: $devops_token&quot;
+                    export DEVOPS_TOKEN=$devops_token
+                    readonly DEVOPS_TOKEN
 
-                if [ ! -f build.sh ]; then
-                    echo &quot;File build.sh does not exist!!!&quot;
-                    exit -2;
-                fi
+                    if [ ! -d &quot;$code_dir&quot; ]; then
+                        echo &quot;Project code directory does not exist!!!&quot;
+                        exit -1;
+                    fi
 
-                if [ $test_pipeline == &quot;true&quot; ]; then
-                    echo &quot;Just test pipeline, exit.&quot;
-                    exit 0
-                fi
-                bash build.sh &quot;$project_name&quot; &quot;$build_variant&quot; &quot;$build_action&quot; &quot;$build_sign&quot; &quot;$build_verity&quot; &quot;$need_publish&quot; &quot;$devops_host_id&quot; &quot;$devops_compile_id&quot; &quot;$is_new_project&quot; &quot;$test_host&quot; &quot;$BUILD_URL&quot; &quot;$server_ip_address&quot;
+                    cd &quot;$code_dir&quot;
+                    echo &quot;&quot;
+                    echo -------------------------------------------------
+                    echo code_dir: 
+                    pwd
+                    echo -------------------------------------------------
+                    echo &quot;&quot;
 
-                &apos;&apos;&apos;
+                    if [ ! -f build.sh ]; then
+                        echo &quot;File build.sh does not exist!!!&quot;
+                        exit -2;
+                    fi
+
+                    if [ $test_pipeline == &quot;true&quot; ]; then
+                        echo &quot;Just test pipeline, exit.&quot;
+                        exit 0
+                    fi
+                    bash build.sh &quot;$project_name&quot; &quot;$build_variant&quot; &quot;$build_action&quot; &quot;$build_sign&quot; &quot;$build_verity&quot; &quot;$need_publish&quot; &quot;$devops_host_id&quot; &quot;$devops_compile_id&quot; &quot;$is_new_project&quot; &quot;$test_host&quot; &quot;$BUILD_URL&quot; &quot;$server_ip_address&quot;
+
+                    &apos;&apos;&apos;)
+                    sh &quot;&quot;&quot;exit $build_rst&quot;&quot;&quot;
+                }
             }
         }
         stage(&apos;file-upload&apos;) {
             steps {
-                sh &apos;&apos;&apos;
-                devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
-                
-                sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
-                
-                # export devops_token
-                echo &quot;devops_token: $devops_token&quot;
-                export DEVOPS_TOKEN=$devops_token
-                readonly DEVOPS_TOKEN
-                
-                if [ ! -d &quot;$code_dir&quot; ]; then
-                    echo &quot;Project code directory does not exist!!!&quot;
-                    exit -1;
-                fi
+                script {
+                    if (&quot;${build_sign}&quot; == &quot;true&quot;) {
+                        echo &quot;\ndo not sign, exit file-upload!\n&quot;
+                        return
+                    }
+                    upload_rst = sh(returnStatus: true, script: &apos;&apos;&apos;
+                    devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
 
-                cd &quot;$code_dir&quot;
-                echo &quot;&quot;
-                echo -------------------------------------------------
-                echo code_dir: 
-                pwd
-                echo -------------------------------------------------
-                echo &quot;&quot;
-                if [ &quot;$build_sign&quot; != &quot;true&quot; ]; then
-                    echo -e &quot;\ndo not sign, exit!\n&quot;
-                    exit 0
-                fi
+                    sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
 
-                # upload file
-                echo -e &apos;\n./upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;\n&apos;
-                python3 upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;
-                # if [ &quot;$test_host&quot; == &quot;true&quot; ]; then
-                #     echo ftp://hongxiangyuan@192.168.150.30/upload/202104/G1930EPQ_V15_HL/V15-HL-G1930DPQV1HB-ZY-0420-V0103.zip &gt; ftp_url.txt
-                # else
-                #     python3 upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;
-                # fi
-                &apos;&apos;&apos;
+                    # export devops_token
+                    echo &quot;devops_token: $devops_token&quot;
+                    export DEVOPS_TOKEN=$devops_token
+                    readonly DEVOPS_TOKEN
+
+                    if [ ! -d &quot;$code_dir&quot; ]; then
+                        echo &quot;Project code directory does not exist!!!&quot;
+                        exit -1;
+                    fi
+
+                    cd &quot;$code_dir&quot;
+                    echo &quot;&quot;
+                    echo -------------------------------------------------
+                    echo code_dir: 
+                    pwd
+                    echo -------------------------------------------------
+                    echo &quot;&quot;
+
+                    # upload file
+                    echo -e &apos;\n./upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;\n&apos;
+                    python3 upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;
+
+                    &apos;&apos;&apos;)
+                    sh &quot;&quot;&quot;exit $upload_rst&quot;&quot;&quot;
+                }
             }
         }
 
         stage(&apos;sign-verity&apos;) {
             steps {
-                sh &apos;&apos;&apos;
-                devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
-                
-                sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
-                
-                # export devops_token
-                echo &quot;devops_token: $devops_token&quot;
-                export DEVOPS_TOKEN=$devops_token
-                readonly DEVOPS_TOKEN
-                
-                if [ ! -d &quot;$code_dir&quot; ]; then
-                    echo &quot;Project code directory does not exist!!!&quot;
-                    exit -1;
-                fi
+                script {
+                    if (&quot;${build_sign}&quot; == &quot;true&quot;) {
+                        echo &quot;\ndo not sign, exit sign-verity!\n&quot;
+                        return
+                    }
+                    sv_rst = sh(returnStatus: true, script: &apos;&apos;&apos;
+                    devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
 
-                cd &quot;$code_dir&quot;
-                echo &quot;&quot;
-                echo -------------------------------------------------
-                echo code_dir: 
-                pwd
-                echo -------------------------------------------------
-                echo &quot;&quot;
+                    sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
 
-                if [ &quot;$build_sign&quot; != &quot;true&quot; ]; then
-                    echo -e &quot;\ndo not sign, exit!\n&quot;
-                    exit 0
-                fi
+                    # export devops_token
+                    echo &quot;devops_token: $devops_token&quot;
+                    export DEVOPS_TOKEN=$devops_token
+                    readonly DEVOPS_TOKEN
 
-                if [ ! -f sign_verify.sh ]; then
-                    echo -e &quot;File sign_verify.sh does not exist!!!&quot;
-                    exit -2
-                fi
+                    if [ ! -d &quot;$code_dir&quot; ]; then
+                        echo &quot;Project code directory does not exist!!!&quot;
+                        exit -1;
+                    fi
 
-                bash sign_verify.sh &quot;$project_name&quot; &quot;$sv_platform_url&quot; &quot;$sv_platform_username&quot; &quot;$sv_platform_passwd&quot; &quot;$sv_platform_terrace&quot; &quot;$sv_platform_board&quot; &quot;$sv_platform_cclist&quot; &quot;$sv_platform_model&quot; &quot;$sv_platform_brand&quot; &quot;$sv_platform_odm&quot; &quot;$publish_username&quot; &quot;$build_verity&quot; &quot;$sv_verity_purpose&quot; &quot;$devops_compile_id&quot;
-                &apos;&apos;&apos;
+                    cd &quot;$code_dir&quot;
+                    echo &quot;&quot;
+                    echo -------------------------------------------------
+                    echo code_dir: 
+                    pwd
+                    echo -------------------------------------------------
+                    echo &quot;&quot;
+
+                    if [ ! -f commit_sign_verify.py ]; then
+                        echo -e &quot;File commit_sign_verify.py does not exist!!!&quot;
+                        exit -2
+                    fi
+
+                    if [ ! -f ftp_url.txt ]; then
+                        echo -e &quot;File ftp_url.txt does not exist!!!&quot;
+                        exit -3
+                    fi
+
+                    ftp_url=$(cat ftp_url.txt)
+                    echo -e &quot;\nftp_url: $ftp_url\n&quot;
+
+                    verity=&apos;&apos;
+                    if [ &quot;$build_verity&quot; == &quot;true&quot; ]; then
+                        verity=&quot;-v&quot;
+                    fi
+
+                    python3 commit_sign_verify.py -p &quot;$project_name&quot; -f &quot;$ftp_url&quot; -u &quot;$sv_platform_url&quot; \
+                        -s &quot;$sv_platform_username&quot; -c &quot;$sv_platform_passwd&quot; -t &quot;$sv_platform_terrace&quot; \
+                        -b &quot;$sv_platform_board&quot; -l &quot;$sv_platform_cclist&quot; -m &quot;$sv_platform_model&quot; \
+                        -r &quot;$sv_platform_brand&quot; -o &quot;$sv_platform_odm&quot; -i &quot;$publish_username&quot; \
+                        -e &quot;$sv_verity_purpose&quot; -d &quot;$devops_compile_id&quot; &quot;$verity&quot;
+                    &apos;&apos;&apos;)
+                    sh &quot;&quot;&quot;exit $sv_rst&quot;&quot;&quot;
+                }
             }
         }
     }
 
     post {
-        aborted {
-            echo &apos;this build was aborted&apos;
+        always {
+            echo &apos;always call&apos;
             sh &apos;&apos;&apos;
             set +e
             devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
@@ -440,12 +474,8 @@ EOF
             echo &quot;devops_token: $devops_token&quot;
             export DEVOPS_TOKEN=$devops_token
             readonly DEVOPS_TOKEN
-            
-            cd $LOCAL_SCRIPT_PATH
 
-            # compile status: 7(stoped)
-            echo &quot;./notify_status.py $devops_compile_id task_stopped&quot;
-            python3 notify_status.py $devops_compile_id task_stopped
+            cd $LOCAL_SCRIPT_PATH
 
             # devops_server server status 0(idle)
             echo &quot;./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id&quot;
@@ -456,11 +486,12 @@ EOF
             python3 update_db.py -t devops_compile \
                 -k compile_build_finish_time -v &quot;$build_finish_time&quot; \
                 -w id -e $devops_compile_id
+
             echo &quot;complete&quot;
             &apos;&apos;&apos;
         }
-        failure {
-            echo &apos;this build was failed&apos;
+        success {
+            echo &apos;this build was success&apos;
             sh &apos;&apos;&apos;
             set +e
             devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
@@ -468,25 +499,60 @@ EOF
             echo &quot;devops_token: $devops_token&quot;
             export DEVOPS_TOKEN=$devops_token
             readonly DEVOPS_TOKEN
-            
+
             cd $LOCAL_SCRIPT_PATH
 
-            # check compile status is 2(init) or 5(compiling)
-            python3 notify_status.py $devops_compile_id connecting check
-            is_init=$?
-            python3 notify_status.py $devops_compile_id compiling check
-            is_compiling=$?
-            if [ &quot;$is_init&quot; = &quot;3&quot; ] || [ &quot;$is_compiling&quot; = &quot;3&quot; ]; then
-                # compile status: 6(build failed)
-                echo &quot;./notify_status.py $devops_compile_id build_failed&quot;
-                python3 notify_status.py $devops_compile_id build_failed
-            fi
+            # status: build_success(0)
+            echo &quot;./notify_status.py $devops_compile_id success&quot;
+            python3 notify_status.py $devops_compile_id success
 
-            # devops_server server status 0(idle)
-            echo &quot;./update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id&quot;
-            python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
             echo &quot;complete&quot;
             &apos;&apos;&apos;
+        }
+        aborted {
+            echo &apos;this build was aborted&apos;
+            sh &apos;&apos;&apos;
+            set +e
+            devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
+            # export devops_token
+            echo &quot;devops_token: $devops_token&quot;
+            export DEVOPS_TOKEN=$devops_token
+            readonly DEVOPS_TOKEN
+
+            cd $LOCAL_SCRIPT_PATH
+
+            # compile status: 7(stoped)
+            echo &quot;./notify_status.py $devops_compile_id task_stopped&quot;
+            python3 notify_status.py $devops_compile_id task_stopped
+
+            echo &quot;complete&quot;
+            &apos;&apos;&apos;
+        }
+        failure {
+            echo &apos;this build was failed&apos;
+            sh &quot;&quot;&quot;
+            set +e
+            # export devops_token_extra
+            echo &quot;devops_token_extra: $devops_token_extra&quot;
+            export DEVOPS_TOKEN=$devops_token_extra
+            readonly DEVOPS_TOKEN
+
+            cd $LOCAL_SCRIPT_PATH
+
+            echo &quot;prepare_rst: $prepare_rst, build_rst: $build_rst, upload_rst: $upload_rst, sv_rst: $sv_rst&quot;
+
+            if [ &quot;$prepare_rst&quot; != &quot;0&quot; ]; then
+                python3 notify_status.py $devops_compile_id prepare_failed
+            elif [ &quot;$build_rst&quot; != &quot;0&quot; ]; then
+                python3 notify_status.py $devops_compile_id $build_rst
+            elif [ &quot;$upload_rst&quot; != &quot;0&quot; ]; then
+                python3 notify_status.py $devops_compile_id upload_failed
+            elif [ &quot;$sv_rst&quot; != &quot;0&quot; ]; then
+                python3 notify_status.py $devops_compile_id sv_failed
+            fi
+
+            echo &quot;complete&quot;
+            &quot;&quot;&quot;
         }
     }
 }</script>
