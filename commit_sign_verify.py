@@ -343,6 +343,7 @@ if __name__ == '__main__':
     if path.isfile(SV_FTP_PATH):
         file = open(SV_FTP_PATH, 'r')
         SV_FTP_PATH = file.read()
+        SV_FTP_PATH = SV_FTP_PATH.strip()
         file.close()
 
     print('''
