@@ -5,6 +5,8 @@ import sys
 
 import utils
 
+from os import path
+
 
 def _exit(code):
     print('*' * 15 + 'commit sign verify end' + '*' * 15)
@@ -337,6 +339,11 @@ if __name__ == '__main__':
         SV_VERITY_PURPOSE = opts.get('-e') if opts.get('-e') else opts.get('--purpose')
     if '-d' in opts or '--id' in opts:
         DEVOPS_COMPILE_ID = opts.get('-d') if opts.get('-d') else opts.get('--id')
+
+    if path.isfile(SV_FTP_PATH):
+        file = open(SV_FTP_PATH, 'r')
+        SV_FTP_PATH = file.read()
+        file.close()
 
     print('''
     PROJECT_NAME:            %s
