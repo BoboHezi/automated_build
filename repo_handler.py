@@ -70,8 +70,8 @@ def handle_sync():
     star_log('handle_sync', 60)
     sync_failed = sync()
     # sync failed
+    global SYNC_RECURSIVE_TIMES
     if SYNC_RECURSIVE_TIMES > 0 and sync_failed and len(sync_failed.keys()) > 0:
-        global SYNC_RECURSIVE_TIMES
         SYNC_RECURSIVE_TIMES -= 1
         print('sync failed')
         for path in sync_failed.keys():
@@ -176,8 +176,8 @@ def handle_overview():
     star_log('handle_overview', 60)
     unclean_nodes = overview()
     # overview failed
+    global OVERVIEW_RECURSIVE_TIMES
     if OVERVIEW_RECURSIVE_TIMES > 0 and not utils.isempty(unclean_nodes):
-        global OVERVIEW_RECURSIVE_TIMES
         OVERVIEW_RECURSIVE_TIMES -= 1
         print('overview failed')
         # clean unclean node
@@ -264,14 +264,14 @@ def cherry_pick(path, cmd):
     return rst_code
 
 
-if __name__ == '__main__':
+def main(argv):
     option_str = 'h-help'
     option_str += ',c-clean'
     option_str += ',s-sync'
     option_str += ',o-overview'
     option_str += ',p-pick:'
 
-    opts = dump(sys.argv[1:], option_str)
+    opts = dump(argv, option_str)
     if not opts:
         exit(1)
 
@@ -330,3 +330,7 @@ if __name__ == '__main__':
                     print('result: %d' % result)
                     success = result if result != 0 else success
                 exit(0 if success == 0 else 3)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
