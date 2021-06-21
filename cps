@@ -1,3 +1,1 @@
-git fetch "ssh://zhangzhanbo@10.20.40.21:29418/Freeme/platforms/common/vendor/freeme" refs/changes/57/68757/5 && git cherry-pick FETCH_HEAD
-git fetch "ssh://zhangzhanbo@10.20.40.21:29418/Freeme/platforms/common/apps/FreemeSettings" refs/changes/65/68765/1 && git cherry-pick FETCH_HEAD
-git fetch "ssh://zhangzhanbo@10.20.40.21:29418/Freeme/platforms/common/core/soul" refs/changes/74/68774/1 && git cherry-pick FETCH_HEAD
+git fetch "ssh://zhangzhanbo@10.20.40.21:29418/Freeme/platforms/common/vendor/freeme" refs/changes/57/68757/5 && git cherry-pick FETCH_HEAD;git fetch "ssh://zhangzhanbo@10.20.40.21:29418/Freeme/platforms/common/apps/FreemeSettings" refs/changes/65/68765/1 && git cherry-pick FETCH_HEAD;git fetch "ssh://zhangzhanbo@10.20.40.21:29418/Freeme/platforms/common/core/soul" refs/changes/74/68774/1 && git cherry-pick FETCH_HEAD

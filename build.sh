@@ -162,7 +162,7 @@ else
 fi
 
 # publish
-if [[ $is_test != "true" && "$is_publish" == "true" && "$build_action" != "ota" && $build_rst = "0" ]]; then
+if [[ $is_test != "true" && "$is_publish" == "true" && $build_rst == "0" ]]; then
     echo -e "\n---------------------publish---------------------\n"
     ./publish
 fi
