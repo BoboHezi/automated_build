@@ -69,7 +69,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>ota_factory_host_pwd</name>
           <description>do not edit</description>
-          <defaultValue>{AQAAABAAAAAQIzq9giJo5f6YpSFWaDMvGc9A0P7ulfmsNrWBsKORo3Q=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQi7zSxTQ9NCogoax2rrxv41rVAkz1zvlQHzEd9Jfj+s8=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>ota_factory_host_path</name>

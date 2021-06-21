@@ -188,3 +188,6 @@ sudo pip install pycryptodome
 
 8. 编译OTA(0603)
 * done(0611)
+
+
+9. 为python文件添加＂main＂函数(0621)
