@@ -57,16 +57,16 @@ function printBlue() {
 
 printParams
 
-# status: connecting(2)
-python3 notify_status.py $devops_compile_id connecting
+# status: repo_processing(12)
+python3 notify_status.py $devops_compile_id repo_processing
 
 # pre-check
 # check params
 if [ -z "$build_project" ] || [ -z "$build_variant" ] || [ -z "$build_action" ] ; then
     echo -e "\nThere is a problem with the incoming parameters, please check\n"
     # status: check_fail(3)
-    python3 notify_status.py $devops_compile_id check_fail
-    exit 2;
+    # python3 notify_status.py $devops_compile_id check_fail
+    exit 3;
 fi
 
 # table devops_server server status
@@ -110,8 +110,8 @@ echo -e "\n---------------------cherry pick---------------------\n"
 python3 repo_handler.py -p ~/.jenkins/script/cps ; cp_rst=$?
 if test $cp_rst != "0"; then
     echo -e "\ncherry-pick failed, exit\n"
-    # status: cherry-pick failed(9)
-    python3 notify_status.py $devops_compile_id cp_failed
+    # status: cp_failed failed(9)
+    # python3 notify_status.py $devops_compile_id cp_failed
     exit 9
 else
     echo -e "\ncherry-pick success\n"
@@ -122,10 +122,10 @@ echo -e "\n---------------------find---------------------\n"
 find=$(find droi/ -maxdepth 3 -mindepth 3 -type d -name $build_project)
 
 if [ ! $find ]; then
-    # status: project_notfound(4)
-    python3 notify_status.py $devops_compile_id project_not_found
+    # status: project_not_found(4)
+    # python3 notify_status.py $devops_compile_id project_not_found
     echo -e "\n$build_project not found\n"
-    exit 3
+    exit 4
 else
     if [ "$is_new_project" == "true" ]; then
         echo "return new_project found"
@@ -169,22 +169,22 @@ fi
 
 # database option
 # table devops_server server status
-python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
+# python3 update_db.py -t devops_server -k server_status -v 0 -w id -e $devops_host_id
 
 # table devops_compile infos
-build_finish_time=`date "+%Y-%m-%d %H:%M:%S"`
-python3 update_db.py -t devops_compile \
-    -k compile_build_finish_time -v "$build_finish_time" \
-    -w id -e $devops_compile_id
+# build_finish_time=`date "+%Y-%m-%d %H:%M:%S"`
+# python3 update_db.py -t devops_compile \
+#     -k compile_build_finish_time -v "$build_finish_time" \
+#     -w id -e $devops_compile_id
 
 # build result
 if test $build_rst = "0"; then
     # status: build_success(0)
-    python3 notify_status.py $devops_compile_id success
+    # python3 notify_status.py $devops_compile_id success
     echo -e "\nbuild success\n"
 else
     # status: build_failed(6)
-    python3 notify_status.py $devops_compile_id build_failed
+    # python3 notify_status.py $devops_compile_id build_failed
     echo -e "\nbuild failed\n"
-    exit 5
+    exit 6
 fi
