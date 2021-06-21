@@ -209,6 +209,9 @@ def main(argv):
         print("otadiff wrong parameter try '-h or --help' to get more information")
         _exit(1)
 
+    global BEFORE_TARGET_FILE, BEFORE_FTP_USERNAME, BEFORE_FTP_PASSWD, AFTER_TARGET_FILE, AFTER_FTP_USERNAME, \
+        AFTER_FTP_PASSWD, SV_PLATFORM_TERRACE, DEVOPS_OTA_TASK_ID
+
     # dump argv
     if '-f' in opts or '--bfile' in opts:
         BEFORE_TARGET_FILE = opts.get('-f') if opts.get('-f') else opts.get('--bfile')
@@ -248,6 +251,7 @@ def main(argv):
         print("otadiff wrong parameter")
         _exit(1)
 
+    global BEFORE_FTP, AFTER_FTP
     # dump ftp url
     BEFORE_FTP = dump_url(BEFORE_TARGET_FILE)
     AFTER_FTP = dump_url(AFTER_TARGET_FILE)
@@ -307,6 +311,7 @@ def main(argv):
                    time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_time))))
 
         if current_time - package_zip_stat.st_mtime < 60 and current_time - update_zip_stat.st_mtime < 60:
+            global OTA_URL
             OTA_URL = upload_package()
             print('\notadiff %s' % OTA_URL)
             _exit(0)
