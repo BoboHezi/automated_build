@@ -56,7 +56,7 @@ def _exit(code=0, ftp=None):
 def http_notify(id, status, otaDir):
     token = os.getenv('DEVOPS_TOKEN')
     if not utils.isempty(token):
-        url = '%s%s?id=%s&status=%s&otaDir=%s' %\
+        url = '%s%s?id=%s&status=%s&otaDir=%s' % \
               (utils.DEVOPS_HTTP_URL, utils.OTA_STATUS_PATH, id, status, otaDir)
         print('\notadiff url: %s' % url)
         headers = {
@@ -191,7 +191,7 @@ def upload_package():
         return None
 
 
-if __name__ == '__main__':
+def main(argv):
     utils.star_log('otadiff start', 60)
     option_str = ''
     option_str += 'f-bfile:'  # BEFORE_TARGET_FILE
@@ -203,7 +203,7 @@ if __name__ == '__main__':
     option_str += ',t-terrace:'  # SV_PLATFORM_TERRACE
     option_str += ',d-id:'  # DEVOPS_OTA_TASK_ID
 
-    opts = utils.dump(sys.argv[1:], option_str)
+    opts = utils.dump(argv, option_str)
 
     if not opts:
         print("otadiff wrong parameter try '-h or --help' to get more information")
@@ -299,15 +299,19 @@ if __name__ == '__main__':
         current_time = time.time()
 
         print('''
-        otadiff package.zip modify time: %s
-        otadiff update.zip modify time:  %s
-        otadiff current_time:            %s
-        ''' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(package_zip_stat.st_mtime)),
-               time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(update_zip_stat.st_mtime)),
-               time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_time))))
+            otadiff package.zip modify time: %s
+            otadiff update.zip modify time:  %s
+            otadiff current_time:            %s
+            ''' % (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(package_zip_stat.st_mtime)),
+                   time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(update_zip_stat.st_mtime)),
+                   time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_time))))
 
         if current_time - package_zip_stat.st_mtime < 60 and current_time - update_zip_stat.st_mtime < 60:
             OTA_URL = upload_package()
             print('\notadiff %s' % OTA_URL)
             _exit(0)
     _exit(6)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])

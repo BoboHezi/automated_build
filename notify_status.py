@@ -52,16 +52,16 @@ STATUS_CODE = {
 SET_STATUS_URL = '%s%s' % (utils.DEVOPS_HTTP_URL, utils.COMPILE_STATUS_PATH)
 
 
-if __name__ == "__main__":
+def main(argv):
     utils.star_log('notify_status start', 60)
-    if len(sys.argv) <= 2:
+    if len(argv) <= 1:
         print('notify_status: wrong params')
         _exit(1)
 
     # get params
-    compile_id = sys.argv[1]
-    status = sys.argv[2]
-    check = True if len(sys.argv) > 3 and sys.argv[3] == 'check' else False
+    compile_id = argv[0]
+    status = argv[1]
+    check = True if len(argv) > 2 and argv[2] == 'check' else False
 
     if status not in STATUS_CODE:
         for k, v in STATUS_CODE.items():
@@ -125,3 +125,7 @@ if __name__ == "__main__":
     print('notify_status: update "%s" %s' % (status, 'success' if success else 'failed'))
 
     _exit(0 if success else 4, cursor)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
