@@ -147,7 +147,7 @@ python3 notify_status.py $devops_compile_id compiling
 
 build_time=`date "+%Y-%m-%d %H:%M:%S"`
 python3 update_db.py -t devops_compile \
-    -k compile_build_time,compile_build_finish_time -v "$build_time," \
+    -k compile_build_time -v "$build_time" \
     -w id -e $devops_compile_id
 
 echo -e "\n---------------------build---------------------\n"
