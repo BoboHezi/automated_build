@@ -20,15 +20,17 @@ FTP_HOST = '192.168.150.30'
 FTP_USER = 'hongxiangyuan'
 FTP_PWD = 'hongxiangyuan014'
 
-if __name__ == '__main__':
+
+def main(argv):
     utils.star_log('upload ftp start', 60)
     utils.execute('echo "" > ftp_url.txt')
     option_str = 'p-project:,f-file:,h-host:,u-user:,c-code:'
-    opts = utils.dump(sys.argv[1:], option_str)
+    opts = utils.dump(argv, option_str)
 
     if not opts:
         print("upload_ftp wrong parameter try '-h or --help' to get more information")
         _exit(1)
+    global PROJECT_NAME, ZIP_FILE, FTP_HOST, FTP_USER, FTP_PWD
     if '-p' in opts or '--project' in opts:
         PROJECT_NAME = opts.get('-p') if opts.get('-p') else opts.get('--project')
     if '-f' in opts or '--file' in opts:
@@ -98,7 +100,13 @@ if __name__ == '__main__':
         elif PLATFORM == 'SPRD':
             ZIP_FILE = '%s/bin/%s.zip' % (publish_out, verno_internal)
 
-    if not (path.exists(ZIP_FILE) and path.isfile(ZIP_FILE)):
+    # if zip doesn't exist, try find
+    if not path.isfile(ZIP_FILE):
+        code, rst = utils.execute('find %s -type f -name "*%s*".zip' % (publish_out, verno_internal))
+        if code == 0 and not utils.isempty(rst):
+            ZIP_FILE = rst.split('\n')[0]
+
+    if not path.isfile(ZIP_FILE):
         print('upload_ftp check ZIP_FILE: %s failed\n' % ZIP_FILE)
         _exit(7)
     print('upload_ftp ZIP_FILE: %s\n' % ZIP_FILE)
@@ -156,3 +164,7 @@ if __name__ == '__main__':
     utils.removedirs(publish_out)
 
     _exit(0, ftp)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
