@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 import re
 import sys
-
-import utils
-
 from os import path
+
+import update_db
+import utils
 
 
 def _exit(code):
-    print('*' * 15 + 'commit sign verify end' + '*' * 15)
+    utils.star_log('commit sign verify end', 60)
     exit(code)
 
 
@@ -263,7 +263,7 @@ def create_sign_task(task_name, urlBefore, model, platform, signAndVerify, ftpUs
     request_data = {
         'name': task_name,
         'urlBefore': urlBefore,
-        'intro': 'create by python',
+        'intro': 'created by automatic deployment',
         'model': model,
         'platform': platform,
         'signAndVerify': signAndVerify,
@@ -284,8 +284,8 @@ def create_sign_task(task_name, urlBefore, model, platform, signAndVerify, ftpUs
             pass
 
 
-if __name__ == '__main__':
-    print('*' * 15 + 'commit sign verify start' + '*' * 15)
+def main(argv):
+    utils.star_log('commit sign verify start', 60)
     option_str = ''
     option_str += 'p-project:'  # PROJECT_NAME
     option_str += ',f-ftp:'  # SV_FTP_PATH
@@ -302,12 +302,15 @@ if __name__ == '__main__':
     option_str += ',i-publish:'  # SV_FTP_PUBLISH_USERNAME
     option_str += ',e-purpose:'  # SV_VERITY_PURPOSE
     option_str += ',d-id:'  # DEVOPS_COMPILE_ID
-    opts = utils.dump(sys.argv[1:], option_str)
+    opts = utils.dump(argv, option_str)
     # print(opts)
 
     if not opts:
         print('commit_sign_verify wrong parameter')
         _exit(1)
+    global PROJECT_NAME, SV_FTP_PATH, SV_URL, SV_USERNAME, SV_PASSWD, SV_PLATFORM, \
+        SV_BOARD, SV_CCLIST, SV_MODEL, SV_BRAND_CUSTOMER, SV_ODM_CUSTOMER, SV_BUILD_VERITY, \
+        SV_FTP_PUBLISH_USERNAME, SV_VERITY_PURPOSE, DEVOPS_COMPILE_ID
 
     if '-p' in opts or '--project' in opts:
         PROJECT_NAME = opts.get('-p') if opts.get('-p') else opts.get('--project')
@@ -347,23 +350,23 @@ if __name__ == '__main__':
         file.close()
 
     print('''
-    PROJECT_NAME:            %s
-    SV_FTP_PATH:             %s
-    SV_URL:                  %s
-    SV_USERNAME:             %s
-    SV_PASSWD:               %s
-    SV_PLATFORM:             %s
-    SV_BOARD:                %s
-    SV_CCLIST:               %s
-    SV_MODEL:                %s
-    SV_BRAND_CUSTOMER:       %s
-    SV_ODM_CUSTOMER:         %s
-    SV_BUILD_VERITY:         %s
-    SV_FTP_PUBLISH_USERNAME: %s
-    DEVOPS_COMPILE_ID:       %s
-    ''' % (PROJECT_NAME, SV_FTP_PATH, SV_URL, SV_USERNAME, SV_PASSWD,
-           SV_PLATFORM, SV_BOARD, SV_CCLIST, SV_MODEL, SV_BRAND_CUSTOMER,
-           SV_ODM_CUSTOMER, SV_BUILD_VERITY, SV_FTP_PUBLISH_USERNAME, DEVOPS_COMPILE_ID))
+        PROJECT_NAME:            %s
+        SV_FTP_PATH:             %s
+        SV_URL:                  %s
+        SV_USERNAME:             %s
+        SV_PASSWD:               %s
+        SV_PLATFORM:             %s
+        SV_BOARD:                %s
+        SV_CCLIST:               %s
+        SV_MODEL:                %s
+        SV_BRAND_CUSTOMER:       %s
+        SV_ODM_CUSTOMER:         %s
+        SV_BUILD_VERITY:         %s
+        SV_FTP_PUBLISH_USERNAME: %s
+        DEVOPS_COMPILE_ID:       %s
+        ''' % (PROJECT_NAME, SV_FTP_PATH, SV_URL, SV_USERNAME, SV_PASSWD,
+               SV_PLATFORM, SV_BOARD, SV_CCLIST, SV_MODEL, SV_BRAND_CUSTOMER,
+               SV_ODM_CUSTOMER, SV_BUILD_VERITY, SV_FTP_PUBLISH_USERNAME, DEVOPS_COMPILE_ID))
 
     if not (PROJECT_NAME and SV_FTP_PATH):
         print('commit_sign_verify miss importent parameter\n')
@@ -399,6 +402,7 @@ if __name__ == '__main__':
             'password': SV_PASSWD}
     status, response = utils.post('%s/sys/login' % SV_URL, data)
     if status == 200:
+        global TOKEN, USER_ID
         try:
             TOKEN = response['result']['token']
             USER_ID = response['result']['userInfo']['id']
@@ -415,6 +419,7 @@ if __name__ == '__main__':
     headers_with_token['X-Access-Token'] = TOKEN
 
     # check model
+    global MODEL_ID, ODM_ID, PROJECT_ID, BRAND_ID
     MODEL_ID = check_model(SV_MODEL, USER_ID, headers_with_token)
     print('commit_sign_verify SV_MODEL: %s, MODEL_ID: %s\n' % (SV_MODEL, MODEL_ID))
     # create model
@@ -513,11 +518,13 @@ if __name__ == '__main__':
         if start_status == 200 and start_response['code'] == 1000 and start_response['msg'] == 'SUCCESS':
             print('commit_sign_verify sign task %s started!\n' % sign_task_data['id'])
 
-    cmd = 'python3 update_db.py -t devops_compile \
-        -k "compile_sign_ftp_url,compile_sign_id,compile_verity_id" \
-        -v "%s,%s,%s" \
-        -w id -e %s' % (SV_FTP_PATH, sign_task_data['id'], verity_task_id, DEVOPS_COMPILE_ID)
-    print('commit_sign_verify update_db cmd:\n%s\n' % cmd)
-    process, rst = utils.async_command(cmd)
-    print('commit_sign_verify rst: %s' % rst)
+    # update database
+    update_argv = ["-t", "devops_compile", "-k", "compile_sign_ftp_url,compile_sign_id,compile_verity_id",
+                   "-v", "%s,%s,%s" % (SV_FTP_PATH, sign_task_data['id'], verity_task_id), "-w", "id",
+                   "-e", DEVOPS_COMPILE_ID]
+    update_db.main(update_argv)
     _exit(0)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])

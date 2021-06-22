@@ -191,3 +191,4 @@ sudo pip install pycryptodome
 
 
 9. 为python文件添加＂main＂函数(0621)
+* done(0622)
