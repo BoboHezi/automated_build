@@ -7,7 +7,6 @@ import utils
 warnings.filterwarnings("ignore")
 import os
 import sys
-import RepoParser
 from fuzzywuzzy import fuzz
 from git import *
 from re import match, search

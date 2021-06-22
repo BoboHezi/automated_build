@@ -8,7 +8,7 @@ import utils
 
 
 def _exit(code, ftp=None):
-    print('*' * 15 + 'upload ftp end' + '*' * 15)
+    utils.star_log('upload ftp end', 60)
     if ftp:
         ftp.quit()
     exit(code)
@@ -21,7 +21,7 @@ FTP_USER = 'hongxiangyuan'
 FTP_PWD = 'hongxiangyuan014'
 
 if __name__ == '__main__':
-    print('*' * 15 + 'upload ftp start' + '*' * 15)
+    utils.star_log('upload ftp start', 60)
     utils.execute('echo "" > ftp_url.txt')
     option_str = 'p-project:,f-file:,h-host:,u-user:,c-code:'
     opts = utils.dump(sys.argv[1:], option_str)

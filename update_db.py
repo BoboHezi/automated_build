@@ -29,7 +29,7 @@ def usage():
 
 
 def _exit(code, cursor=None):
-    print('*' * 15 + 'update_db end' + '*' * 15)
+    utils.star_log('update_db start', 60)
     if cursor != None:
         cursor.close()
     exit(code)
@@ -42,12 +42,13 @@ VALUES = None
 WHERE_KEY = None
 WHERE_VALUE = None
 
-if __name__ == "__main__":
+
+def main(argv):
     # dump options
-    print('*' * 15 + 'update_db start' + '*' * 15)
+    utils.star_log('update_db start', 60)
 
     option_str = 'h-help,d-database:,t-table:,k-keys:,v-values:,w-where:,e-equals:'
-    opts = dump(sys.argv[1:], option_str)
+    opts = dump(argv, option_str)
 
     # check dump result
     if not opts:
@@ -58,6 +59,7 @@ if __name__ == "__main__":
         usage()
         _exit(2)
 
+    global DATABASE, TABLE, KEYS, VALUES, WHERE_KEY, WHERE_VALUE
     # check options
     if '-d' in opts or '--database' in opts:
         DATABASE = opts.get('-d') if opts.get('-d') else opts.get('--database')
@@ -81,13 +83,13 @@ if __name__ == "__main__":
         usage()
         _exit(3)
     print('''
-	DATABASE:    %s
-	TABLE:       %s
-	KEYS:        %s
-	VALUES:      %s
-	WHERE_KEY:   %s
-	WHERE_VALUE: %s
-	''' % (DATABASE, TABLE, KEYS, VALUES, WHERE_KEY, WHERE_VALUE))
+        DATABASE:    %s
+        TABLE:       %s
+        KEYS:        %s
+        VALUES:      %s
+        WHERE_KEY:   %s
+        WHERE_VALUE: %s
+        ''' % (DATABASE, TABLE, KEYS, VALUES, WHERE_KEY, WHERE_VALUE))
 
     # KEYS and VALUES must have same length
     if len(KEYS) != len(VALUES):
@@ -129,3 +131,7 @@ if __name__ == "__main__":
         print('update_db: update failed')
 
     _exit(0 if cursor.rowcount > 0 else 5)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
