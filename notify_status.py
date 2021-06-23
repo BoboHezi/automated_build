@@ -87,13 +87,13 @@ def main(argv):
     pre_status = select_status(cursor, compile_id)
     if pre_status is None:
         print('notify_status: wrong id %s' % compile_id)
-        return 2, cursor
+        return 2, None
     elif pre_status == code:
         print('notify_status: same status')
-        return 3, cursor
+        return 3, None
 
     if check:
-        return 0, cursor
+        return 0, None
 
     # update by http
     devops_token = os.getenv('DEVOPS_TOKEN')
@@ -110,7 +110,7 @@ def main(argv):
                 success = response['success']
                 if code == 200 and success:
                     print('notify_status: update "%s" success' % status)
-                    return 0, cursor
+                    return 0, None
             except Exception as e:
                 print('notify_status: Exception %s' % e)
         else:
@@ -124,7 +124,7 @@ def main(argv):
     success = cursor.rowcount == 1
     print('notify_status: update "%s" %s' % (status, 'success' if success else 'failed'))
 
-    return 0 if success else 4, cursor
+    return 0 if success else 4, None
 
 
 if __name__ == "__main__":

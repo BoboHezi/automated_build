@@ -123,7 +123,7 @@ def main(argv):
         print(ftp.getwelcome())
     except Exception as e:
         print('upload_ftp login failed')
-        return 8, ftp
+        return 8, None
     print
 
     # check remote dir & cwd
@@ -145,7 +145,7 @@ def main(argv):
             ftp.cwd(upload_path)
         except Exception as e:
             print('upload_ftp mkd failed\n')
-            return 9, ftp
+            return 9, None
     print('upload_ftp remote dir: %s\n' % ftp.pwd())
 
     # upload
@@ -154,7 +154,7 @@ def main(argv):
         ftp.storbinary('STOR ' + path.basename(ZIP_FILE), open(ZIP_FILE, 'rb'), 1024)
     except Exception as e:
         print('upload_ftp upload failed\n')
-        return 10, ftp
+        return 10, None
 
     file_url = 'ftp://%s@%s%s/%s' % (FTP_USER, FTP_HOST, upload_path, ZIP_FILE.split('/')[-1])
     print('upload success %s' % file_url)
@@ -168,7 +168,7 @@ def main(argv):
     utils.async_command(clean_cmd)
     utils.removedirs('out')
 
-    return 0, ftp
+    return 0, None
 
 
 if __name__ == '__main__':
