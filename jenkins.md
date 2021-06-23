@@ -179,7 +179,7 @@ WantedBy=multi-user.target
 |sv_platform_brand        |string              |品牌商，若为空，则使用项目客户号|
 |sv_platform_odm          |string              |方案商，若为空，则使用项目渠道号最后一段（eg:HONGXIANGYUAN_HONGXIANGYUAN）|
 |sv_platform_cclist       |string              |CC list|
-|sv_verity_purpose        |[official, factory] |验收用途，official：正式验收，factory：验收|
+|sv_verity_purpose        |[official, factory] |验收用途，official：正式验收，factory：工厂验收|
 |publish_username         |string              |验收包释放用户，若为空，则使用项目客户号|
 
 ### pipeline 阶段说明
