@@ -29,7 +29,7 @@ def main(argv):
 
     if not opts:
         print("upload_ftp wrong parameter try '-h or --help' to get more information")
-        _exit(1)
+        return 1, None
     global PROJECT_NAME, ZIP_FILE, FTP_HOST, FTP_USER, FTP_PWD
     if '-p' in opts or '--project' in opts:
         PROJECT_NAME = opts.get('-p') if opts.get('-p') else opts.get('--project')
@@ -56,14 +56,14 @@ def main(argv):
 
     if not PROJECT_NAME:
         print('upload_ftp must specify project(use -p or --project)\n')
-        _exit(3)
+        return 3, None
 
     # check MTK or SPRD
     PLATFORM = utils.dump_platform()
 
     if not PLATFORM:
         print('upload_ftp platform check failed\n')
-        _exit(5)
+        return 5, None
     print('upload_ftp platform: %s\n' % PLATFORM)
 
     # find project first
@@ -72,7 +72,7 @@ def main(argv):
 
     if status or not project_path or not path.exists(project_path + '/ProjectConfig.mk'):
         print('upload_ftp %s not found\n' % PROJECT_NAME)
-        _exit(6)
+        return 6, None
     print('upload_ftp project: %s found %s\n' % (PROJECT_NAME, project_path))
 
     # find build config file
@@ -108,7 +108,7 @@ def main(argv):
 
     if not path.isfile(ZIP_FILE):
         print('upload_ftp check ZIP_FILE: %s failed\n' % ZIP_FILE)
-        _exit(7)
+        return 7, None
     print('upload_ftp ZIP_FILE: %s\n' % ZIP_FILE)
 
     date_str = time.strftime('%Y%m', time.localtime())
@@ -123,7 +123,7 @@ def main(argv):
         print(ftp.getwelcome())
     except Exception as e:
         print('upload_ftp login failed')
-        _exit(8, ftp)
+        return 8, ftp
     print
 
     # check remote dir & cwd
@@ -145,7 +145,7 @@ def main(argv):
             ftp.cwd(upload_path)
         except Exception as e:
             print('upload_ftp mkd failed\n')
-            _exit(9, ftp)
+            return 9, ftp
     print('upload_ftp remote dir: %s\n' % ftp.pwd())
 
     # upload
@@ -154,7 +154,7 @@ def main(argv):
         ftp.storbinary('STOR ' + path.basename(ZIP_FILE), open(ZIP_FILE, 'rb'), 1024)
     except Exception as e:
         print('upload_ftp upload failed\n')
-        _exit(10, ftp)
+        return 10, ftp
 
     file_url = 'ftp://%s@%s%s/%s' % (FTP_USER, FTP_HOST, upload_path, ZIP_FILE.split('/')[-1])
     print('upload success %s' % file_url)
@@ -163,8 +163,14 @@ def main(argv):
     # delete publish package
     utils.removedirs(publish_out)
 
-    _exit(0, ftp)
+    # repoclean
+    clean_cmd = 'repo forall -c \'echo "$REPO_PATH ($REPO_REMOTE)"; git clean -fd; git reset --hard;\''
+    utils.async_command(clean_cmd)
+    utils.removedirs('out')
+
+    return 0, ftp
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    r, f = main(sys.argv[1:])
+    _exit(r, f)

@@ -307,7 +307,7 @@ def main(argv):
 
     if not opts:
         print('commit_sign_verify wrong parameter')
-        _exit(1)
+        return 1
     global PROJECT_NAME, SV_FTP_PATH, SV_URL, SV_USERNAME, SV_PASSWD, SV_PLATFORM, \
         SV_BOARD, SV_CCLIST, SV_MODEL, SV_BRAND_CUSTOMER, SV_ODM_CUSTOMER, SV_BUILD_VERITY, \
         SV_FTP_PUBLISH_USERNAME, SV_VERITY_PURPOSE, DEVOPS_COMPILE_ID
@@ -370,7 +370,7 @@ def main(argv):
 
     if not (PROJECT_NAME and SV_FTP_PATH):
         print('commit_sign_verify miss importent parameter\n')
-        _exit(2)
+        return 2
 
     # dump prject
     project = utils.dump_project(PROJECT_NAME)
@@ -378,7 +378,7 @@ def main(argv):
 
     if not project or utils.isempty(project.project_path):
         print('commit_sign_verify project not found\n')
-        _exit(3)
+        return 3
 
     # if model(机型) not specified, use uppercase project name
     if utils.isempty(SV_MODEL):
@@ -410,10 +410,10 @@ def main(argv):
             print('commit_sign_verify USER_ID: %s, token: %s\n' % (USER_ID, TOKEN))
             if utils.isempty(TOKEN) or utils.isempty(USER_ID):
                 print('commit_sign_verify login error!\n')
-                _exit(4)
+                return 4
     else:
         print('commit_sign_verify login error!\n')
-        _exit(4)
+        return 4
 
     headers_with_token = utils.common_headers.copy()
     headers_with_token['X-Access-Token'] = TOKEN
@@ -428,7 +428,7 @@ def main(argv):
         MODEL_ID = create_model(SV_MODEL, USER_ID, headers_with_token)
         if not MODEL_ID or int(MODEL_ID) <= 0:
             print('commit_sign_verify model %s create failed\n' % SV_MODEL)
-            _exit(5)
+            return 5
         else:
             print('commit_sign_verify SV_MODEL: %s created, id: %s\n' % (SV_MODEL, MODEL_ID))
 
@@ -440,7 +440,7 @@ def main(argv):
         ODM_ID = create_odm(SV_ODM_CUSTOMER, USER_ID, headers_with_token)
         if not ODM_ID or int(ODM_ID) <= 0:
             print('commit_sign_verify odm %s create failed\n' % SV_ODM_CUSTOMER)
-            _exit(6)
+            return 6
         else:
             print('commit_sign_verify SV_ODM_CUSTOMER: %s created, id: %s\n' % (SV_ODM_CUSTOMER, ODM_ID))
 
@@ -454,7 +454,7 @@ def main(argv):
                                     headers_with_token)
         if not PROJECT_ID or int(PROJECT_ID) <= 0:
             print('commit_sign_verify project %s create failed\n' % project.customer_branch)
-            _exit(7)
+            return 7
         else:
             print('commit_sign_verify project: %s created, id: %s\n' % (project.customer_branch, PROJECT_ID))
 
@@ -466,7 +466,7 @@ def main(argv):
         BRAND_ID = create_brand(SV_BRAND_CUSTOMER, USER_ID, headers_with_token)
         if not BRAND_ID or int(BRAND_ID) <= 0:
             print('commit_sign_verify brand %s create failed\n' % SV_BRAND_CUSTOMER)
-            _exit(8)
+            return 8
         else:
             print('commit_sign_verify SV_BRAND_CUSTOMER: %s created, id: %s\n' % (SV_BRAND_CUSTOMER, ODM_ID))
 
@@ -479,7 +479,7 @@ def main(argv):
         SV_FTP_PATH = str(SV_FTP_PATH).replace('%s@' % ftpUsername, '')
     if utils.isempty(ftpUsername):
         print('ftpUsername not specified!\n')
-        _exit(9)
+        return 9
     print('commit_sign_verify ftpUsername: %s\n' % ftpUsername)
 
     # create verity task first
@@ -493,7 +493,7 @@ def main(argv):
                                               headers_with_token)
         if not verity_task_data:
             print('commit_sign_verify create verity task failed!\n')
-            _exit(10)
+            return 10
         else:
             print('commit_sign_verify verity task created, id: %s\n' % verity_task_data['taskId'])
 
@@ -504,7 +504,7 @@ def main(argv):
                                       ftpUsername, verity_task_id, USER_ID, headers_with_token)
     if not sign_task_data:
         print('commit_sign_verify create sign task failed!\n')
-        _exit(11)
+        return 11
     print('commit_sign_verify sign task created: %s\n' % sign_task_data['id'])
 
     # start task
@@ -523,8 +523,9 @@ def main(argv):
                    "-v", "%s,%s,%s" % (SV_FTP_PATH, sign_task_data['id'], verity_task_id), "-w", "id",
                    "-e", DEVOPS_COMPILE_ID]
     update_db.main(update_argv)
-    _exit(0)
+    return 0
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    r = main(sys.argv[1:])
+    _exit(r)

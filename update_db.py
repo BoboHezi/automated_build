@@ -29,7 +29,7 @@ def usage():
 
 
 def _exit(code, cursor=None):
-    utils.star_log('update_db start', 60)
+    utils.star_log('update_db end', 60)
     if cursor != None:
         cursor.close()
     exit(code)
@@ -52,12 +52,12 @@ def main(argv):
 
     # check dump result
     if not opts:
-        _exit(1)
+        return 1, None
 
     # check help
     if '-h' in opts or '--help' in opts:
         usage()
-        _exit(2)
+        return 2, None
 
     global DATABASE, TABLE, KEYS, VALUES, WHERE_KEY, WHERE_VALUE
     # check options
@@ -81,7 +81,7 @@ def main(argv):
     # must specify below options
     if not (DATABASE and TABLE and KEYS and VALUES):
         usage()
-        _exit(3)
+        return 3, None
     print('''
         DATABASE:    %s
         TABLE:       %s
@@ -94,7 +94,7 @@ def main(argv):
     # KEYS and VALUES must have same length
     if len(KEYS) != len(VALUES):
         print('update_db: KEYS and VALUES must have same length')
-        _exit(4)
+        return 4, None
 
     # genrate SQL
     update_sql = ('UPDATE %s SET (UPDATES)' % TABLE)
@@ -130,8 +130,9 @@ def main(argv):
     else:
         print('update_db: update failed')
 
-    _exit(0 if cursor.rowcount > 0 else 5)
+    return 0 if cursor.rowcount > 0 else 5, None
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    r, c = main(sys.argv[1:])
+    _exit(r, c)

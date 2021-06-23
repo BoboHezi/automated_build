@@ -207,7 +207,7 @@ def main(argv):
 
     if not opts:
         print("otadiff wrong parameter try '-h or --help' to get more information")
-        _exit(1)
+        return 1, None
 
     global BEFORE_TARGET_FILE, BEFORE_FTP_USERNAME, BEFORE_FTP_PASSWD, AFTER_TARGET_FILE, AFTER_FTP_USERNAME, \
         AFTER_FTP_PASSWD, SV_PLATFORM_TERRACE, DEVOPS_OTA_TASK_ID
@@ -249,7 +249,7 @@ def main(argv):
             not BEFORE_TARGET_FILE.endswith('_target_files.zip') or \
             not AFTER_TARGET_FILE.endswith('_target_files.zip'):
         print("otadiff wrong parameter")
-        _exit(1)
+        return 1, None
 
     global BEFORE_FTP, AFTER_FTP
     # dump ftp url
@@ -260,7 +260,7 @@ def main(argv):
     before, after = download()
     if utils.isempty(before) or utils.isempty(after):
         print('\notadiff download failed.')
-        _exit(2)
+        return 2, None
 
     # enter platform
     ary = SV_PLATFORM_TERRACE.split('_')
@@ -268,7 +268,7 @@ def main(argv):
     print('\notadiff platform: %s' % platform)
     if not (platform and (path.isdir(platform) or path.islink(platform))):
         print('\notadiff folder platform: %s not found!' % platform)
-        _exit(3)
+        return 3, None
     chdir(platform)
     print('\notadiff now in %s' % getcwd())
 
@@ -276,7 +276,7 @@ def main(argv):
     cmd = PLATFORM_CMD[platform] if platform in PLATFORM_CMD else None
     if utils.isempty(cmd):
         print('\notadiff folder cmd not found!')
-        _exit(4)
+        return 4, None
 
     # remove package.zip & update.zip
     utils.removedirs('package.zip')
@@ -291,7 +291,7 @@ def main(argv):
     utils.star_log('make ota end', 60)
     if rst != 0:
         print('\notadiff ota cmd failed' % cmd)
-        _exit(5)
+        return 5, None
 
     # remove target files
     utils.removedirs('../%s' % BEFORE_FTP['name'])
@@ -314,9 +314,10 @@ def main(argv):
             global OTA_URL
             OTA_URL = upload_package()
             print('\notadiff %s' % OTA_URL)
-            _exit(0)
-    _exit(6)
+            return 0, None
+    return 6, None
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    r, f = main(sys.argv[1:])
+    _exit(r, f)
