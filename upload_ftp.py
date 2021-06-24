@@ -3,6 +3,7 @@ import sys
 import time
 from ftplib import FTP
 from os import path
+from re import search
 
 import utils
 
@@ -163,10 +164,15 @@ def main(argv):
     # delete publish package
     utils.removedirs(publish_out)
 
-    # repoclean
-    clean_cmd = 'repo forall -c \'echo "$REPO_PATH ($REPO_REMOTE)"; git clean -fd; git reset --hard;\''
-    utils.async_command(clean_cmd)
-    utils.removedirs('out')
+    # remove out if necessary
+    c, t = utils.execute('df $PWD')
+    if c == 0 and not utils.isempty(t):
+        match = search('[ ]+([0-9]+)[ ]+([0-9]+)[ ]+([0-9]+)[ ]+', t)
+        if match and match.group(3):
+            available = int(match.group(3))
+            if available < 200 * 1024 * 1024:
+                print('upload_ftp df: %s' % t.split('\n')[1])
+                utils.async_command('[ -d out ] && rm -rf out')
 
     return 0, None
 
