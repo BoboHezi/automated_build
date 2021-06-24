@@ -53,6 +53,15 @@
 
 echo -e &quot;\nserver_ip_address: $server_ip_address, server_hostname: $server_hostname\n&quot;
 
+rst=$(echo &quot;&quot; | telnet $server_ip_address 22)
+echo $rst | grep &quot;Connected&quot;
+if [[ $? -ne 0 ]]; then
+    echo -e &quot;\nhost can not reach&quot;
+    # mark server_status 6
+    python3 update_db.py -t devops_server -k server_status -v 6 -w id -e $devops_host_id
+    exit 1
+fi
+
 # connect &amp; reboot
 sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
 sudo -S reboot &lt;&lt; END
@@ -63,13 +72,6 @@ rst=$?
 
 cd $LOCAL_SCRIPT_PATH
 echo -e &quot;\nrst: $rst, current workspace: `pwd`&quot;
-
-if [[ $rst -ne 0 ]]; then
-    echo -e &quot;\nhost can not reach&quot;
-    # mark server_status 6
-    python3 update_db.py -t devops_server -k server_status -v 6 -w id -e $devops_host_id
-    exit 1
-fi
 
 # waitting...
 echo -e &quot;\nhost shutdown, waitting for boot&quot;

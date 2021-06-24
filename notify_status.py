@@ -56,7 +56,7 @@ def main(argv):
     utils.star_log('notify_status start', 60)
     if len(argv) <= 1:
         print('notify_status: wrong params')
-        _exit(1)
+        return 1, None
 
     # get params
     compile_id = argv[0]
@@ -70,7 +70,7 @@ def main(argv):
                 break
     if status not in STATUS_CODE:
         print('wrong status')
-        _exit(1)
+        return 1, None
     code = STATUS_CODE[status]
 
     # sql connect
@@ -87,13 +87,13 @@ def main(argv):
     pre_status = select_status(cursor, compile_id)
     if pre_status is None:
         print('notify_status: wrong id %s' % compile_id)
-        _exit(2, cursor)
+        return 2, None
     elif pre_status == code:
         print('notify_status: same status')
-        _exit(3, cursor)
+        return 3, None
 
     if check:
-        _exit(0)
+        return 0, None
 
     # update by http
     devops_token = os.getenv('DEVOPS_TOKEN')
@@ -110,7 +110,7 @@ def main(argv):
                 success = response['success']
                 if code == 200 and success:
                     print('notify_status: update "%s" success' % status)
-                    _exit(0)
+                    return 0, None
             except Exception as e:
                 print('notify_status: Exception %s' % e)
         else:
@@ -124,8 +124,9 @@ def main(argv):
     success = cursor.rowcount == 1
     print('notify_status: update "%s" %s' % (status, 'success' if success else 'failed'))
 
-    _exit(0 if success else 4, cursor)
+    return 0 if success else 4, None
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    r, c = main(sys.argv[1:])
+    _exit(r, c)

@@ -244,7 +244,8 @@ def removedirs(file):
         for i in os.listdir(file):
             removedirs('%s/%s' % (file, i))
         try:
-            os.removedirs(file)
+            if path.isdir(file):
+                os.removedirs(file)
         except Exception as e:
             print(e)
 
