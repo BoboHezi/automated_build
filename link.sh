@@ -9,7 +9,7 @@ fi
 
 echo "src=$src, dest=$dest"
 
-excludes=("link.sh" "utils.py" "RepoParser.py" "otadiff.py" "web_terminal.sh")
+excludes=("link.sh" "utils.py" "RepoParser.py" "otadiff.py" "web_terminal.sh" "ttyd_x86_64.sh")
 
 src_files=`find -maxdepth 1 -type f -regex '.*\.sh\|.*\.py'`
 for file in $src_files; do
