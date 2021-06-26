@@ -39,6 +39,10 @@ url='http://192.168.48.105:8080/jeecg-boot/server/devopsServer/jenkinsRequestSer
 
 echo -e "\n*******web terminal*******\n"
 
+home="/home/`whoami`"
+ttyd_file=${ttyd_file/#~/$home}
+code_dir=${code_dir/#~/$home}
+
 echo "code_dir      : $code_dir"
 echo "stop_terminal : $stop_terminal"
 echo "ttyd_file     : $ttyd_file"
@@ -73,6 +77,9 @@ fi
 # find ttyd
 if [ ! -f $ttyd_file ]; then
     echo "$ttyd_file not exist!"
+    full_url=$url"?id=$id&status=5&ServerDir="
+    echo "full_url: $full_url"
+    curl -H X-Access-Token:"$DEVOPS_TOKEN" -X GET $full_url
     exit 1
 fi
 
@@ -93,5 +100,4 @@ ServerDir=$([[ $status == 0 ]] && echo "http://$ip:$ttyd_port" || echo "")
 full_url=$url"?id=$id&status=$status&ServerDir=$ServerDir"
 echo "full_url: $full_url"
 curl -H X-Access-Token:"$DEVOPS_TOKEN" -X GET $full_url
-
 exit 0
