@@ -28,7 +28,7 @@ function get_random_port {
 
 function http_notify {
     url='http://192.168.48.105:8080/jeecg-boot/server/devopsServer/jenkinsRequestServer'
-    full_url=$url"?id=$1&status=$1&ServerDir=$3"
+    full_url=$url"?id=$1&status=$2&ServerDir=$3"
     echo "full_url: $full_url"
     curl -H X-Access-Token:"$DEVOPS_TOKEN" -X GET $full_url
 }
