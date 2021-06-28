@@ -89,7 +89,7 @@ fi
 ttyd_port=$(get_random_port 1000 65535)
 echo '------------start tydd------------'
 echo "$ttyd_file -p $ttyd_port -m 2 bash &"
-$ttyd_file -p $ttyd_port -m 2 bash &
+$ttyd_file -p $ttyd_port -m 5 bash &
 
 sleep 5s
 ttyd_pid=$(ps -ef | grep ttyd | grep -v 'grep' | grep -v 'web_terminal' | awk '{print $2}')
