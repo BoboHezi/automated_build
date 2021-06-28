@@ -26,6 +26,13 @@ function get_random_port {
    echo "$PORT"
 }
 
+function http_notify {
+    url='http://192.168.48.105:8080/jeecg-boot/server/devopsServer/jenkinsRequestServer'
+    full_url=$url"?id=$1&status=$1&ServerDir=$3"
+    echo "full_url: $full_url"
+    curl -H X-Access-Token:"$DEVOPS_TOKEN" -X GET $full_url
+}
+
 # argv_str=$*
 # argv=(${argv_str//,/ })
 # code_dir=${argv[0]}
@@ -35,7 +42,6 @@ stop_terminal=$2
 ttyd_file=$3
 id=$4
 ip=$5
-url='http://192.168.48.105:8080/jeecg-boot/server/devopsServer/jenkinsRequestServer'
 
 echo -e "\n*******web terminal*******\n"
 
@@ -63,9 +69,7 @@ status=1
 
 # just kill
 if [[ "$stop_terminal" == "true" ]]; then
-    full_url=$url"?id=$id&status=$status&ServerDir="
-    echo "full_url: $full_url"
-    curl -H X-Access-Token:"$DEVOPS_TOKEN" -X GET $full_url
+    http_notify "$id" "$status" ""
     exit 0
 fi
 
@@ -77,27 +81,23 @@ fi
 # find ttyd
 if [ ! -f $ttyd_file ]; then
     echo "$ttyd_file not exist!"
-    full_url=$url"?id=$id&status=5&ServerDir="
-    echo "full_url: $full_url"
-    curl -H X-Access-Token:"$DEVOPS_TOKEN" -X GET $full_url
+    http_notify "$id" "5" ""
     exit 1
 fi
 
-# random port
+# start ttyd with random port
 ttyd_port=$(get_random_port 1000 65535)
-
 echo '------------start tydd------------'
 echo "$ttyd_file -p $ttyd_port -m 2 bash &"
 $ttyd_file -p $ttyd_port -m 2 bash &
 
 sleep 5s
-
 ttyd_pid=$(ps -ef | grep ttyd | grep -v 'grep' | grep -v 'web_terminal' | awk '{print $2}')
-echo -e "pid: $ttyd_pid"
-status=$([[ $ttyd_pid -gt 0 ]] && echo 0 || echo 5)
+echo -e "ttyd pid: $ttyd_pid"
 
+# notify
+status=$([[ $ttyd_pid -gt 0 ]] && echo 0 || echo 5)
 ServerDir=$([[ $status == 0 ]] && echo "http://$ip:$ttyd_port" || echo "")
-full_url=$url"?id=$id&status=$status&ServerDir=$ServerDir"
-echo "full_url: $full_url"
-curl -H X-Access-Token:"$DEVOPS_TOKEN" -X GET $full_url
+http_notify "$id" "$status" "$ServerDir"
+
 exit 0
