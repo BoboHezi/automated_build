@@ -86,7 +86,7 @@ def check_item(user_id=USER_ID, name=None, keyword=None, url=None, headers=utils
                         if item[name] == keyword:
                             return item
         except Exception as e:
-            print(e)
+            print('commit_sign_verify check %s: %s, %s' % (name, keyword, e))
         finally:
             pass
 
@@ -263,7 +263,7 @@ def create_sign_task(task_name, urlBefore, model, platform, signAndVerify, ftpUs
     request_data = {
         'name': task_name,
         'urlBefore': urlBefore,
-        'intro': 'created by automatic deployment',
+        'intro': 'created by automatic deployment(%s)' % DEVOPS_COMPILE_ID,
         'model': model,
         'platform': platform,
         'signAndVerify': signAndVerify,
