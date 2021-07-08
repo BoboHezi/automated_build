@@ -284,13 +284,14 @@ def main(argv):
 
     # execute
     cmd = cmd.replace('$before', before, 1).replace('$after', after, 1)
+    cmd = cmd.replace('(', '\(').replace(')', '\)')
     print('\notadiff cmd: %s\n' % cmd)
     utils.star_log('make ota start', 60)
     process, rst = utils.async_command(cmd)
     # rst, msg = utils.execute(cmd)
     utils.star_log('make ota end', 60)
     if rst != 0:
-        print('\notadiff ota cmd failed' % cmd)
+        print('\notadiff ota cmd failed')
         return 5, None
 
     # remove target files
