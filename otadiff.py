@@ -175,7 +175,7 @@ def upload_package():
     upload_path = '%s%s--%s' % (AFTER_FTP['path'], before_verno, after_verno)
     # mkd and enter
     try:
-        if upload_path not in ftp.nlst(AFTER_FTP['path']):
+        if upload_path.split('/')[-1] not in ftp.nlst(AFTER_FTP['path']):
             ftp.mkd(upload_path)
         ftp.cwd(upload_path)
         print('\notadiff now in %s' % upload_path)
