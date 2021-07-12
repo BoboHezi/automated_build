@@ -157,7 +157,8 @@ echo -e "\nmk -f -$build_variant $is_sign $build_project $build_action\n"
 if [ $is_test == "true" ]; then
     ./test_script.sh ; build_rst=$?
 else
-    ./mk -f -$build_variant $is_sign $build_project $build_action ; build_rst=$?
+    exit 255
+    # ./mk -f -$build_variant $is_sign $build_project $build_action ; build_rst=$?
     # ./test_script.sh ; build_rst=$?
 fi
 
