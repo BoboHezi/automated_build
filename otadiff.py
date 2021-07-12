@@ -175,14 +175,26 @@ def upload_package():
     upload_path = '%s%s--%s' % (AFTER_FTP['path'], before_verno, after_verno)
     # mkd and enter
     try:
-        if upload_path.split('/')[-1] not in ftp.nlst(AFTER_FTP['path']):
-            ftp.mkd(upload_path)
         ftp.cwd(upload_path)
-        print('\notadiff now in %s' % upload_path)
     except Exception as e:
-        print('\notadiff mkd failed: %s' % e)
-        ftp.quit()
-        return None
+        print('\notadiff cwd failed: %s, try mkd\n' % e)
+        try:
+            ftp.cwd('~')
+            base_dir = ftp.pwd()
+            for p in upload_path.split('/'):
+                if utils.isempty(p):
+                    continue
+                base_dir = base_dir + p + '/'
+                try:
+                    ftp.cwd(base_dir)
+                except Exception as e:
+                    ftp.mkd(base_dir)
+            ftp.cwd(upload_path)
+            print('\notadiff now in %s' % upload_path)
+        except Exception as e:
+            print('\notadiff mkd failed: %s' % e)
+            ftp.quit()
+            return None
 
     # upload
     try:
