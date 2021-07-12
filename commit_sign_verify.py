@@ -48,6 +48,8 @@ SV_FTP_PUBLISH_USERNAME = None
 SV_VERITY_PURPOSE = 'official'
 # 编译任务ID
 DEVOPS_COMPILE_ID = None
+# 优先级
+SV_VERITY_LEVEL = 0
 
 TOKEN = None
 
@@ -242,7 +244,7 @@ def create_verity_task(project_id, ftpPath, ftpUsername, platform, board, ccList
         'ftpPublishFolder': 'ftp://upload.droi.com:21/',
         'ftpPublishUsername': ftpPublishUsername,
         'passby': 0,
-        'level': None,
+        'level': SV_VERITY_LEVEL,
         'userName': userName,
         'userId1': userId1
     }
@@ -302,6 +304,7 @@ def main(argv):
     option_str += ',i-publish:'  # SV_FTP_PUBLISH_USERNAME
     option_str += ',e-purpose:'  # SV_VERITY_PURPOSE
     option_str += ',d-id:'  # DEVOPS_COMPILE_ID
+    option_str += ',y-priority:'  # SV_VERITY_LEVEL
     opts = utils.dump(argv, option_str)
     # print(opts)
 
@@ -310,7 +313,7 @@ def main(argv):
         return 1
     global PROJECT_NAME, SV_FTP_PATH, SV_URL, SV_USERNAME, SV_PASSWD, SV_PLATFORM, \
         SV_BOARD, SV_CCLIST, SV_MODEL, SV_BRAND_CUSTOMER, SV_ODM_CUSTOMER, SV_BUILD_VERITY, \
-        SV_FTP_PUBLISH_USERNAME, SV_VERITY_PURPOSE, DEVOPS_COMPILE_ID
+        SV_FTP_PUBLISH_USERNAME, SV_VERITY_PURPOSE, SV_VERITY_LEVEL, DEVOPS_COMPILE_ID
 
     if '-p' in opts or '--project' in opts:
         PROJECT_NAME = opts.get('-p') if opts.get('-p') else opts.get('--project')
@@ -342,6 +345,8 @@ def main(argv):
         SV_VERITY_PURPOSE = opts.get('-e') if opts.get('-e') else opts.get('--purpose')
     if '-d' in opts or '--id' in opts:
         DEVOPS_COMPILE_ID = opts.get('-d') if opts.get('-d') else opts.get('--id')
+    if '-y' in opts or '--priority' in opts:
+        SV_VERITY_LEVEL = opts.get('-y') if opts.get('-y') else opts.get('--priority')
 
     if path.isfile(SV_FTP_PATH):
         file = open(SV_FTP_PATH, 'r')

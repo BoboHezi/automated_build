@@ -4,6 +4,7 @@ def prepare_rst = ''
 def build_rst = ''
 def upload_rst = ''
 def sv_rst = ''
+def known_status = '0 1 2 3 4 5 6 7 8 9 10 11 12 13 '
 
 pipeline {
     agent 'any'
@@ -333,7 +334,10 @@ EOF
             if [ "$prepare_rst" != "0" ]; then
                 python3 notify_status.py $devops_compile_id prepare_failed
             elif [ "$build_rst" != "0" ]; then
-                python3 notify_status.py $devops_compile_id $build_rst
+                case "$known_status" in
+                    *"$build_rst "*) python3 notify_status.py $devops_compile_id $build_rst ;;
+                    *) python3 notify_status.py $devops_compile_id build_failed ;;
+                esac
             elif [ "$upload_rst" != "0" ]; then
                 python3 notify_status.py $devops_compile_id upload_failed
             elif [ "$sv_rst" != "0" ]; then
