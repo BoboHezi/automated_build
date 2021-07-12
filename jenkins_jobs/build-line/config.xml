@@ -201,6 +201,21 @@
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>sv_verity_level</name>
+          <description>低    ：0
+中    ：1
+高    ：2
+加急：3</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>0</string>
+              <string>1</string>
+              <string>2</string>
+              <string>3</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>publish_username</name>
           <description>验收包释放用户，若为空，则使用项目客户号</description>
@@ -252,6 +267,7 @@ pipeline {
                     println &quot;sv_platform_odm: ${sv_platform_odm}&quot;
                     println &quot;sv_platform_cclist: ${sv_platform_cclist}&quot;
                     println &quot;sv_verity_purpose: ${sv_verity_purpose}&quot;
+                    println &quot;sv_verity_level: ${sv_verity_level}&quot;
                     println &quot;publish_username: ${publish_username}&quot;
                     println &quot;LOCAL_SCRIPT_PATH: ${LOCAL_SCRIPT_PATH}&quot;
                     println &quot;REMOTE_SCRIPT_PATH: ${REMOTE_SCRIPT_PATH}&quot;
@@ -453,13 +469,13 @@ EOF
                         -s \&quot;$sv_platform_username\&quot; -c \&quot;$sv_platform_passwd\&quot; -t \&quot;$sv_platform_terrace\&quot; \
                         -b \&quot;$sv_platform_board\&quot; -l \&quot;$sv_platform_cclist\&quot; -m \&quot;$sv_platform_model\&quot; \
                         -r \&quot;$sv_platform_brand\&quot; -o \&quot;$sv_platform_odm\&quot; -i \&quot;$publish_username\&quot; \
-                        -e \&quot;$sv_verity_purpose\&quot; -d \&quot;$devops_compile_id\&quot; \&quot;$verity\&quot;&quot;
+                        -e \&quot;$sv_verity_purpose\&quot; -d \&quot;$devops_compile_id\&quot; -y \&quot;$sv_verity_level\&quot; \&quot;$verity\&quot;&quot;
 
                     python3 commit_sign_verify.py -p \&quot;$project_name\&quot; -f \&quot;ftp_url.txt\&quot; -u \&quot;$sv_platform_url\&quot; \
                         -s \&quot;$sv_platform_username\&quot; -c \&quot;$sv_platform_passwd\&quot; -t \&quot;$sv_platform_terrace\&quot; \
                         -b \&quot;$sv_platform_board\&quot; -l \&quot;$sv_platform_cclist\&quot; -m \&quot;$sv_platform_model\&quot; \
                         -r \&quot;$sv_platform_brand\&quot; -o \&quot;$sv_platform_odm\&quot; -i \&quot;$publish_username\&quot; \
-                        -e \&quot;$sv_verity_purpose\&quot; -d \&quot;$devops_compile_id\&quot; \&quot;$verity\&quot;
+                        -e \&quot;$sv_verity_purpose\&quot; -d \&quot;$devops_compile_id\&quot; -y \&quot;$sv_verity_level\&quot; \&quot;$verity\&quot;
                     &apos;&apos;&apos;)
                     sh &quot;&quot;&quot;exit $sv_rst&quot;&quot;&quot;
                 }
