@@ -130,7 +130,7 @@ rst=$?
 echo &quot;rst: $rst&quot;
 
 if [[ $rst != 0 ]]; then
-	url=&quot;http://192.168.48.105:8080/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id=$id&amp;status=7&amp;otaDir=&amp;otaLogUrl=$BUILD_URL/console&quot;
+	url=&quot;http://192.168.48.2:8082/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id=$id&amp;status=7&amp;otaDir=&amp;otaLogUrl=$BUILD_URL/console&quot;
 	echo &quot;url: $url&quot;
 	curl -H X-Access-Token:&quot;$devops_token&quot; -X GET $url
 fi
