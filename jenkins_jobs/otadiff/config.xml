@@ -109,16 +109,19 @@ sshpass -p &quot;$ota_factory_host_pwd&quot; scp -r $LOCAL_SCRIPT_PATH/otadiff.p
 sshpass -p &quot;$ota_factory_host_pwd&quot; ssh -o StrictHostKeyChecking=no &quot;$ota_factory_host_user@$ota_factory_host_ip&quot; &lt;&lt; EOF
 
 echo &quot;devops_token: $devops_token&quot;
+echo &quot;BUILD_URL: $BUILD_URL&quot;
 export DEVOPS_TOKEN=$devops_token
+export BUILD_URL=$BUILD_URL
 readonly DEVOPS_TOKEN
+readonly BUILD_URL
 
 cd $ota_factory_host_path
 
 pwd
 
-python3 otadiff.py --bfile=&quot;$before_target_file&quot; --buser=&quot;$before_ftp_username&quot; --bpasswd=&quot;$before_ftp_passwd&quot; \
-	--afile=&quot;$after_target_file&quot; --auser=&quot;$after_ftp_username&quot; --apasswd=&quot;$after_ftp_passwd&quot; \
-    --terrace=&quot;$sv_platform_terrace&quot; --id=&quot;$id&quot;
+[ -f otadiff.py ] &amp;&amp; ( python3 otadiff.py --bfile=&quot;$before_target_file&quot; --buser=&quot;$before_ftp_username&quot; \
+	--bpasswd=&quot;$before_ftp_passwd&quot; --afile=&quot;$after_target_file&quot; --auser=&quot;$after_ftp_username&quot; \
+    --apasswd=&quot;$after_ftp_passwd&quot; --terrace=&quot;$sv_platform_terrace&quot; --id=&quot;$id&quot; || echo &quot;exit 0&quot; )
 
 EOF
 
@@ -127,8 +130,9 @@ rst=$?
 echo &quot;rst: $rst&quot;
 
 if [[ $rst != 0 ]]; then
-	curl -H X-Access-Token:&quot;$devops_token&quot; -X GET \
-    	http://192.168.48.2:8082/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id\=$id\&amp;status\=3\&amp;otaDir\=
+	url=&quot;http://192.168.48.105:8080/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id=$id&amp;status=7&amp;otaDir=&amp;otaLogUrl=$BUILD_URL/console&quot;
+	echo &quot;url: $url&quot;
+	curl -H X-Access-Token:&quot;$devops_token&quot; -X GET $url
 fi
 </command>
       <configuredLocalRules/>
