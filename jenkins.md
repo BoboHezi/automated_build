@@ -323,3 +323,5 @@ sudo pip install pycryptodome
 
 
 10. 回传OTA编译错误原因(0708)
+
+* done(0714)
