@@ -119,15 +119,21 @@ cd $ota_factory_host_path
 
 pwd
 
-python3 otadiff.py --bfile=&quot;$before_target_file&quot; --buser=&quot;$before_ftp_username&quot; --bpasswd=&quot;$before_ftp_passwd&quot; \
-	--afile=&quot;$after_target_file&quot; --auser=&quot;$after_ftp_username&quot; --apasswd=&quot;$after_ftp_passwd&quot; \
-    --terrace=&quot;$sv_platform_terrace&quot; --id=&quot;$id&quot;
+[ -f otadiff.py ] &amp;&amp; ( python3 otadiff.py --bfile=&quot;$before_target_file&quot; --buser=&quot;$before_ftp_username&quot; \
+	--bpasswd=&quot;$before_ftp_passwd&quot; --afile=&quot;$after_target_file&quot; --auser=&quot;$after_ftp_username&quot; \
+    --apasswd=&quot;$after_ftp_passwd&quot; --terrace=&quot;$sv_platform_terrace&quot; --id=&quot;$id&quot; || echo &quot;exit 0&quot; )
 
 EOF
 
 rst=$?
 
 echo &quot;rst: $rst&quot;
+
+if [[ $rst != 0 ]]; then
+	url=&quot;http://192.168.48.105:8080/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id=$id&amp;status=7&amp;otaDir=&amp;otaLogUrl=$BUILD_URL/console&quot;
+	echo &quot;url: $url&quot;
+	curl -H X-Access-Token:&quot;$devops_token&quot; -X GET $url
+fi
 </command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
