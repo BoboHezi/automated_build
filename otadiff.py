@@ -271,6 +271,9 @@ def main(argv):
         print("otadiff wrong parameter")
         return 4, None
 
+    # notify processing & log url
+    http_notify(DEVOPS_OTA_TASK_ID, 2, '')
+
     global BEFORE_FTP, AFTER_FTP
     # dump ftp url
     BEFORE_FTP = dump_url(BEFORE_TARGET_FILE)
