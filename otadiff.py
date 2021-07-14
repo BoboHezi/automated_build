@@ -53,7 +53,7 @@ OTA_URL = None
 
 
 def _exit(code=0, ftp=None):
-    http_notify(DEVOPS_OTA_TASK_ID, 3 if code else 0, '' if code else OTA_URL)
+    http_notify(DEVOPS_OTA_TASK_ID, code, '' if code else OTA_URL)
     utils.star_log('otadiff end', 60)
     if ftp:
         ftp.quit()
@@ -62,9 +62,10 @@ def _exit(code=0, ftp=None):
 
 def http_notify(id, status, otaDir):
     token = os.getenv('DEVOPS_TOKEN')
+    build_url = os.getenv('BUILD_URL')
     if not utils.isempty(token):
-        url = '%s%s?id=%s&status=%s&otaDir=%s' % \
-              (utils.DEVOPS_HTTP_URL, utils.OTA_STATUS_PATH, id, status, otaDir)
+        url = '%s%s?id=%s&status=%s&otaDir=%s&otaLogUrl=%s' % \
+              (utils.DEVOPS_HTTP_URL, utils.OTA_STATUS_PATH, id, status, otaDir, build_url.append('console'))
         print('\notadiff url: %s' % url)
         headers = {
             'X-Access-Token': token
@@ -175,14 +176,26 @@ def upload_package():
     upload_path = '%s%s--%s' % (AFTER_FTP['path'], before_verno, after_verno)
     # mkd and enter
     try:
-        if upload_path not in ftp.nlst(AFTER_FTP['path']):
-            ftp.mkd(upload_path)
         ftp.cwd(upload_path)
-        print('\notadiff now in %s' % upload_path)
     except Exception as e:
-        print('\notadiff mkd failed: %s' % e)
-        ftp.quit()
-        return None
+        print('\notadiff cwd failed: %s, try mkd\n' % e)
+        try:
+            ftp.cwd('~')
+            base_dir = ftp.pwd()
+            for p in upload_path.split('/'):
+                if utils.isempty(p):
+                    continue
+                base_dir = base_dir + p + '/'
+                try:
+                    ftp.cwd(base_dir)
+                except Exception as e:
+                    ftp.mkd(base_dir)
+            ftp.cwd(upload_path)
+            print('\notadiff now in %s' % upload_path)
+        except Exception as e:
+            print('\notadiff mkd failed: %s' % e)
+            ftp.quit()
+            return None
 
     # upload
     try:
@@ -214,7 +227,7 @@ def main(argv):
 
     if not opts:
         print("otadiff wrong parameter try '-h or --help' to get more information")
-        return 1, None
+        return 4, None
 
     global BEFORE_TARGET_FILE, BEFORE_FTP_USERNAME, BEFORE_FTP_PASSWD, AFTER_TARGET_FILE, AFTER_FTP_USERNAME, \
         AFTER_FTP_PASSWD, SV_PLATFORM_TERRACE, DEVOPS_OTA_TASK_ID
@@ -256,7 +269,7 @@ def main(argv):
             not BEFORE_TARGET_FILE.endswith('_target_files.zip') or \
             not AFTER_TARGET_FILE.endswith('_target_files.zip'):
         print("otadiff wrong parameter")
-        return 1, None
+        return 4, None
 
     global BEFORE_FTP, AFTER_FTP
     # dump ftp url
@@ -267,7 +280,7 @@ def main(argv):
     before, after = download()
     if utils.isempty(before) or utils.isempty(after):
         print('\notadiff download failed.')
-        return 2, None
+        return 5, None
 
     # enter platform
     ary = SV_PLATFORM_TERRACE.split('_')
@@ -275,7 +288,7 @@ def main(argv):
     print('\notadiff platform: %s' % platform)
     if not (platform and (path.isdir(platform) or path.islink(platform))):
         print('\notadiff folder platform: %s not found!' % platform)
-        return 3, None
+        return 6, None
     chdir(platform)
     print('\notadiff now in %s' % getcwd())
 
@@ -283,7 +296,7 @@ def main(argv):
     cmd = PLATFORM_CMD[platform] if platform in PLATFORM_CMD else None
     if utils.isempty(cmd):
         print('\notadiff folder cmd not found!')
-        return 4, None
+        return 7, None
 
     # remove package.zip & update.zip
     utils.removedirs('package.zip')
@@ -299,7 +312,7 @@ def main(argv):
     utils.star_log('make ota end', 60)
     if rst != 0:
         print('\notadiff ota cmd failed')
-        return 5, None
+        return 3, None
 
     # remove target files
     utils.removedirs('../%s' % BEFORE_FTP['name'])
@@ -322,8 +335,9 @@ def main(argv):
             global OTA_URL
             OTA_URL = upload_package()
             print('\notadiff %s' % OTA_URL)
-            return 0, None
-    return 6, None
+            if not utils.isempty(OTA_URL):
+                return 0, None
+    return 8, None
 
 
 if __name__ == '__main__':

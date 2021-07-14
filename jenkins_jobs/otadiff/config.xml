@@ -109,8 +109,11 @@ sshpass -p &quot;$ota_factory_host_pwd&quot; scp -r $LOCAL_SCRIPT_PATH/otadiff.p
 sshpass -p &quot;$ota_factory_host_pwd&quot; ssh -o StrictHostKeyChecking=no &quot;$ota_factory_host_user@$ota_factory_host_ip&quot; &lt;&lt; EOF
 
 echo &quot;devops_token: $devops_token&quot;
+echo &quot;BUILD_URL: $BUILD_URL&quot;
 export DEVOPS_TOKEN=$devops_token
+export BUILD_URL=$BUILD_URL
 readonly DEVOPS_TOKEN
+readonly BUILD_URL
 
 cd $ota_factory_host_path
 
@@ -125,11 +128,6 @@ EOF
 rst=$?
 
 echo &quot;rst: $rst&quot;
-
-if [[ $rst != 0 ]]; then
-	curl -H X-Access-Token:&quot;$devops_token&quot; -X GET \
-    	http://192.168.48.105:8080/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id\=$id\&amp;status\=3\&amp;otaDir\=
-fi
 </command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
