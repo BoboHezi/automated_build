@@ -135,8 +135,8 @@ def dump_node(status_str):
 def overview():
     rst_code, text = execute('repo info -o')
     ary = text.split('-' * 28)
+    unclean_nodes = []
     if ary and len(ary) >= 2:
-        unclean_nodes = []
         available_lines = []
         path_index = []
         # clean empty line & record 'path'
@@ -167,7 +167,14 @@ def overview():
                 node['path'] = available_lines[i]
                 unclean_nodes.append(node)
         # print(unclean_nodes)
-        return unclean_nodes
+    # dump .repo/manifests
+    manifests_path = ORIGIN_WORK_DIRECTORY + '/.repo/manifests'
+    manifests_repo = Repo(manifests_path)
+    heads = dump_node(manifests_repo.git.status())
+    if heads != 0:
+        node = {'path': manifests_path, manifests_repo.active_branch.name: heads[0] if isinstance(heads, list) else heads}
+        unclean_nodes.append(node)
+    return unclean_nodes
 
 
 # recursive overview util success
@@ -199,6 +206,8 @@ def handle_overview():
                 elif isinstance(heads, int):
                     reset(repo, heads)
                 repo.remotes.origin.pull()
+            if node['path'] == ORIGIN_WORK_DIRECTORY + '/.repo/manifests':
+                continue
             checkout_cmd = ['-b', 'master']
             for branch in repo.branches:
                 if branch.name == 'master':
@@ -292,6 +301,13 @@ def main(argv):
             git_name_path_dict = {}
             for project in google_repo.projects:
                 git_name_path_dict[project.name] = project.path
+            # add .repo/manifests
+            manifests_path = '.repo/manifests'
+            manifests_repo = Repo(manifests_path)
+            srh = search('[0-9]\/([^\s]*)', manifests_repo.git.remote('-v')) if manifests_repo else None
+            manifests_remote = srh.group(1) if srh else None
+            if manifests_remote:
+                git_name_path_dict[manifests_remote] = manifests_path
             # dump cherry-pick cmd
             cps = read_cps_from_file(file)
             print('cps:\n%s' % cps)
@@ -313,6 +329,7 @@ def main(argv):
                     exit(2)
                 # begin cherry-pick
                 success = 0
+                sync_flag = False
                 for cmd in cps:
                     path = ORIGIN_WORK_DIRECTORY + os.sep + cmd_project[cmd][1]
                     repo = Repo(path)
@@ -328,6 +345,11 @@ def main(argv):
                     result = cherry_pick(path, cmd)
                     print('result: %d' % result)
                     success = result if result != 0 else success
+                    sync_flag = ('.repo/manifests' in path and result == 0) if not sync_flag else sync_flag
+                # if .repo/manifests cherry-pick success
+                if success == 0 and sync_flag:
+                    print('\nmanifests cherry-pick success, repo sync')
+                    utils.execute('repo sync')
                 exit(0 if success == 0 else 3)
 
 

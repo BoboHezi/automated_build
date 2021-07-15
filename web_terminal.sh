@@ -88,7 +88,7 @@ fi
 # start ttyd with random port
 ttyd_port=$(get_random_port 1000 65535)
 echo '------------start tydd------------'
-echo "$ttyd_file -p $ttyd_port -m 2 bash &"
+echo "$ttyd_file -p $ttyd_port -m 5 bash &"
 $ttyd_file -p $ttyd_port -m 5 bash &
 
 sleep 5s
