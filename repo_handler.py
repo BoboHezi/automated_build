@@ -296,21 +296,40 @@ def main(argv):
             if utils.isempty(file) or not os.path.exists(file):
                 print('%s not exists' % file)
                 continue
+            # dump cherry-pick cmd
+            cps = read_cps_from_file(file)
+            print('cps:')
+            manifests_cps = []
+            for cp in cps:
+                print(cp)
+                if 'Freeme/platforms/manifest' in cp:
+                    manifests_cps.append(cp)
+            if len(manifests_cps) > 0:
+                manifests_path = ORIGIN_WORK_DIRECTORY + os.sep + '.repo/manifests'
+                repo = Repo(manifests_path)
+                success = 0
+                print('\nin %s try exxcute' % manifests_path)
+                for cmd in manifests_cps:
+                    cps.remove(cmd)
+                    # git checkout . && git clean -xfd
+                    repo.git.checkout('.')
+                    repo.git.clean('-xdf')
+                    local_user_name = repo.config_reader('global').get_value('user', 'name')
+                    cmd = change_name(cmd, local_user_name)
+                    result = cherry_pick(manifests_path, cmd)
+                    print('%s\nresult: %d' % (cmd, result))
+                    success = result if result != 0 else success
+                if success == 0:
+                    print('\nmanifests cherry-pick success, repo sync')
+                    utils.execute('repo sync && repo start --all master')
+                else:
+                    print('\nmanifests cherry-pick failed, exit')
+                    exit(3)
             # dump current repo
             google_repo = dump_projects()
             git_name_path_dict = {}
             for project in google_repo.projects:
                 git_name_path_dict[project.name] = project.path
-            # add .repo/manifests
-            manifests_path = '.repo/manifests'
-            manifests_repo = Repo(manifests_path)
-            srh = search('[0-9]\/([^\s]*)', manifests_repo.git.remote('-v')) if manifests_repo else None
-            manifests_remote = srh.group(1) if srh else None
-            if manifests_remote:
-                git_name_path_dict[manifests_remote] = manifests_path
-            # dump cherry-pick cmd
-            cps = read_cps_from_file(file)
-            print('cps:\n%s' % cps)
             # delete file cps
             os.remove(file)
             if not utils.isempty(cps):
@@ -329,7 +348,6 @@ def main(argv):
                     exit(2)
                 # begin cherry-pick
                 success = 0
-                sync_flag = False
                 for cmd in cps:
                     path = ORIGIN_WORK_DIRECTORY + os.sep + cmd_project[cmd][1]
                     repo = Repo(path)
@@ -345,11 +363,6 @@ def main(argv):
                     result = cherry_pick(path, cmd)
                     print('result: %d' % result)
                     success = result if result != 0 else success
-                    sync_flag = ('.repo/manifests' in path and result == 0) if not sync_flag else sync_flag
-                # if .repo/manifests cherry-pick success
-                if success == 0 and sync_flag:
-                    print('\nmanifests cherry-pick success, repo sync')
-                    utils.execute('repo sync')
                 exit(0 if success == 0 else 3)
 
 
