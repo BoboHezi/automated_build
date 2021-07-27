@@ -133,6 +133,7 @@ def download():
             ftp.login(AFTER_FTP_USERNAME, AFTER_FTP_PASSWD)
             print('\notadiff %s login success' % AFTER_FTP['host'])
         except Exception as e:
+            utils.removedirs(path.abspath(before_local_file.name))
             print('\notadiff %s login failed: %s' % (AFTER_FTP_USERNAME, e))
             return None, None
 
@@ -145,6 +146,7 @@ def download():
         print('\notadiff %s download success' % AFTER_FTP['name'])
     except Exception as e:
         print('\notadiff %s download failed: %s\n' % (AFTER_FTP['name'], e))
+        utils.removedirs(path.abspath(before_local_file.name))
         return None, None
     finally:
         after_local_file.close()
@@ -279,12 +281,6 @@ def main(argv):
     BEFORE_FTP = dump_url(BEFORE_TARGET_FILE)
     AFTER_FTP = dump_url(AFTER_TARGET_FILE)
 
-    # download target files
-    before, after = download()
-    if utils.isempty(before) or utils.isempty(after):
-        print('\notadiff download failed.')
-        return 5, None
-
     # enter platform
     ary = SV_PLATFORM_TERRACE.split('_')
     platform = '%s_%s' % (ary[0], ary[1]) if ary and len(ary) > 1 else None
@@ -301,6 +297,12 @@ def main(argv):
         print('\notadiff folder cmd not found!')
         return 7, None
 
+    # download target files
+    before, after = download()
+    if utils.isempty(before) or utils.isempty(after):
+        print('\notadiff download failed.')
+        return 5, None
+
     # remove package.zip & update.zip
     utils.removedirs('package.zip')
     utils.removedirs('update.zip')
@@ -313,13 +315,12 @@ def main(argv):
     process, rst = utils.async_command(cmd)
     # rst, msg = utils.execute(cmd)
     utils.star_log('make ota end', 60)
+    # remove target files
+    utils.removedirs(before)
+    utils.removedirs(after)
     if rst != 0:
         print('\notadiff ota cmd failed')
         return 3, None
-
-    # remove target files
-    utils.removedirs('../%s' % BEFORE_FTP['name'])
-    utils.removedirs('../%s' % AFTER_FTP['name'])
 
     if path.isfile('package.zip') and path.isfile('update.zip'):
         package_zip_stat = os.stat('package.zip')
