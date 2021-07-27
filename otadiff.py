@@ -118,6 +118,7 @@ def download():
         ftp.retrbinary('RETR %s' % BEFORE_FTP['name'], before_local_file.write)
         print('\notadiff %s download success' % BEFORE_FTP['name'])
     except Exception as e:
+        utils.removedirs(path.abspath(before_local_file.name))
         print('\notadiff download failed: %s\n' % e)
         ftp.quit()
         return None, None
@@ -147,6 +148,7 @@ def download():
     except Exception as e:
         print('\notadiff %s download failed: %s\n' % (AFTER_FTP['name'], e))
         utils.removedirs(path.abspath(before_local_file.name))
+        utils.removedirs(path.abspath(after_local_file.name))
         return None, None
     finally:
         after_local_file.close()
