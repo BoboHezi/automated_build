@@ -325,3 +325,9 @@ sudo pip install pycryptodome
 10. 回传OTA编译错误原因(0708)
 
 * done(0714)
+
+
+11. 记录编译时，项目ProjectConfig.mk(0806)
+
+
+12. 记录编译时，所有git仓库信息(0806)

@@ -22,6 +22,16 @@
 > 参考文档：https://zhuanlan.zhihu.com/p/265542636
 
 1. 安装docker(Ubuntu 14需要使用17.12.1-ce)
+```shell
+sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+curl -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+sudo apt-key fingerprint 0EBFCD88
+sudo add-apt-repository "deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/ $(lsb_release -cs) stable"
+sudo apt-get update
+apt-cache madison docker-ce
+sudo apt-get install docker-ce=17.12.1~ce-0~ubuntu
+sudo docker run hello-world
+```
 
 2. ```docker pull buchgr/bazel-remote-cache```
 
@@ -42,13 +52,14 @@ cd bazel-buildfarm
 
 2. 修改.bazelversion文件内容为bazel的版本号```bazel version```
 
-3. 修改examples/worker.config.example
+3. 修改client，examples/worker.config.example
 root:					# 把这里改成一个的确存在的路径
 cas_cache_directory:	# 把这里要么改成一个对上面root的相对路径，要么改为绝对路径
 target:					# 修改为server的ip(eg.192.168.1.5:8980)
 
 4. 配置&启动server
 ```shell
+# 首次编译需使用Python3
 bazel run src/main/java/build/buildfarm:buildfarm-server $PWD/examples/server.config.example
 ```
 
