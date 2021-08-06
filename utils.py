@@ -164,8 +164,21 @@ def dump_platform(folder=getcwd()):
         source = readlink(manifest)
         if 'SPRD' in source:
             PLATFORM = 'SPRD'
-        elif 'MTK' in source:
+        elif 'ALPS' in source:
             PLATFORM = 'MTK'
+    elif path.isfile(manifest):
+        from xml import sax
+        from RepoParser import RepoParser
+        parser = sax.make_parser()
+        parser.setFeature(sax.handler.feature_namespaces, 0)
+        repo = RepoParser()
+        parser.setContentHandler(repo)
+        parser.parse(manifest)
+        if len(repo.includes) > 0:
+            if 'SPRD' in repo.includes[0]:
+                PLATFORM = 'SPRD'
+            elif 'ALPS' in repo.includes[0]:
+                PLATFORM = 'MTK'
     if not PLATFORM:
         if path.exists(folder + '/vendor/sprd'):
             PLATFORM = 'SPRD'
