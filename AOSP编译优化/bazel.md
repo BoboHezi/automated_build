@@ -66,6 +66,8 @@ bazel run src/main/java/build/buildfarm:buildfarm-server $PWD/examples/server.co
 5. 配置&启动client
 ```shell
 bazel run src/main/java/build/buildfarm:buildfarm-operationqueue-worker $PWD/examples/worker.config.example
+or
+bazel run //src/main/java/build/buildfarm:buildfarm-memory-worker $PWD/examples/worker.config.example
 ```
 
 6. 编译时，添加 --remote_executor=grpc://server-host:8980
