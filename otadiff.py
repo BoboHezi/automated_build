@@ -300,10 +300,11 @@ def main(argv):
         return 7, None
 
     # download target files
-    before, after = download()
-    if utils.isempty(before) or utils.isempty(after):
-        print('\notadiff download failed.')
-        return 5, None
+    if not (path.isfile(BEFORE_FTP['name']) and path.isfile(AFTER_FTP['name'])):
+        before, after = download()
+        if utils.isempty(before) or utils.isempty(after):
+            print('\notadiff download failed.')
+            return 5, None
 
     # remove package.zip & update.zip
     utils.removedirs('package.zip')
@@ -318,8 +319,8 @@ def main(argv):
     # rst, msg = utils.execute(cmd)
     utils.star_log('make ota end', 60)
     # remove target files
-    utils.removedirs(before)
-    utils.removedirs(after)
+    # utils.removedirs(before)
+    # utils.removedirs(after)
     if rst != 0:
         print('\notadiff ota cmd failed')
         return 3, None
