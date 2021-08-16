@@ -309,6 +309,13 @@ def main(argv):
     utils.removedirs('package.zip')
     utils.removedirs('update.zip')
 
+    # add jdk11 path
+    jdk11_path = 'android_out_host/prebuilts/jdk/jdk11/linux-x86/bin'
+    if path.isdir(jdk11_path):
+        jdk11_path = path.realpath(jdk11_path)
+        os.environ['PATH'] = "%s:%s" % (jdk11_path, os.environ['PATH'])
+        utils.async_command('java -version')
+
     # execute
     cmd = cmd.replace('$before', before, 1).replace('$after', after, 1)
     cmd = cmd.replace('(', '\(').replace(')', '\)')
