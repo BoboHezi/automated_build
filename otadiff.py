@@ -305,6 +305,9 @@ def main(argv):
         if utils.isempty(before) or utils.isempty(after):
             print('\notadiff download failed.')
             return 5, None
+    else:
+        before = BEFORE_FTP['name']
+        after = AFTER_FTP['name']
 
     # remove package.zip & update.zip
     utils.removedirs('package.zip')
