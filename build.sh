@@ -102,7 +102,7 @@ repo start --all master
 # 'clean code'
 if [[ "$is_test" != "true" && "$build_action" != "r" ]]; then
     python3 repo_handler.py -c
-    # repo sync
+    repo sync
 fi
 
 echo -e "\n---------------------cherry pick---------------------\n"
