@@ -173,7 +173,7 @@ def overview():
     heads = dump_node(manifests_repo.git.status())
     if heads != 0:
         node = {'path': manifests_path, manifests_repo.active_branch.name: heads[0] if isinstance(heads, list) else heads}
-        unclean_nodes.append(node)
+        # unclean_nodes.append(node)
     return unclean_nodes
 
 
@@ -303,7 +303,7 @@ def main(argv):
             for cp in cps:
                 print(cp)
                 if 'Freeme/platforms/manifest' in cp:
-                    manifests_cps.append(cp)
+                    # manifests_cps.append(cp)
             if len(manifests_cps) > 0:
                 manifests_path = ORIGIN_WORK_DIRECTORY + os.sep + '.repo/manifests'
                 repo = Repo(manifests_path)
