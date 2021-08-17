@@ -98,6 +98,7 @@ case $build_action in
 esac
 
 echo -e "\n---------------------repo handler---------------------\n"
+repo abandon --all
 repo start --all master
 # 'clean code'
 if [[ "$is_test" != "true" && "$build_action" != "r" ]]; then
