@@ -304,6 +304,7 @@ def main(argv):
                 print(cp)
                 if 'Freeme/platforms/manifest' in cp:
                     # manifests_cps.append(cp)
+                    pass
             if len(manifests_cps) > 0:
                 manifests_path = ORIGIN_WORK_DIRECTORY + os.sep + '.repo/manifests'
                 repo = Repo(manifests_path)
