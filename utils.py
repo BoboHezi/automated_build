@@ -2,14 +2,13 @@
 import getopt
 import json
 import os
+import requests
 import sys
 from os import getcwd
 from os import path
 from os import readlink
 from re import match
 from subprocess import Popen, PIPE, STDOUT
-
-import requests
 
 # url
 DEVOPS_HTTP_URL = 'http://192.168.48.105:8080'
@@ -134,6 +133,11 @@ def dump(args=[], opt_str=''):
 
 def isempty(obj):
     return True if not (obj and len(obj)) else False
+
+
+def equals_ignore_case(str1, str2):
+    import re
+    return re.match(re.escape(str1) + r'\Z', str2, re.I) is not None
 
 
 def get_option_val(fpath, key):

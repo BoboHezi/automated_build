@@ -85,8 +85,17 @@ def check_item(user_id=USER_ID, name=None, keyword=None, url=None, headers=utils
                     return datas[0]
                 elif len(datas) > 1:
                     for item in datas:
-                        if item[name] == keyword:
-                            return item
+                        if extra and len(extra) > 0:
+                            flag = True
+                            for key, value in extra.items():
+                                if not utils.equals_ignore_case(item[key], value):
+                                    flag = False
+                                    break
+                            if flag:
+                                return item
+                        elif not utils.isempty(keyword):
+                            if utils.equals_ignore_case(item[name], keyword):
+                                return item
         except Exception as e:
             print('commit_sign_verify check %s: %s, %s' % (name, keyword, e))
         finally:
@@ -118,7 +127,7 @@ def check_model(model=SV_MODEL, user=USER_ID, headers=utils.common_headers):
     if data:
         try:
             rst_model = data['model']
-            if rst_model and rst_model == model:
+            if rst_model and utils.equals_ignore_case(rst_model, model):
                 return data['id']
         finally:
             pass
@@ -130,7 +139,7 @@ def check_odm(odm=SV_ODM_CUSTOMER, user=USER_ID, headers=utils.common_headers):
     if data:
         try:
             rst_odm = data['odm']
-            if rst_odm and rst_odm == odm:
+            if rst_odm and utils.equals_ignore_case(rst_odm, odm):
                 return data['id']
         finally:
             pass
@@ -142,7 +151,7 @@ def check_brand(brand=SV_BRAND_CUSTOMER, user=USER_ID, headers=utils.common_head
     if data:
         try:
             rst_brand = data['brand']
-            if rst_brand and rst_brand == brand:
+            if rst_brand and utils.equals_ignore_case(rst_brand, brand):
                 return data['id']
         finally:
             pass
@@ -162,7 +171,9 @@ def check_project(project=None, channel=None, brand=None, user=USER_ID, headers=
             rst_channel = data['channel']
             rst_brand = data['brand']
 
-            if rst_project == project and rst_channel == channel and rst_brand == brand:
+            if utils.equals_ignore_case(rst_project, project) \
+                    and utils.equals_ignore_case(rst_channel, channel) \
+                    and utils.equals_ignore_case(rst_brand, brand):
                 return data['id']
         finally:
             pass
