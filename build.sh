@@ -98,7 +98,9 @@ case $build_action in
 esac
 
 echo -e "\n---------------------repo handler---------------------\n"
+repo abandon --all > /dev/null 2>&1 || echo
 repo start --all master
+repo sync > /dev/null 2>&1 || echo
 # 'clean code'
 if [[ "$is_test" != "true" && "$build_action" != "r" ]]; then
     python3 repo_handler.py -c
