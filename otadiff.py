@@ -44,7 +44,7 @@ PLATFORM_CMD = {
     'SPRD_9850o': 'build/tools/releasetools/ota_from_target_files -i $before $after update.zip',
     'SPRD_9863p': 'build/tools/releasetools/ota_from_target_files --block -i $before $after update.zip',
     'SPRD_T610r': 'android_out_host/linux-x86/bin/ota_from_target_files -i $before $after update.zip',
-    'SPRD_9832r': 'android_out_host/linux-x86/bin/ota_from_target_files -i $before $after update.zip --override_timestamp'
+    'SPRD_9832r': 'android_out_host/linux-x86/bin/ota_from_target_files -i $before $after update.zip --downgrade'
 }
 
 BEFORE_FTP = None
