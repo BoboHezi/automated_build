@@ -44,7 +44,7 @@ PLATFORM_CMD = {
     'SPRD_9850o': 'build/tools/releasetools/ota_from_target_files -i $before $after update.zip',
     'SPRD_9863p': 'build/tools/releasetools/ota_from_target_files --block -i $before $after update.zip',
     'SPRD_T610r': 'android_out_host/linux-x86/bin/ota_from_target_files -i $before $after update.zip',
-    'SPRD_9832r': 'android_out_host/linux-x86/bin/ota_from_target_files -i $before $after update.zip'
+    'SPRD_9832r': 'android_out_host/linux-x86/bin/ota_from_target_files -i $before $after update.zip --override_timestamp'
 }
 
 BEFORE_FTP = None
@@ -270,8 +270,8 @@ def main(argv):
     if utils.isempty(BEFORE_TARGET_FILE) or utils.isempty(BEFORE_FTP_USERNAME) or utils.isempty(BEFORE_FTP_PASSWD) or \
             utils.isempty(AFTER_TARGET_FILE) or utils.isempty(AFTER_FTP_USERNAME) or \
             utils.isempty(AFTER_FTP_PASSWD) or utils.isempty(SV_PLATFORM_TERRACE) or \
-            not 'target_files' in BEFORE_TARGET_FILE or \
-            not 'target_files' in AFTER_TARGET_FILE:
+            'target_files' not in BEFORE_TARGET_FILE or \
+            'target_files' not in AFTER_TARGET_FILE:
         print("otadiff wrong parameter")
         return 4, None
 
