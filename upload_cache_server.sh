@@ -172,7 +172,7 @@ project_path=$(find droi/ -maxdepth 3 -mindepth 3 -type d -name $project_name)
 build_utils="vendor/freeme/build/tools/build_utils.py"
 merged_config="$cache_folder/ProjectConfig.mk"
 if [[ -f "$project_path/ProjectConfig.mk" && -f "$build_utils" ]]; then
-    echo -e "\nupload_cache_server merge $merged_config\n"
+    echo -e "\nupload_cache_server merge $merged_config"
     python $build_utils "merge-config" "$project_path/ProjectConfig.mk" > "$merged_config"
 fi
 
@@ -193,9 +193,9 @@ if [[ "$build_sign" != "true" ]]; then
     if [[ -n "$build_info_file" && -f $build_info_file ]]; then
         # find unsigned publish file
         publish_file=$(get_unsigned_publish_file $build_info_file $PLATFORM)
-        echo -e "\nupload_cache_server publish_file: $publish_file"
 
         if [[ -n "$publish_file" && -f $publish_file ]]; then
+            echo -e "\nupload_cache_server publish_file: $publish_file"
             if [[ ${publish_file##*.} == "pac" ]]; then
                 zip_name=${publish_file##*/}
                 zip_name=${zip_name/.pac/.zip}
