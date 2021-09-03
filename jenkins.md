@@ -331,3 +331,6 @@ sudo pip install pycryptodome
 
 
 12. 记录编译时，所有git仓库信息(0806)
+
+
+13. 非签名编译版本，刷机包保存(0831)

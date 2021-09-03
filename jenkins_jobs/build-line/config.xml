@@ -25,19 +25,19 @@
         <hudson.model.StringParameterDefinition>
           <name>project_name</name>
           <description>编译项目名</description>
-          <defaultValue>g1930epq_v10a_hl</defaultValue>
+          <defaultValue>g1930fua_v10k_a</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>code_dir</name>
           <description>编译服务器上，项目所属仓库的位置</description>
-          <defaultValue>/data/6758N/</defaultValue>
+          <defaultValue>/data/SPRD-P0-HXY-T310</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>server_ip_address</name>
           <description>编译服务器IP地址</description>
-          <defaultValue>10.20.100.16</defaultValue>
+          <defaultValue>192.168.151.238</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -49,7 +49,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>server_passwd</name>
           <description>编译服务器，SSH密码</description>
-          <defaultValue>{AQAAABAAAAAQc0jBGdWAQQVYAZKAArCjENR/rZc2G48vg32ptE0IP3Y=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQwd7WqP0tqW4VHdVrvMTPOwIozsU5Pe7SMIXxGdKKmuY=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>build_variant</name>
@@ -65,7 +65,7 @@
         <hudson.model.StringParameterDefinition>
           <name>cherry_picks</name>
           <description>cherry-pick命令</description>
-          <defaultValue></defaultValue>
+          <defaultValue>git fetch \&quot;ssh://zhangzhanbo@10.20.40.21:29418/Freeme/platforms/manifest\&quot; refs/changes/58/76958/1 &amp;&amp; git cherry-pick FETCH_HEAD</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
@@ -119,7 +119,7 @@
         <hudson.model.BooleanParameterDefinition>
           <name>test_host</name>
           <description>是否用来测试主机</description>
-          <defaultValue>false</defaultValue>
+          <defaultValue>true</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sign_ftp_url</name>
@@ -136,7 +136,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>sign_ftp_upload_passwd</name>
           <description>签名包上传用户密码</description>
-          <defaultValue>{AQAAABAAAACQfBkfpsYLKZidR91msY0Hjw+HCUh3TG0pbjJmcFXMZvmOte50c4SG6scU8pDn6ly+yNzy7iBopR0KFjPlV1EjmeEvCLoWX1Bntc2r7yAPcjN4gDAKWWpslHKFwKb53xHXp1V+cjkKvY2bXnnEM7SPyr7mWPVrqXrkSuDzSW26o+nXfmfH+SonAXn6RY7iewUxIhPmna8yiAdYui+pyIhAUw==}</defaultValue>
+          <defaultValue>{AQAAABAAAAAgKE+4kGeUF3ARseop/5u1yTarRgJdJVcXMofRpcykAqaMb2Vxxgv4XkXsLAyY/b76}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_url</name>
@@ -153,42 +153,36 @@
         <hudson.model.PasswordParameterDefinition>
           <name>sv_platform_passwd</name>
           <description>签名验收后台登录用户密码</description>
-          <defaultValue>{AQAAABAAAACQyDpbEzRAGhqy3+QqHljzi3n0Uq7TMyTzPphH7gucUiZ88KFuSl2Sf7RKPhzgEtSk4gDUHSzgrP/R5/pj0ejyLH6srcpxtudeeRMiH0g2Lj7RiaTkBf9g2mjuCs4lQlX5gSrmlpCexJTSoiXEDgamqpNXJpq0Czya/IIQsdbPrKaVzLbaKCv5pKFiRtokLLLduBoRtC+d82aRwFrwcLaIbA==}</defaultValue>
+          <defaultValue>{AQAAABAAAAAgzqaqzGoYTuwP17bsSR8uafGNDanCiUQ73g5AcFZip5UWk0acdTpyRzS4zp+qwXTQ}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_terrace</name>
           <description>签名平台，eg:SPRD_T310p_hongxiangyuan</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_board</name>
           <description>主板（用与验收包释放路径），若为空，则使用大写的项目名</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_model</name>
           <description>机型，若为空，则使用大写的项目名</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_brand</name>
           <description>品牌商，若为空，则使用项目客户号</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_odm</name>
           <description>方案商，若为空，则使用项目渠道号最后一段（eg:HONGXIANGYUAN_HONGXIANGYUAN）</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_cclist</name>
           <description>CC list</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
@@ -225,7 +219,7 @@
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.92">
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.93">
     <script>
 def devops_token_extra = &apos;&apos;
 def prepare_rst = &apos;&apos;
@@ -384,10 +378,6 @@ EOF
         stage(&apos;file-upload&apos;) {
             steps {
                 script {
-                    if (&quot;${build_sign}&quot; != &quot;true&quot;) {
-                        echo &quot;\ndo not sign, exit file-upload!\n&quot;
-                        return
-                    }
                     upload_rst = sh(returnStatus: true, script: &apos;&apos;&apos;
                     devops_token=`cat $DEVOPS_TOKEN_FILE || echo &quot;&quot;`
 
@@ -410,6 +400,14 @@ EOF
                     pwd
                     echo -------------------------------------------------
                     echo &quot;&quot;
+
+                    # upload cache file(publish file if not sign, manifest.xml, ProjectConfig.mk, vmlinux)
+                    echo -e &apos;\n./upload_cache_server.sh &quot;$server_passwd&quot; &quot;$devops_compile_id&quot; &quot;$BUILD_NUMBER&quot; &quot;$build_sign&quot;&apos;
+                    ./upload_cache_server.sh &quot;$server_passwd&quot; &quot;$devops_compile_id&quot; &quot;$BUILD_NUMBER&quot; &quot;$build_sign&quot; || echo
+
+                    if [ &quot;$build_sign&quot; != &quot;true&quot; ]; then
+                        exit 0
+                    fi
 
                     # upload file
                     echo -e &apos;\n./upload_ftp.py -p &quot;$project_name&quot; -h &quot;$sign_ftp_url&quot; -u &quot;$sign_ftp_upload_username&quot; -c &quot;$sign_ftp_upload_passwd&quot;\n&apos;

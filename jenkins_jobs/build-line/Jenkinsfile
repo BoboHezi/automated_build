@@ -156,10 +156,6 @@ EOF
         stage('file-upload') {
             steps {
                 script {
-                    if ("${build_sign}" != "true") {
-                        echo "\ndo not sign, exit file-upload!\n"
-                        return
-                    }
                     upload_rst = sh(returnStatus: true, script: '''
                     devops_token=`cat $DEVOPS_TOKEN_FILE || echo ""`
 
@@ -182,6 +178,14 @@ EOF
                     pwd
                     echo -------------------------------------------------
                     echo ""
+
+                    # upload cache file(publish file if not sign, manifest.xml, ProjectConfig.mk, vmlinux)
+                    echo -e '\n./upload_cache_server.sh "$server_passwd" "$devops_compile_id" "$BUILD_NUMBER" "$build_sign"'
+                    ./upload_cache_server.sh "$server_passwd" "$devops_compile_id" "$BUILD_NUMBER" "$build_sign" || echo
+
+                    if [ "$build_sign" != "true" ]; then
+                        exit 0
+                    fi
 
                     # upload file
                     echo -e '\n./upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"\n'

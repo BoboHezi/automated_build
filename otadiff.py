@@ -270,8 +270,8 @@ def main(argv):
     if utils.isempty(BEFORE_TARGET_FILE) or utils.isempty(BEFORE_FTP_USERNAME) or utils.isempty(BEFORE_FTP_PASSWD) or \
             utils.isempty(AFTER_TARGET_FILE) or utils.isempty(AFTER_FTP_USERNAME) or \
             utils.isempty(AFTER_FTP_PASSWD) or utils.isempty(SV_PLATFORM_TERRACE) or \
-            not BEFORE_TARGET_FILE.endswith('_target_files.zip') or \
-            not AFTER_TARGET_FILE.endswith('_target_files.zip'):
+            'target_files' not in BEFORE_TARGET_FILE or \
+            'target_files' not in AFTER_TARGET_FILE:
         print("otadiff wrong parameter")
         return 4, None
 
