@@ -110,8 +110,7 @@ fi
 # create manifest tag file
 script_base=$(ls -l build.sh | awk '{print $NF}')
 script_base=${script_base%/*}
-jenkins_build_number=$(echo $BUILD_URL | awk -F/ '{print $6}')
-manifest_tag_file="$script_base"/tag_"$devops_compile_id"_"$jenkins_build_number".xml
+manifest_tag_file="$script_base"/tag_"$devops_compile_id"_"$build_id".xml
 echo -e "\n---------------------create manifest tag---------------------\n"
 repo manifest -r -o $manifest_tag_file
 echo -e "\n<!--cherry picks" >> $manifest_tag_file

@@ -402,7 +402,7 @@ EOF
                     echo &quot;&quot;
 
                     # upload cache file(publish file if not sign, manifest.xml, ProjectConfig.mk, vmlinux)
-                    echo -e &apos;\n./upload_cache_server.sh &quot;$server_passwd&quot; &quot;$devops_compile_id&quot; &quot;$BUILD_NUMBER&quot; &quot;$build_sign&quot;&apos;
+                    echo -e &apos;\n./upload_cache_server.sh &quot;xxxxxxx&quot; &quot;$devops_compile_id&quot; &quot;$BUILD_NUMBER&quot; &quot;$build_sign&quot;&apos;
                     ./upload_cache_server.sh &quot;$server_passwd&quot; &quot;$devops_compile_id&quot; &quot;$BUILD_NUMBER&quot; &quot;$build_sign&quot; || echo
 
                     if [ &quot;$build_sign&quot; != &quot;true&quot; ]; then

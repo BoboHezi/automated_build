@@ -172,7 +172,7 @@ project_path=$(find droi/ -maxdepth 3 -mindepth 3 -type d -name $project_name)
 build_utils="vendor/freeme/build/tools/build_utils.py"
 merged_config="$cache_folder/ProjectConfig.mk"
 if [[ -f "$project_path/ProjectConfig.mk" && -f "$build_utils" ]]; then
-    echo -e "\nupload_cache_server merge $merged_config"
+    echo -e "\nupload_cache_server merge $merged_config\n"
     python $build_utils "merge-config" "$project_path/ProjectConfig.mk" > "$merged_config"
 fi
 
@@ -182,8 +182,9 @@ if [[ ! -f $vmlinux_file ]]; then
     vmlinux_file=$(find out/ -type f -name vmlinux)
 fi
 if [[ -f $vmlinux_file ]]; then
-    echo -e "\nupload_cache_server copy $vmlinux_file to $cache_folder"
-    cp $vmlinux_file $cache_folder
+    echo -e "\nupload_cache_server copy $vmlinux_file"
+    zip -j -q $cache_folder/vmlinux.zip $vmlinux_file
+    # cp $vmlinux_file $cache_folder
 fi
 
 # copy publish file to $cache_folder

@@ -180,7 +180,7 @@ EOF
                     echo ""
 
                     # upload cache file(publish file if not sign, manifest.xml, ProjectConfig.mk, vmlinux)
-                    echo -e '\n./upload_cache_server.sh "$server_passwd" "$devops_compile_id" "$BUILD_NUMBER" "$build_sign"'
+                    echo -e '\n./upload_cache_server.sh "xxxxxxx" "$devops_compile_id" "$BUILD_NUMBER" "$build_sign"'
                     ./upload_cache_server.sh "$server_passwd" "$devops_compile_id" "$BUILD_NUMBER" "$build_sign" || echo
 
                     if [ "$build_sign" != "true" ]; then
