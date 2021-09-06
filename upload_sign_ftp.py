@@ -9,7 +9,7 @@ import utils
 
 
 def _exit(code, ftp=None):
-    utils.star_log('upload ftp end', 60)
+    utils.star_log('upload signed ftp end', 60)
     if ftp:
         ftp.quit()
     exit(code)
@@ -23,12 +23,12 @@ FTP_PWD = 'hongxiangyuan014'
 
 
 def main(argv):
-    utils.star_log('upload ftp start', 60)
+    utils.star_log('upload signed ftp start', 60)
     option_str = 'p-project:,f-file:,h-host:,u-user:,c-code:'
     opts = utils.dump(argv, option_str)
 
     if not opts:
-        print("upload_ftp wrong parameter try '-h or --help' to get more information")
+        print("upload_sign_ftp wrong parameter try '-h or --help' to get more information")
         return 1, None
     global PROJECT_NAME, ZIP_FILE, FTP_HOST, FTP_USER, FTP_PWD
     if '-p' in opts or '--project' in opts:
@@ -55,25 +55,25 @@ def main(argv):
         """ % (PROJECT_NAME, ZIP_FILE, FTP_HOST, FTP_USER, FTP_PWD))
 
     if not PROJECT_NAME:
-        print('upload_ftp must specify project(use -p or --project)\n')
+        print('upload_sign_ftp must specify project(use -p or --project)\n')
         return 3, None
 
     # check MTK or SPRD
     PLATFORM = utils.dump_platform()
 
     if not PLATFORM:
-        print('upload_ftp platform check failed\n')
+        print('upload_sign_ftp platform check failed\n')
         return 5, None
-    print('upload_ftp platform: %s\n' % PLATFORM)
+    print('upload_sign_ftp platform: %s\n' % PLATFORM)
 
     # find project first
     find_cmd = 'find droi/ -maxdepth 3 -mindepth 3 -type d -name %s' % PROJECT_NAME
     status, project_path = utils.execute(find_cmd)
 
     if status or not project_path or not path.exists(project_path + '/ProjectConfig.mk'):
-        print('upload_ftp %s not found\n' % PROJECT_NAME)
+        print('upload_sign_ftp %s not found\n' % PROJECT_NAME)
         return 6, None
-    print('upload_ftp project: %s found %s\n' % (PROJECT_NAME, project_path))
+    print('upload_sign_ftp project: %s found %s\n' % (PROJECT_NAME, project_path))
 
     # find build config file
     build_config_file = utils.get_option_val('mk', 'readonly BUILD_INFO_FILE').replace('\'', '')
@@ -86,7 +86,7 @@ def main(argv):
         project_product = project_product[5:]
     if utils.isempty(project_product) or project_product != PROJECT_NAME:
         build_config_file = '%s/ProjectConfig.mk' % project_path
-    print('upload_ftp build_config_file: %s\n' % build_config_file)
+    print('upload_sign_ftp build_config_file: %s\n' % build_config_file)
 
     # find zip file
     publish_out = 'droi/out/%s' % PROJECT_NAME
@@ -110,13 +110,13 @@ def main(argv):
             ZIP_FILE = rst.split('\n')[0]
 
     if not path.isfile(ZIP_FILE):
-        print('upload_ftp check ZIP_FILE: %s failed\n' % ZIP_FILE)
+        print('upload_sign_ftp check ZIP_FILE: %s failed\n' % ZIP_FILE)
         return 7, None
-    print('upload_ftp ZIP_FILE: %s\n' % ZIP_FILE)
+    print('upload_sign_ftp ZIP_FILE: %s\n' % ZIP_FILE)
 
     date_str = time.strftime('%Y%m', time.localtime())
     upload_path = '/upload/%s/%s' % (date_str, PROJECT_NAME.upper())
-    print('upload_ftp upload_path: %s' % upload_path)
+    print('upload_sign_ftp upload_path: %s' % upload_path)
 
     # ftp connect & login
     ftp = FTP()
@@ -125,7 +125,7 @@ def main(argv):
         ftp.login(FTP_USER, FTP_PWD)
         print(ftp.getwelcome())
     except Exception as e:
-        print('upload_ftp login failed: %s' % e)
+        print('upload_sign_ftp login failed: %s' % e)
         return 8, None
     print
 
@@ -133,7 +133,7 @@ def main(argv):
     try:
         ftp.cwd(upload_path)
     except Exception as e:
-        print('upload_ftp cwd failed: %s, try mkd\n' % e)
+        print('upload_sign_ftp cwd failed: %s, try mkd\n' % e)
         try:
             ftp.cwd('~')
             base_dir = ftp.pwd()
@@ -147,20 +147,20 @@ def main(argv):
                     ftp.mkd(base_dir)
             ftp.cwd(upload_path)
         except Exception as e:
-            print('upload_ftp mkd failed: %s\n' % e)
+            print('upload_sign_ftp mkd failed: %s\n' % e)
             return 9, None
-    print('upload_ftp remote dir: %s\n' % ftp.pwd())
+    print('upload_sign_ftp remote dir: %s\n' % ftp.pwd())
 
     # upload
-    print('upload_ftp start upload file\n')
+    print('upload_sign_ftp start upload file\n')
     try:
         ftp.storbinary('STOR ' + path.basename(ZIP_FILE), open(ZIP_FILE, 'rb'), 1024)
     except Exception as e:
-        print('upload_ftp upload failed: %s\n' % e)
+        print('upload_sign_ftp upload failed: %s\n' % e)
         return 10, None
 
     file_url = 'ftp://%s@%s%s/%s' % (FTP_USER, FTP_HOST, upload_path, ZIP_FILE.split('/')[-1])
-    print('upload success %s' % file_url)
+    print('upload_sign_ftp upload success %s' % file_url)
     utils.place_config(build_config_file, 'IMP_FTP_URL', file_url)
 
     # delete publish package
@@ -173,7 +173,7 @@ def main(argv):
         if match and match.group(3):
             available = int(match.group(3))
             if available < 200 * 1024 * 1024:
-                print('upload_ftp df: %s' % t.split('\n')[1])
+                print('upload_sign_ftp df: %s' % t.split('\n')[1])
                 utils.async_command('[ -d out ] && rm -rf out')
 
     return 0, None

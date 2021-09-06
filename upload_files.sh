@@ -97,7 +97,7 @@ function check_install() {
     password=$2
 
     if ! type $program >/dev/null 2>&1; then
-        echo -e "\nupload_cache_server install $program"
+        echo -e "\nupload_files install $program"
 
         if type apt-get >/dev/null 2>&1; then
             sudo -S apt-get update >/dev/null 2>&1 << EOF
@@ -130,7 +130,7 @@ if [[ ! -n "$my_password" || ! -n "$devops_compile_id" || ! -n "$jenkins_build_n
 fi
 
 # find jenkins script path
-SCRIPT_BASE=$(ls -l upload_cache_server.sh | awk '{print $NF}')
+SCRIPT_BASE=$(ls -l upload_files.sh | awk '{print $NF}')
 SCRIPT_BASE=${SCRIPT_BASE%/*}
 
 # define avalible cache hosts
@@ -149,7 +149,7 @@ source build/envsetup.sh > /dev/null 2>&1
 
 # dump platform
 PLATFORM=$(get_platform)
-echo -n "upload_cache_server PLATFORM: $PLATFORM"
+echo -n "upload_files PLATFORM: $PLATFORM"
 if [[ ! -n "$PLATFORM" || ! -n "$PLATFORM" ]]; then
     echo -e " error, exit."
     exit 2
@@ -161,12 +161,12 @@ echo -e "\n"
 time_stamp=`date -d "$(date '+%y-%m-%d %H:%M:%S')" +%s`
 cache_base=cache_"$ID_STAMP"_$time_stamp
 cache_folder="$SCRIPT_BASE"/"$cache_base"
-echo -e "upload_cache_server cache_folder: $cache_folder"
+echo -e "upload_files cache_folder: $cache_folder"
 mkdir $cache_folder
 
 # cp manifest.xml file with tag to $cache_folder
 manifest_tag_file="$SCRIPT_BASE"/tag_"$ID_STAMP".xml
-echo -e "\nupload_cache_server manifest_tag_file: $manifest_tag_file"
+echo -e "\nupload_files manifest_tag_file: $manifest_tag_file"
 if [[ ! -f $manifest_tag_file ]]; then
     repo manifest -r -o $manifest_tag_file
 fi
@@ -180,7 +180,7 @@ project_path=$(find droi/ -maxdepth 3 -mindepth 3 -type d -name $project_name)
 build_utils="vendor/freeme/build/tools/build_utils.py"
 merged_config="$cache_folder/ProjectConfig.mk"
 if [[ -f "$project_path/ProjectConfig.mk" && -f "$build_utils" ]]; then
-    echo -e "\nupload_cache_server merge $merged_config"
+    echo -e "\nupload_files merge $merged_config"
     python $build_utils "merge-config" "$project_path/ProjectConfig.mk" > "$merged_config"
 fi
 
@@ -190,20 +190,20 @@ if [[ ! -f $vmlinux_file ]]; then
     vmlinux_file=$(find out/ -type f -name vmlinux)
 fi
 if [[ -f $vmlinux_file ]]; then
-    echo -e "\nupload_cache_server copy $vmlinux_file"
+    echo -e "\nupload_files copy $vmlinux_file"
     zip -j -q $cache_folder/vmlinux.zip $vmlinux_file
     # cp $vmlinux_file $cache_folder
 fi
 
 # copy publish file to $cache_folder
 if [[ "$build_sign" != "true" ]]; then
-    echo -e "\nupload_cache_server build_info_file: $build_info_file"
+    echo -e "\nupload_files build_info_file: $build_info_file"
     if [[ -n "$build_info_file" && -f $build_info_file ]]; then
         # find unsigned publish file
         publish_file=$(get_unsigned_publish_file $build_info_file $PLATFORM)
 
         if [[ -n "$publish_file" && -f $publish_file ]]; then
-            echo -e "\nupload_cache_server publish_file: $publish_file"
+            echo -e "\nupload_files publish_file: $publish_file"
             if [[ ${publish_file##*.} == "pac" ]]; then
                 zip_name=${publish_file##*/}
                 zip_name=${zip_name/.pac/.zip}
@@ -224,7 +224,7 @@ cache_location=$(whoami)@${MY_INET_ADDR}:${cache_folder}
 
 # collecting folder size
 cache_size=$(du $cache_folder | awk '{print $1}')
-echo -e "\nupload_cache_server cache_size: $cache_size"
+echo -e "\nupload_files cache_size: $cache_size"
 
 # scp to cache host
 if type sshpass >/dev/null 2>&1; then
@@ -267,7 +267,7 @@ if type sshpass >/dev/null 2>&1; then
             path="~"
         fi
 
-        echo -e "\nupload_cache_server ${user}@${ip}:${path}"
+        echo -e "\nupload_files ${user}@${ip}:${path}"
 
         # mkdir in remote
         sshpass -p "${pwd}" ssh -o StrictHostKeyChecking=no "${user}@${ip}" """
@@ -294,10 +294,10 @@ EOF
     fi
 fi
 
-echo -e "\nupload_cache_server cache_location: $cache_location\n\n"
+echo -e "\nupload_files cache_location: $cache_location\n\n"
 
 if [[ "$build_sign" == "true" ]]; then
-    echo -e "\n./upload_ftp.py -p \"$project_name\" -h \"$sign_ftp_url\" -u \"$sign_ftp_upload_username\" -c \"$sign_ftp_upload_passwd\"\n"
-    python3 upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
+    echo -e "\n./upload_sign_ftp.py -p \"$project_name\" -h \"$sign_ftp_url\" -u \"$sign_ftp_upload_username\" -c \"$sign_ftp_upload_passwd\"\n"
+    python3 upload_sign_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
 fi
 
