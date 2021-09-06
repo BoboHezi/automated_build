@@ -293,3 +293,5 @@ fi
 
 echo -e "\nupload_cache_server cache_location: $cache_location\n\n"
 
+exit 0
+
