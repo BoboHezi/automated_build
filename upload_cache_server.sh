@@ -131,14 +131,13 @@ SCRIPT_BASE=$(ls -l upload_cache_server.sh | awk '{print $NF}')
 SCRIPT_BASE=${SCRIPT_BASE%/*}
 
 # define avalible cache hosts
-CACHE_HOSTS=$(python3 -c """
+CACHE_HOSTS=($(python3 -c """
 import os;
 os.chdir('$SCRIPT_BASE');
 import utils;
 print(str(utils.CACHE_HOSTS).replace('\'','').replace(', ', ' ').replace('(', '').replace(')', ''));
 """
-)
-CACHE_HOSTS=($CACHE_HOSTS)
+))
 
 # define cache path name in remote
 REMOTE_CACHE_FOLDER="jenkins_cache"
