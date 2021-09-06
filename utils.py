@@ -156,6 +156,20 @@ def get_option_val(fpath, key):
     return
 
 
+def place_config(fpath, key, value):
+    if not path.exists(fpath):
+        return
+
+    before = get_option_val(fpath, key)
+    if value == before:
+        return
+
+    if before:
+        execute('sed -i "s/^\s*%s\s*=\s*.*/%s = %s/g" %s' % (key, key, value, fpath))
+    else:
+        execute('echo "%s = %s" >> %s' % (key, value, fpath))
+
+
 def dump_platform(folder=getcwd()):
     if isempty(folder) or not path.isdir(folder):
         return None

@@ -24,7 +24,6 @@ FTP_PWD = 'hongxiangyuan014'
 
 def main(argv):
     utils.star_log('upload ftp start', 60)
-    utils.execute('echo "" > ftp_url.txt')
     option_str = 'p-project:,f-file:,h-host:,u-user:,c-code:'
     opts = utils.dump(argv, option_str)
 
@@ -159,7 +158,7 @@ def main(argv):
 
     file_url = 'ftp://%s@%s%s/%s' % (FTP_USER, FTP_HOST, upload_path, ZIP_FILE.split('/')[-1])
     print('upload success %s' % file_url)
-    utils.execute('echo "%s" > ftp_url.txt' % file_url)
+    utils.place_config(build_config_file, 'IMP_FTP_URL', file_url)
 
     # delete publish package
     utils.removedirs(publish_out)

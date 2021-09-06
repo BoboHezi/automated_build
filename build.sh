@@ -114,7 +114,7 @@ manifest_tag_file="$script_base"/tag_"$devops_compile_id"_"$build_id".xml
 echo -e "\n---------------------create manifest tag---------------------\n"
 repo manifest -r -o $manifest_tag_file
 echo -e "\n<!--cherry picks" >> $manifest_tag_file
-cat ~/.jenkins/script/cps >> $manifest_tag_file
+cat $script_base/cps >> $manifest_tag_file
 echo -e "\n-->" >> $manifest_tag_file
 echo -e "\nmanifest_tag_file: $manifest_tag_file\n"
 

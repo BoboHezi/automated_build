@@ -233,21 +233,13 @@ EOF
                         exit -2
                     fi
 
-                    if [ ! -f ftp_url.txt ]; then
-                        echo -e "File ftp_url.txt does not exist!!!"
-                        exit -3
-                    fi
-
-                    ftp_url=$(cat ftp_url.txt)
-                    echo -e "\nftp_url: $ftp_url\n"
-
-                    echo "./commit_sign_verify.py -p \"$project_name\" -f \"ftp_url.txt\" -u \"$sv_platform_url\" \
+                    echo "./commit_sign_verify.py -p \"$project_name\" -u \"$sv_platform_url\" \
                         -s \"$sv_platform_username\" -c \"$sv_platform_passwd\" -t \"$sv_platform_terrace\" \
                         -b \"$sv_platform_board\" -l \"$sv_platform_cclist\" -m \"$sv_platform_model\" \
                         -r \"$sv_platform_brand\" -o \"$sv_platform_odm\" -i \"$publish_username\" \
                         -e \"$sv_verity_purpose\" -d \"$devops_compile_id\" -y \"$sv_verity_level\" \"$verity\""
 
-                    python3 commit_sign_verify.py -p \"$project_name\" -f \"ftp_url.txt\" -u \"$sv_platform_url\" \
+                    python3 commit_sign_verify.py -p \"$project_name\" -u \"$sv_platform_url\" \
                         -s \"$sv_platform_username\" -c \"$sv_platform_passwd\" -t \"$sv_platform_terrace\" \
                         -b \"$sv_platform_board\" -l \"$sv_platform_cclist\" -m \"$sv_platform_model\" \
                         -r \"$sv_platform_brand\" -o \"$sv_platform_odm\" -i \"$publish_username\" \
