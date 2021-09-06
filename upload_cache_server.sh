@@ -296,8 +296,8 @@ fi
 
 echo -e "\nupload_cache_server cache_location: $cache_location\n\n"
 
-echo -e '\n./upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"\n'
-python3 upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
-
-exit 0
+if [[ "$build_sign" == "true" ]]; then
+    echo -e "\n./upload_ftp.py -p \"$project_name\" -h \"$sign_ftp_url\" -u \"$sign_ftp_upload_username\" -c \"$sign_ftp_upload_passwd\"\n"
+    python3 upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
+fi
 

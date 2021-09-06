@@ -79,9 +79,12 @@ def main(argv):
     build_config_file = utils.get_option_val('mk', 'readonly BUILD_INFO_FILE').replace('\'', '')
     if utils.isempty(build_config_file) or not path.isfile(build_config_file):
         build_config_file = '%s/ProjectConfig.mk' % project_path
-    project_product = utils.get_option_val(build_config_file, 'project' if PLATFORM == 'MTK' else 'product')
-    if utils.isempty(project_product) \
-            or project_product != (PROJECT_NAME if PLATFORM == 'MTK' else 'full_' + PROJECT_NAME):
+    project_product = utils.get_option_val(build_config_file, 'product')
+    if utils.isempty(project_product):
+        project_product = utils.get_option_val(build_config_file, 'project')
+    if not utils.isempty(project_product) and project_product.startswith('full_'):
+        project_product = project_product[5:]
+    if utils.isempty(project_product) or project_product != PROJECT_NAME:
         build_config_file = '%s/ProjectConfig.mk' % project_path
     print('upload_ftp build_config_file: %s\n' % build_config_file)
 
