@@ -118,7 +118,7 @@ jenkins_build_number=$3
 build_sign=$4
 
 ID_STAMP="${devops_compile_id}_${jenkins_build_number}"
-MY_INET_ADDR=$(ip a | grep "192.168" | awk '{print $2}' | awk -F/ '{print $1}')
+MY_INET_ADDR=$(ip a | grep "\(192.168\)\|\(10.20\)" | awk '{print $2}' | awk -F/ '{print $1}')
 
 # check paramter
 if [[ ! -n "$my_password" || ! -n "$devops_compile_id" || ! -n "$jenkins_build_number" ]]; then
@@ -126,11 +126,19 @@ if [[ ! -n "$my_password" || ! -n "$devops_compile_id" || ! -n "$jenkins_build_n
     exit 1
 fi
 
+# find jenkins script path
+SCRIPT_BASE=$(ls -l upload_cache_server.sh | awk '{print $NF}')
+SCRIPT_BASE=${SCRIPT_BASE%/*}
+
 # define avalible cache hosts
-CACHE_HOSTS=(
-    "tzq,192.168.151.232,1"
-    "szd,192.168.48.98,1"
+CACHE_HOSTS=$(python3 -c """
+import os;
+os.chdir('$SCRIPT_BASE');
+import utils;
+print(str(utils.CACHE_HOSTS).replace('\'','').replace(', ', ' ').replace('(', '').replace(')', ''));
+"""
 )
+CACHE_HOSTS=($CACHE_HOSTS)
 
 # define cache path name in remote
 REMOTE_CACHE_FOLDER="jenkins_cache"
@@ -149,15 +157,13 @@ echo -e "\n"
 # create cache folder cache_$devops_compile_id_$jenkins_build_number_$time_stamp
 # time_stamp=$(date '+%y-%m-%d-%H-%M')
 time_stamp=`date -d "$(date '+%y-%m-%d %H:%M:%S')" +%s`
-script_base=$(ls -l upload_cache_server.sh | awk '{print $NF}')
-script_base=${script_base%/*}
 cache_base=cache_"$ID_STAMP"_$time_stamp
-cache_folder="$script_base"/"$cache_base"
+cache_folder="$SCRIPT_BASE"/"$cache_base"
 echo -e "upload_cache_server cache_folder: $cache_folder"
 mkdir $cache_folder
 
 # cp manifest.xml file with tag to $cache_folder
-manifest_tag_file="$script_base"/tag_"$ID_STAMP".xml
+manifest_tag_file="$SCRIPT_BASE"/tag_"$ID_STAMP".xml
 echo -e "\nupload_cache_server manifest_tag_file: $manifest_tag_file"
 if [[ ! -f $manifest_tag_file ]]; then
     repo manifest -r -o $manifest_tag_file
@@ -214,6 +220,10 @@ check_install "sshpass" "$my_password"
 # define cache location, default local
 cache_location=$(whoami)@${MY_INET_ADDR}:${cache_folder}
 
+# collecting folder size
+cache_size=$(du $cache_folder | awk '{print $1}')
+echo -e "\nupload_cache_server cache_size: $cache_size"
+
 # scp to cache host
 if type sshpass >/dev/null 2>&1; then
     # define host:disk map
@@ -247,36 +257,39 @@ if type sshpass >/dev/null 2>&1; then
     ip=$(echo ${CACHE_HOSTS[$max_free_space_host]} | awk -F "," '{print $2}')
     pwd=$(echo ${CACHE_HOSTS[$max_free_space_host]} | awk -F "," '{print $3}')
     path=$max_free_path
-    free=$max_free_space
 
-    if [ ${path} = "/" ]; then
-        path="~"
-    fi
+    # if free space is 300M greater than required
+    if [[ $max_free_space -gt `expr $cache_size + 300 \* 1024` ]]; then
+        # change to home if necessary
+        if [ ${path} = "/" ]; then
+            path="~"
+        fi
 
-    echo -e "\nupload_cache_server ${user}@${ip}:${path}"
+        echo -e "\nupload_cache_server ${user}@${ip}:${path}"
 
-    # mkdir in remote
-    sshpass -p "${pwd}" ssh -o StrictHostKeyChecking=no "${user}@${ip}" """
-    cd ${path}
-    echo -e "now in ${ip}"
+        # mkdir in remote
+        sshpass -p "${pwd}" ssh -o StrictHostKeyChecking=no "${user}@${ip}" """
+        cd ${path}
+        echo -e "now in ${ip}"
 
-    pwd
+        pwd
 
-    if [ ! -d ${REMOTE_CACHE_FOLDER} ]; then
-        sudo -S mkdir ${REMOTE_CACHE_FOLDER} << EOF
+        if [ ! -d ${REMOTE_CACHE_FOLDER} ]; then
+            sudo -S mkdir ${REMOTE_CACHE_FOLDER} << EOF
 ${pwd}
 EOF
-        sudo -S chmod -R a+rw ${REMOTE_CACHE_FOLDER} << EOF
+            sudo -S chmod -R a+rw ${REMOTE_CACHE_FOLDER} << EOF
 ${pwd}
 EOF
+        fi
+        """
+        # scp to remote
+        sshpass -p "${pwd}" scp -r ${cache_folder} "${user}@${ip}":${path}/${REMOTE_CACHE_FOLDER}
+
+        cache_location="${user}@${ip}":${path}/${REMOTE_CACHE_FOLDER}/${cache_base}
+
+        rm -rf $cache_folder
     fi
-    """
-    # scp to remote
-    sshpass -p "${pwd}" scp -r ${cache_folder} "${user}@${ip}":${path}/${REMOTE_CACHE_FOLDER}
-
-    cache_location="${user}@${ip}":${path}/${REMOTE_CACHE_FOLDER}/${cache_base}
-
-    rm -rf $cache_folder
 fi
 
 echo -e "\nupload_cache_server cache_location: $cache_location\n\n"

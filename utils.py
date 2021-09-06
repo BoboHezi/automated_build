@@ -21,6 +21,12 @@ DB_USER = "root"
 DB_PASSWORD = "yun764946"
 DB_DATABASE = "jeecg-boot242"
 
+# cache host
+CACHE_HOSTS = (
+    'tzq,192.168.151.232,1',
+    'szd,192.168.48.98,1'
+)
+
 common_headers = {
     'Accept': 'application/json, text/plain, */*',
     'Accept-Encoding': 'gzip, deflate',
