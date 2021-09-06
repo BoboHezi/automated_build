@@ -116,6 +116,9 @@ my_password=$1
 devops_compile_id=$2
 jenkins_build_number=$3
 build_sign=$4
+sign_ftp_url=$5
+sign_ftp_upload_username=$6
+sign_ftp_upload_passwd=$7
 
 ID_STAMP="${devops_compile_id}_${jenkins_build_number}"
 MY_INET_ADDR=$(ip a | grep "\(192.168\)\|\(10.20\)" | awk '{print $2}' | awk -F/ '{print $1}')
@@ -292,6 +295,9 @@ EOF
 fi
 
 echo -e "\nupload_cache_server cache_location: $cache_location\n\n"
+
+echo -e '\n./upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"\n'
+python3 upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
 
 exit 0
 
