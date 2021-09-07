@@ -119,6 +119,7 @@ build_sign=$4
 sign_ftp_url=$5
 sign_ftp_upload_username=$6
 sign_ftp_upload_passwd=$7
+compile_send_email=$8
 
 ID_STAMP="${devops_compile_id}_${jenkins_build_number}"
 MY_INET_ADDR=$(ip a | grep "\(192.168\)\|\(10.20\)" | awk '{print $2}' | awk -F/ '{print $1}')
@@ -223,7 +224,7 @@ check_install "sshpass" "$my_password"
 cache_location=$(whoami)@${MY_INET_ADDR}:${cache_folder}
 
 # collecting folder size
-cache_size=$(du $cache_folder | awk '{print $1}')
+cache_size=$(du -s $cache_folder | awk '{print $1}')
 echo -e "\nupload_files cache_size: $cache_size"
 
 # scp to cache host
@@ -295,6 +296,36 @@ EOF
 fi
 
 echo -e "\nupload_files cache_location: $cache_location\n\n"
+
+# insert into database
+create_by='jenkins'
+create_time=$(date '+%Y-%m-%d %H:%M:%S')
+compile_platform_id=$(python3 -c """
+import os
+os.chdir('$SCRIPT_BASE')
+import utils
+import mysql.connector
+db_connect = mysql.connector.connect(
+host=utils.DB_HOST,
+port=utils.DB_PORT,
+user=utils.DB_USER,
+passwd=utils.DB_PASSWORD,
+database=utils.DB_DATABASE
+)
+cursor = db_connect.cursor()
+cursor.execute('select compile_platform_id from devops_compile where id=$devops_compile_id')
+result = cursor.fetchall()
+print(result[0][0])
+""")
+version_internal=$(get_config_val $build_info_file 'FREEME_PRODUCT_INFO_SW_VERNO_INTERNAL')
+
+echo -e "create_by: $create_by, create_time: $create_time, jenkins_build_id: $jenkins_build_id, \
+    devops_compile_id: $devops_compile_id, project_name: $project_name, compile_send_email: $compile_send_email, \
+    compile_platform_id: $compile_platform_id, version_internal: $version_internal, cache_location: $cache_location"
+
+./updatea_db.py -m insert -t devops_compile_cache \
+    -k "create_by,create_time,jenkins_build_id,devops_compile_id,project_name,compile_send_email,compile_platform_id,version_internal,cache_location" \
+    -v "$create_by,$create_time,$jenkins_build_id,$devops_compile_id,$project_name,$compile_send_email,$compile_platform_id,$version_internal,$cache_location"
 
 if [[ "$build_sign" == "true" ]]; then
     echo -e "\n./upload_sign_ftp.py -p \"$project_name\" -h \"$sign_ftp_url\" -u \"$sign_ftp_upload_username\" -c \"$sign_ftp_upload_passwd\"\n"
