@@ -43,7 +43,7 @@ KEYS = None
 VALUES = None
 WHERE_KEY = None
 WHERE_VALUE = None
-MODEL='update'
+MODEL = 'update'
 
 
 def main(argv):

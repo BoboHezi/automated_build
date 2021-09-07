@@ -315,13 +315,9 @@ database=utils.DB_DATABASE
 cursor = db_connect.cursor()
 cursor.execute('select compile_platform_id from devops_compile where id=$devops_compile_id')
 result = cursor.fetchall()
-print(result[0][0])
+print(result[0][0]) if len(result) > 0 else None
 """)
 version_internal=$(get_config_val $build_info_file 'FREEME_PRODUCT_INFO_SW_VERNO_INTERNAL')
-
-echo -e "create_by: $create_by, create_time: $create_time, jenkins_build_id: $jenkins_build_number, \
-    devops_compile_id: $devops_compile_id, project_name: $project_name, compile_send_email: $compile_send_email, \
-    compile_platform_id: $compile_platform_id, version_internal: $version_internal, cache_location: $cache_location"
 
 ./update_db.py -m insert -t devops_compile_cache \
     -k "create_by,create_time,jenkins_build_id,devops_compile_id,project_name,compile_send_email,compile_platform_id,version_internal,cache_location" \

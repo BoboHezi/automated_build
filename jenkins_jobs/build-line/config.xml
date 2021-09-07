@@ -403,7 +403,8 @@ EOF
 
                     # upload cache file(publish file if not sign, manifest.xml, ProjectConfig.mk, vmlinux)
                     echo -e &apos;\n./upload_files.sh &quot;xxxxxxx&quot; &quot;$devops_compile_id&quot; &quot;$BUILD_NUMBER&quot; &quot;$build_sign&quot; &quot;$sign_ftp_url&quot; &quot;$sign_ftp_upload_username&quot; &quot;$sign_ftp_upload_passwd&quot;&apos;
-                    ./upload_files.sh &quot;$server_passwd&quot; &quot;$devops_compile_id&quot; &quot;$BUILD_NUMBER&quot; &quot;$build_sign&quot; &quot;$sign_ftp_url&quot; &quot;$sign_ftp_upload_username&quot; &quot;$sign_ftp_upload_passwd&quot;
+                    ./upload_files.sh &quot;$server_passwd&quot; &quot;$devops_compile_id&quot; &quot;$BUILD_NUMBER&quot; &quot;$build_sign&quot; &quot;$sign_ftp_url&quot; \
+                        &quot;$sign_ftp_upload_username&quot; &quot;$sign_ftp_upload_passwd&quot; &quot;$sv_platform_cclist&quot;
                     &apos;&apos;&apos;)
                     sh &quot;&quot;&quot;exit $upload_rst&quot;&quot;&quot;
                 }
