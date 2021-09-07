@@ -367,7 +367,7 @@ def main(argv):
         if path.isfile(build_config_file):
             SV_FTP_PATH = utils.get_option_val(build_config_file, 'IMP_FTP_URL')
 
-    if path.isfile(SV_FTP_PATH):
+    if not utils.isempty(SV_FTP_PATH) and path.isfile(SV_FTP_PATH):
         file = open(SV_FTP_PATH, 'r')
         SV_FTP_PATH = file.read()
         SV_FTP_PATH = SV_FTP_PATH.strip()

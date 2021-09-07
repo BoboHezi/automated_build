@@ -319,13 +319,13 @@ print(result[0][0])
 """)
 version_internal=$(get_config_val $build_info_file 'FREEME_PRODUCT_INFO_SW_VERNO_INTERNAL')
 
-echo -e "create_by: $create_by, create_time: $create_time, jenkins_build_id: $jenkins_build_id, \
+echo -e "create_by: $create_by, create_time: $create_time, jenkins_build_id: $jenkins_build_number, \
     devops_compile_id: $devops_compile_id, project_name: $project_name, compile_send_email: $compile_send_email, \
     compile_platform_id: $compile_platform_id, version_internal: $version_internal, cache_location: $cache_location"
 
-./updatea_db.py -m insert -t devops_compile_cache \
+./update_db.py -m insert -t devops_compile_cache \
     -k "create_by,create_time,jenkins_build_id,devops_compile_id,project_name,compile_send_email,compile_platform_id,version_internal,cache_location" \
-    -v "$create_by,$create_time,$jenkins_build_id,$devops_compile_id,$project_name,$compile_send_email,$compile_platform_id,$version_internal,$cache_location"
+    -v "$create_by,$create_time,$jenkins_build_number,$devops_compile_id,$project_name,$compile_send_email,$compile_platform_id,$version_internal,$cache_location"
 
 if [[ "$build_sign" == "true" ]]; then
     echo -e "\n./upload_sign_ftp.py -p \"$project_name\" -h \"$sign_ftp_url\" -u \"$sign_ftp_upload_username\" -c \"$sign_ftp_upload_passwd\"\n"
