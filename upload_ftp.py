@@ -144,8 +144,8 @@ def main(argv):
             ftp.cwd(REMOTE_PATH)
         except Exception as e:
             print('upload_ftp cwd failed: %s, try mkd\n' % e)
-            rst = mkdir(REMOTE_PATH, ftp)
-            if rst:
+            result = mkdir(REMOTE_PATH, ftp)
+            if result:
                 ftp.cwd(REMOTE_PATH)
             else:
                 return 5, ftp

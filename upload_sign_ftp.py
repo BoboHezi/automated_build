@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import sys
 import time
+import upload_ftp
 from ftplib import FTP
 from os import path
 from re import search
@@ -118,46 +119,11 @@ def main(argv):
     upload_path = '/upload/%s/%s' % (date_str, PROJECT_NAME.upper())
     print('upload_sign_ftp upload_path: %s' % upload_path)
 
-    # ftp connect & login
-    ftp = FTP()
-    ftp.connect(FTP_HOST, 21, 30)
-    try:
-        ftp.login(FTP_USER, FTP_PWD)
-        print(ftp.getwelcome())
-    except Exception as e:
-        print('upload_sign_ftp login failed: %s' % e)
-        return 8, None
-    print
-
-    # check remote dir & cwd
-    try:
-        ftp.cwd(upload_path)
-    except Exception as e:
-        print('upload_sign_ftp cwd failed: %s, try mkd\n' % e)
-        try:
-            ftp.cwd('~')
-            base_dir = ftp.pwd()
-            for p in upload_path.split('/'):
-                if utils.isempty(p):
-                    continue
-                base_dir = base_dir + p + '/'
-                try:
-                    ftp.cwd(base_dir)
-                except Exception as e:
-                    ftp.mkd(base_dir)
-            ftp.cwd(upload_path)
-        except Exception as e:
-            print('upload_sign_ftp mkd failed: %s\n' % e)
-            return 9, None
-    print('upload_sign_ftp remote dir: %s\n' % ftp.pwd())
-
-    # upload
-    print('upload_sign_ftp start upload file\n')
-    try:
-        ftp.storbinary('STOR ' + path.basename(ZIP_FILE), open(ZIP_FILE, 'rb'), 1024)
-    except Exception as e:
-        print('upload_sign_ftp upload failed: %s\n' % e)
-        return 10, None
+    # upload by upload_ftp.py
+    argv = ['-h', FTP_HOST, '-u', FTP_USER, '-c', FTP_PWD, '-l', ZIP_FILE, '-r', upload_path]
+    rst, ftp = upload_ftp.main(argv)
+    if rst is not 0:
+        return rst, ftp
 
     file_url = 'ftp://%s@%s%s/%s' % (FTP_USER, FTP_HOST, upload_path, ZIP_FILE.split('/')[-1])
     print('upload_sign_ftp upload success %s' % file_url)
