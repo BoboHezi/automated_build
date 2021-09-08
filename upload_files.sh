@@ -142,6 +142,14 @@ import utils;
 print(str(utils.CACHE_HOSTS).replace('\'','').replace(', ', ' ').replace('(', '').replace(')', ''));
 """
 ))
+# define avalible cache ftp
+CACHE_FTP=($(python3 -c """
+import os;
+os.chdir('$SCRIPT_BASE');
+import utils;
+print(str(utils.CACHE_FTP).replace('\'','').replace(', ', ' ').replace('(', '').replace(')', ''));
+"""
+))
 
 # define cache path name in remote
 REMOTE_CACHE_FOLDER="jenkins_cache"
@@ -173,7 +181,7 @@ if [[ ! -f $manifest_tag_file ]]; then
 fi
 mv $manifest_tag_file $cache_folder
 
-# create ProjectConfig.mk & copy to $cache_folder
+# create ProjectConfig.mk
 build_info_file=$(grep "readonly BUILD_INFO_FILE" mk | awk -F"=" '{print $2}')
 build_info_file=${build_info_file//\'/}
 project_name=$(get_project $build_info_file)
@@ -193,7 +201,6 @@ fi
 if [[ -f $vmlinux_file ]]; then
     echo -e "\nupload_files copy $vmlinux_file"
     zip -j -q $cache_folder/vmlinux.zip $vmlinux_file
-    # cp $vmlinux_file $cache_folder
 fi
 
 # copy publish file to $cache_folder
@@ -218,17 +225,28 @@ if [[ "$build_sign" != "true" ]]; then
 fi
 
 # check & install sshpass
-check_install "sshpass" "$my_password"
+[ ${#CACHE_HOSTS[*]} -gt 0 ] && [ ! ${#CACHE_FTP[*]} -gt 0 ] && check_install "sshpass" "$my_password"
 
 # define cache location, default local
 cache_location=$(whoami)@${MY_INET_ADDR}:${cache_folder}
 
-# collecting folder size
-cache_size=$(du -s $cache_folder | awk '{print $1}')
-echo -e "\nupload_files cache_size: $cache_size"
+# upload to ftp server
+if [[ ${#CACHE_FTP[*]} -gt 0 ]]; then
+    echo -e "\nupload_files CACHE_FTP: ${CACHE_FTP[*]}"
+    first_ftp=${CACHE_FTP[0]}
+    user=$(echo $first_ftp | awk -F "," '{print $1}')
+    url=$(echo $first_ftp | awk -F "," '{print $2}')
+    pwd=$(echo $first_ftp | awk -F "," '{print $3}')
 
+    remote_folder="$REMOTE_CACHE_FOLDER/`date '+%Y%m'`"
+    ./upload_ftp.py -h $url -u $user -c $pwd -l $cache_folder -r $remote_folder
+
+    if [[ $? -eq 0 ]]; then
+        cache_location="ftp://$user@$url/$remote_folder/$cache_base"
+        rm -rf $cache_folder
+    fi
 # scp to cache host
-if type sshpass >/dev/null 2>&1; then
+elif type sshpass >/dev/null 2>&1 && [ ${#CACHE_HOSTS[*]} -gt 0 ]; then
     # define host:disk map
     declare -A avalible_disks
     OLD_IFS="$IFS"
@@ -260,6 +278,10 @@ if type sshpass >/dev/null 2>&1; then
     ip=$(echo ${CACHE_HOSTS[$max_free_space_host]} | awk -F "," '{print $2}')
     pwd=$(echo ${CACHE_HOSTS[$max_free_space_host]} | awk -F "," '{print $3}')
     path=$max_free_path
+
+    # collecting folder size
+    cache_size=$(du -s $cache_folder | awk '{print $1}')
+    echo -e "\nupload_files cache_size: $cache_size"
 
     # if free space is 300M greater than required
     if [[ $max_free_space -gt `expr $cache_size + 300 \* 1024` ]]; then

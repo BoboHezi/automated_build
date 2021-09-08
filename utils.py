@@ -27,6 +27,11 @@ CACHE_HOSTS = (
     'szd,192.168.48.98,1'
 )
 
+# cache ftp host
+CACHE_FTP = (
+    'FreemeImp,ftp.droi.com,FImp0102ya'
+)
+
 common_headers = {
     'Accept': 'application/json, text/plain, */*',
     'Accept-Encoding': 'gzip, deflate',
