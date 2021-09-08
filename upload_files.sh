@@ -134,6 +134,30 @@ fi
 SCRIPT_BASE=$(ls -l upload_files.sh | awk '{print $NF}')
 SCRIPT_BASE=${SCRIPT_BASE%/*}
 
+# get platform & vmlinux from db
+query_rst=$(python3 -c """
+import os
+os.chdir('$SCRIPT_BASE')
+import utils
+import mysql.connector
+db_connect = mysql.connector.connect(
+host=utils.DB_HOST,
+port=utils.DB_PORT,
+user=utils.DB_USER,
+passwd=utils.DB_PASSWORD,
+database=utils.DB_DATABASE
+)
+cursor = db_connect.cursor()
+cursor.execute('select compile_platform_id,compile_save_vmlinux from devops_compile where id=$devops_compile_id')
+result = cursor.fetchall()
+print(result[0][0]+' '+result[0][1]) if len(result) > 0 else None
+cursor.close()
+db_connect.close()
+""")
+ary=($query_rst)
+COMPILE_PLATFORM_ID=${ary[0]}
+COMPILE_SAVE_VMLINUX=${ary[1]}
+
 # define avalible cache hosts
 CACHE_HOSTS=($(python3 -c """
 import os;
@@ -194,13 +218,15 @@ if [[ -f "$project_path/ProjectConfig.mk" && -f "$build_utils" ]]; then
 fi
 
 # copy vmlinux to $cache_folder
-vmlinux_file="out/target/product/$project_name/obj/KERNEL/vmlinux"
-if [[ ! -f $vmlinux_file ]]; then
-    vmlinux_file=$(find out/ -type f -name vmlinux)
-fi
-if [[ -f $vmlinux_file ]]; then
-    echo -e "\nupload_files copy $vmlinux_file"
-    zip -j -q $cache_folder/vmlinux.zip $vmlinux_file
+if [[ "$COMPILE_SAVE_VMLINUX" == "Y" ]]; then
+    vmlinux_file="out/target/product/$project_name/obj/KERNEL/vmlinux"
+    if [[ ! -f $vmlinux_file ]]; then
+        vmlinux_file=$(find out/ -type f -name vmlinux)
+    fi
+    if [[ -f $vmlinux_file ]]; then
+        echo -e "\nupload_files copy $vmlinux_file"
+        zip -j -q $cache_folder/vmlinux.zip $vmlinux_file
+    fi
 fi
 
 # copy publish file to $cache_folder
@@ -322,28 +348,11 @@ echo -e "\nupload_files cache_location: $cache_location\n\n"
 # insert into database
 create_by='jenkins'
 create_time=$(date '+%Y-%m-%d %H:%M:%S')
-compile_platform_id=$(python3 -c """
-import os
-os.chdir('$SCRIPT_BASE')
-import utils
-import mysql.connector
-db_connect = mysql.connector.connect(
-host=utils.DB_HOST,
-port=utils.DB_PORT,
-user=utils.DB_USER,
-passwd=utils.DB_PASSWORD,
-database=utils.DB_DATABASE
-)
-cursor = db_connect.cursor()
-cursor.execute('select compile_platform_id from devops_compile where id=$devops_compile_id')
-result = cursor.fetchall()
-print(result[0][0]) if len(result) > 0 else None
-""")
 version_internal=$(get_config_val $build_info_file 'FREEME_PRODUCT_INFO_SW_VERNO_INTERNAL')
 
 ./update_db.py -m insert -t devops_compile_cache \
     -k "create_by,create_time,jenkins_build_id,devops_compile_id,project_name,compile_send_email,compile_platform_id,version_internal,cache_location" \
-    -v "$create_by,$create_time,$jenkins_build_number,$devops_compile_id,$project_name,$compile_send_email,$compile_platform_id,$version_internal,$cache_location"
+    -v "$create_by,$create_time,$jenkins_build_number,$devops_compile_id,$project_name,$compile_send_email,$COMPILE_PLATFORM_ID,$version_internal,$cache_location"
 
 # upload sign ftp
 if [[ "$build_sign" == "true" ]]; then
