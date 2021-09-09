@@ -103,6 +103,9 @@ def main(argv):
                 ZIP_FILE = '%s/%s(%s).zip' % (publish_out, verno, verno_internal)
         elif PLATFORM == 'SPRD':
             ZIP_FILE = '%s/bin/%s.zip' % (publish_out, verno_internal)
+        # remove str after [space]
+        if ' ' in ZIP_FILE:
+            ZIP_FILE = '%s.zip' % ZIP_FILE.split(' ')[0]
 
     # if zip doesn't exist, try find
     if not path.isfile(ZIP_FILE):

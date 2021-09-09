@@ -176,7 +176,7 @@ print(str(utils.CACHE_FTP).replace('\'','').replace(', ', ' ').replace('(', '').
 ))
 
 # define cache path name in remote
-REMOTE_CACHE_FOLDER="jenkins_cache"
+REMOTE_CACHE_FOLDER="IMP_jenkins_cache"
 
 source build/envsetup.sh > /dev/null 2>&1
 
@@ -199,7 +199,7 @@ mkdir $cache_folder
 
 # cp manifest.xml file with tag to $cache_folder
 manifest_tag_file="$SCRIPT_BASE"/tag_"$ID_STAMP".xml
-echo -e "\nupload_files manifest_tag_file: $manifest_tag_file"
+echo -e "\nupload_files preserve manifest_tag_file: $manifest_tag_file"
 if [[ ! -f $manifest_tag_file ]]; then
     repo manifest -r -o $manifest_tag_file
 fi
@@ -213,7 +213,7 @@ project_path=$(find droi/ -maxdepth 3 -mindepth 3 -type d -name $project_name)
 build_utils="vendor/freeme/build/tools/build_utils.py"
 merged_config="$cache_folder/ProjectConfig.mk"
 if [[ -f "$project_path/ProjectConfig.mk" && -f "$build_utils" ]]; then
-    echo -e "\nupload_files merge $merged_config"
+    echo -e "\nupload_files preserve merge $merged_config"
     python $build_utils "merge-config" "$project_path/ProjectConfig.mk" > "$merged_config"
 fi
 
@@ -224,7 +224,7 @@ if [[ "$COMPILE_SAVE_VMLINUX" == "Y" ]]; then
         vmlinux_file=$(find out/ -type f -name vmlinux)
     fi
     if [[ -f $vmlinux_file ]]; then
-        echo -e "\nupload_files copy $vmlinux_file"
+        echo -e "\nupload_files preserve vmlinux: $vmlinux_file"
         zip -j -q $cache_folder/vmlinux.zip $vmlinux_file
     fi
 fi
@@ -237,7 +237,7 @@ if [[ "$build_sign" != "true" ]]; then
         publish_file=$(get_unsigned_publish_file $build_info_file $PLATFORM)
 
         if [[ -n "$publish_file" && -f $publish_file ]]; then
-            echo -e "\nupload_files publish_file: $publish_file"
+            echo -e "\nupload_files preserve publish_file: $publish_file"
             if [[ ${publish_file##*.} == "pac" ]]; then
                 zip_name=${publish_file##*/}
                 zip_name=${zip_name/.pac/.zip}
