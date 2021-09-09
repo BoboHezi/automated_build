@@ -171,7 +171,13 @@ def overview():
     manifests_path = ORIGIN_WORK_DIRECTORY + '/.repo/manifests'
     manifests_repo = Repo(manifests_path)
     heads = dump_node(manifests_repo.git.status())
-    if heads != 0:
+    if heads is None and 'git rebase --' in manifests_repo.git.status():
+        try:
+            manifests_repo.git.rebase('--abort')
+            heads = dump_node(manifests_repo.git.status())
+        except Exception as e:
+            pass
+    if heads and heads != 0:
         node = {'path': manifests_path, manifests_repo.active_branch.name: heads[0] if isinstance(heads, list) else heads}
         unclean_nodes.append(node)
     return unclean_nodes
@@ -193,8 +199,6 @@ def handle_overview():
             if not repo:
                 continue
             # clean unclean branch
-            repo.active_branch.name
-            repo.branches
             for branch in node.keys():
                 if branch == 'path':
                     continue
