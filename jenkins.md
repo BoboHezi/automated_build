@@ -290,6 +290,8 @@ sudo pip install pycryptodome
 
 2. 可将out目录的vmlinux自动上传某一地址（0508）
 
+* done(0909)
+
 
 3. 优化build.sh脚本，修改更新数据库操作（0508）
 
@@ -329,8 +331,14 @@ sudo pip install pycryptodome
 
 11. 记录编译时，项目ProjectConfig.mk(0806)
 
+* done(0909)
+
 
 12. 记录编译时，所有git仓库信息(0806)
 
+* done(0909)
+
 
 13. 非签名编译版本，刷机包保存(0831)
+
+* done(0909)

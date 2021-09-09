@@ -182,7 +182,7 @@ EOF
                     # upload cache file(publish file if not sign, manifest.xml, ProjectConfig.mk, vmlinux)
                     echo -e '\n./upload_files.sh "xxxxxxx" "$devops_compile_id" "$BUILD_NUMBER" "$build_sign" "$sign_ftp_url" "$sign_ftp_upload_username" "$sign_ftp_upload_passwd"'
                     ./upload_files.sh "$server_passwd" "$devops_compile_id" "$BUILD_NUMBER" "$build_sign" "$sign_ftp_url" \
-                    "$sign_ftp_upload_username" "$sign_ftp_upload_passwd" "$sv_platform_cclist"
+                        "$sign_ftp_upload_username" "$sign_ftp_upload_passwd" "$sv_platform_cclist"
                     ''')
                     sh """exit $upload_rst"""
                 }

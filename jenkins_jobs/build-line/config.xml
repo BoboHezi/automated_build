@@ -119,7 +119,7 @@
         <hudson.model.BooleanParameterDefinition>
           <name>test_host</name>
           <description>是否用来测试主机</description>
-          <defaultValue>true</defaultValue>
+          <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sign_ftp_url</name>
