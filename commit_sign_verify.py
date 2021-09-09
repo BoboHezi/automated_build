@@ -359,7 +359,15 @@ def main(argv):
     if '-y' in opts or '--priority' in opts:
         SV_VERITY_LEVEL = opts.get('-y') if opts.get('-y') else opts.get('--priority')
 
-    if path.isfile(SV_FTP_PATH):
+    if utils.isempty(SV_FTP_PATH):
+        build_config_file = utils.get_option_val('mk', 'readonly BUILD_INFO_FILE').replace('\'', '')
+        if utils.isempty(build_config_file) or not path.isfile(build_config_file):
+            status, project_path = utils.execute('find droi/ -maxdepth 3 -mindepth 3 -type d -name %s' % PROJECT_NAME)
+            build_config_file = '%s/ProjectConfig.mk'
+        if path.isfile(build_config_file):
+            SV_FTP_PATH = utils.get_option_val(build_config_file, 'IMP_FTP_URL')
+
+    if not utils.isempty(SV_FTP_PATH) and path.isfile(SV_FTP_PATH):
         file = open(SV_FTP_PATH, 'r')
         SV_FTP_PATH = file.read()
         SV_FTP_PATH = SV_FTP_PATH.strip()

@@ -102,10 +102,21 @@ repo abandon --all > /dev/null 2>&1 || echo
 repo start --all master
 repo sync > /dev/null 2>&1 || echo
 # 'clean code'
-if [[ "$is_test" != "true" && "$build_action" != "r" ]]; then
+if [[ "$build_action" != "r" ]]; then
     python3 repo_handler.py -c
     # repo sync
 fi
+
+# create manifest tag file
+script_base=$(ls -l build.sh | awk '{print $NF}')
+script_base=${script_base%/*}
+manifest_tag_file="$script_base"/tag_"$devops_compile_id"_"$build_id".xml
+echo -e "\n---------------------create manifest tag---------------------\n"
+repo manifest -r -o $manifest_tag_file
+echo -e "\n<!--cherry picks" >> $manifest_tag_file
+cat $script_base/cps >> $manifest_tag_file
+echo -e "\n-->" >> $manifest_tag_file
+echo -e "\nmanifest_tag_file: $manifest_tag_file\n"
 
 echo -e "\n---------------------cherry pick---------------------\n"
 # cherry pick

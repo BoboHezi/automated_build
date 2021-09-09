@@ -21,6 +21,17 @@ DB_USER = "root"
 DB_PASSWORD = "freeme@2021"
 DB_DATABASE = "jeecg-boot242"
 
+# cache host
+CACHE_HOSTS = (
+    'tzq,192.168.151.232,1',
+    'szd,192.168.48.98,1'
+)
+
+# cache ftp host
+CACHE_FTP = (
+    'FreemeImp,ftp.droi.com,FImp0102ya'
+)
+
 common_headers = {
     'Accept': 'application/json, text/plain, */*',
     'Accept-Encoding': 'gzip, deflate',
@@ -154,6 +165,20 @@ def get_option_val(fpath, key):
             if matchObj:
                 return matchObj.group(4)
     return
+
+
+def place_config(fpath, key, value):
+    if not path.exists(fpath):
+        return
+
+    before = get_option_val(fpath, key)
+    if value == before:
+        return
+
+    if before:
+        execute('sed -i "s/^\s*%s\s*=\s*.*/%s = %s/g" %s' % (key, key, value, fpath))
+    else:
+        execute('echo "%s = %s" >> %s' % (key, value, fpath))
 
 
 def dump_platform(folder=getcwd()):

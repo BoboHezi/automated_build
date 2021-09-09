@@ -156,10 +156,6 @@ EOF
         stage('file-upload') {
             steps {
                 script {
-                    if ("${build_sign}" != "true") {
-                        echo "\ndo not sign, exit file-upload!\n"
-                        return
-                    }
                     upload_rst = sh(returnStatus: true, script: '''
                     devops_token=`cat $DEVOPS_TOKEN_FILE || echo ""`
 
@@ -183,9 +179,10 @@ EOF
                     echo -------------------------------------------------
                     echo ""
 
-                    # upload file
-                    echo -e '\n./upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"\n'
-                    python3 upload_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
+                    # upload cache file(publish file if not sign, manifest.xml, ProjectConfig.mk, vmlinux)
+                    echo -e '\n./upload_files.sh "xxxxxxx" "$devops_compile_id" "$BUILD_NUMBER" "$build_sign" "$sign_ftp_url" "$sign_ftp_upload_username" "$sign_ftp_upload_passwd"'
+                    ./upload_files.sh "$server_passwd" "$devops_compile_id" "$BUILD_NUMBER" "$build_sign" "$sign_ftp_url" \
+                        "$sign_ftp_upload_username" "$sign_ftp_upload_passwd" "$sv_platform_cclist"
 
                     ''')
                     sh """exit $upload_rst"""
@@ -229,21 +226,13 @@ EOF
                         exit -2
                     fi
 
-                    if [ ! -f ftp_url.txt ]; then
-                        echo -e "File ftp_url.txt does not exist!!!"
-                        exit -3
-                    fi
-
-                    ftp_url=$(cat ftp_url.txt)
-                    echo -e "\nftp_url: $ftp_url\n"
-
-                    echo "./commit_sign_verify.py -p \"$project_name\" -f \"ftp_url.txt\" -u \"$sv_platform_url\" \
+                    echo "./commit_sign_verify.py -p \"$project_name\" -u \"$sv_platform_url\" \
                         -s \"$sv_platform_username\" -c \"$sv_platform_passwd\" -t \"$sv_platform_terrace\" \
                         -b \"$sv_platform_board\" -l \"$sv_platform_cclist\" -m \"$sv_platform_model\" \
                         -r \"$sv_platform_brand\" -o \"$sv_platform_odm\" -i \"$publish_username\" \
                         -e \"$sv_verity_purpose\" -d \"$devops_compile_id\" -y \"$sv_verity_level\" \"$verity\""
 
-                    python3 commit_sign_verify.py -p \"$project_name\" -f \"ftp_url.txt\" -u \"$sv_platform_url\" \
+                    python3 commit_sign_verify.py -p \"$project_name\" -u \"$sv_platform_url\" \
                         -s \"$sv_platform_username\" -c \"$sv_platform_passwd\" -t \"$sv_platform_terrace\" \
                         -b \"$sv_platform_board\" -l \"$sv_platform_cclist\" -m \"$sv_platform_model\" \
                         -r \"$sv_platform_brand\" -o \"$sv_platform_odm\" -i \"$publish_username\" \
