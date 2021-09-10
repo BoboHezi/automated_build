@@ -174,21 +174,22 @@ else
     # ./test_script.sh ; build_rst=$?
 fi
 
-# find buiil failed flag
-setup=build/envsetup.sh
-fld_flag=$(grep -r "echo -n \"\${color_failed}" $setup | awk -F"\"" '{print $2}' | awk -F"color_failed}" '{print $2}')
-# find BUILD_INFO_FILE
-raw=$(grep -r "readonly BUILD_INFO_FILE" mk | awk -F"=" '{print $2}')
-raw=${raw//\'/}
-build_info_file=${raw//\"/}
-# find BUILD_LOG_FILE
-product=$(grep -r "product" $build_info_file | awk -F"= " '{print $2}')
-action=$(grep -r "action" $build_info_file | awk -F"= " '{print $2}')
-build_log_file="${product}-${action}.log"
-echo -e "build_log_file: $build_log_file"
-if [ -f $build_log_file ]; then
-    grep -r "$fld_flag" $build_log_file && build_rst=1 || build_rst=0
-    echo -e "By $build_log_file, build_rst is $build_rst."
+if [[ $build_rst == "0" ]]; then
+    # find buiil failed flag
+    setup=build/envsetup.sh
+    fld_flag=$(grep -r "echo -n \"\${color_failed}" $setup | awk -F"\"" '{print $2}' | awk -F"color_failed}" '{print $2}')
+    # find BUILD_INFO_FILE
+    raw=$(grep -r "readonly BUILD_INFO_FILE" mk | awk -F"=" '{print $2}')
+    raw=${raw//\'/}
+    build_info_file=${raw//\"/}
+    # find BUILD_LOG_FILE
+    product=$(grep -r "product" $build_info_file | awk -F"= " '{print $2}')
+    action=$(grep -r "action" $build_info_file | awk -F"= " '{print $2}')
+    build_log_file="${product}-${action}.log"
+    if [ -f $build_log_file ]; then
+        grep -r "$fld_flag" $build_log_file && build_rst=1 || build_rst=0
+        echo -e "By $build_log_file, build_rst is $build_rst."
+    fi
 fi
 
 # publish
