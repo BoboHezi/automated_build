@@ -217,9 +217,12 @@ if [[ -f "$project_path/ProjectConfig.mk" && -f "$build_utils" ]]; then
     python $build_utils "merge-config" "$project_path/ProjectConfig.mk" > "$merged_config"
 fi
 
+# find out
+out_product="out/target/product/$project_name"
+
 # copy vmlinux to $cache_folder
 if [[ "$COMPILE_SAVE_VMLINUX" == "Y" ]]; then
-    vmlinux_file="out/target/product/$project_name/obj/KERNEL/vmlinux"
+    vmlinux_file="$out_product/obj/KERNEL/vmlinux"
     if [[ ! -f $vmlinux_file ]]; then
         vmlinux_file=$(find out/ -type f -name vmlinux)
     fi
@@ -246,6 +249,21 @@ if [[ "$build_sign" != "true" ]]; then
                 cp $publish_file $cache_folder
             fi
             rm -rf droi/out/$project_name
+        fi
+
+        # find target_file
+        file_ptn=""
+        if [[ -d "$out_product/archive_ota" ]]; then
+            full_package=$out_product/archive_ota
+            file_ptn="*target_files*.zip"
+        elif [[ -d "$out_product/obj/PACKAGING/target_files_intermediates" ]]; then
+            full_package=$out_product/obj/PACKAGING/target_files_intermediates
+            file_ptn="*.zip"
+        fi
+        ota_package=`ls -t $full_package/$file_ptn | head -1`
+        if [[ -f $ota_package ]]; then
+            echo -e "\nupload_files preserve ota_package: $ota_package"
+            cp $ota_package $cache_folder
         fi
     fi
 fi
@@ -352,7 +370,7 @@ version_internal=$(get_config_val $build_info_file 'FREEME_PRODUCT_INFO_SW_VERNO
 
 ./update_db.py -m insert -t devops_compile_cache \
     -k "create_by,create_time,jenkins_build_id,devops_compile_id,project_name,compile_send_email,compile_platform_id,version_internal,cache_location" \
-    -v "$create_by,$create_time,$jenkins_build_number,$devops_compile_id,$project_name,$compile_send_email,$COMPILE_PLATFORM_ID,$version_internal,$cache_location"
+    -v "$create_by,$create_time,$jenkins_build_number,$devops_compile_id,$project_name,${compile_send_email//,/;},$COMPILE_PLATFORM_ID,$version_internal,$cache_location"
 
 # upload sign ftp
 if [[ "$build_sign" == "true" ]]; then
