@@ -22,6 +22,7 @@
 DEVOPS_TOKEN_FILE: /home/server/.jenkins/dhuerki
 LOCAL_SCRIPT_PATH: /home/server/.jenkins/script/
 REMOTE_SCRIPT_PATH: /home/server/.jenkins/script/
+python3: /usr/bin/python3
 ```
 
 ## 配置主机
