@@ -11,14 +11,14 @@ from re import match
 from subprocess import Popen, PIPE, STDOUT
 
 # url
-DEVOPS_HTTP_URL = 'http://192.168.48.2:8082'
+DEVOPS_HTTP_URL = 'http://192.168.48.113:8082'
 COMPILE_STATUS_PATH = '/jeecg-boot/compile/devopsCompile/setStatusJenkins'
 OTA_STATUS_PATH = '/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus'
 # database
-DB_HOST = "192.168.48.2"
+DB_HOST = "192.168.1.23"
 DB_PORT = 3306
 DB_USER = "root"
-DB_PASSWORD = "freeme@2021"
+DB_PASSWORD = "root"
 DB_DATABASE = "jeecg-boot242"
 
 # cache host
