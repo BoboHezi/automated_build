@@ -225,6 +225,11 @@ if [[ "$COMPILE_SAVE_VMLINUX" == "Y" ]]; then
     vmlinux_file="$out_product/obj/KERNEL/vmlinux"
     if [[ ! -f $vmlinux_file ]]; then
         vmlinux_file=$(find out/ -type f -name vmlinux)
+        vmlinux_file=($vmlinux_file)
+    fi
+    if [[ ! -f $vmlinux_file ]]; then
+        vmlinux_file=$(find bsp/out/ -type f -name vmlinux)
+        vmlinux_file=($vmlinux_file)
     fi
     if [[ -f $vmlinux_file ]]; then
         echo -e "\nupload_files preserve vmlinux: $vmlinux_file"

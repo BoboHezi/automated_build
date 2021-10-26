@@ -17,47 +17,47 @@
         <hudson.model.StringParameterDefinition>
           <name>before_target_file</name>
           <description>起始包target路径</description>
-          <defaultValue>ftp://192.168.0.131/hongxiangyuan/202011/V13_GY/verified/V13-GY-G1930DPQV1HB-ZY-1128-V0101/V13-GY-G1930DPQV1HB-ZY-1128-V0101_signed_verified_target_files.zip</defaultValue>
+          <defaultValue>ftp://upload.droi.com/202108/H983A1_F20/verified/SHB1.F20.YUN.V10/SHB1.F20.YUN.V10_signed_verified_target_files.zip</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>before_ftp_username</name>
           <description>起始包登录用户名</description>
-          <defaultValue>ftp_user</defaultValue>
+          <defaultValue>mengbo</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.PasswordParameterDefinition>
           <name>before_ftp_passwd</name>
           <description>起始包登录密码</description>
-          <defaultValue>{AQAAABAAAAAQQdZV8ywRaGALZgXcWM+irHIvmpWRdTMLvTak6rTW05o=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQHEyDx+/vjhS7GPzfn4HrxWrvQFjabr9sHIPDnfQEz8g=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>after_target_file</name>
           <description>目标包target路径</description>
-          <defaultValue>ftp://upload.droi.com/202105/G1930EPQ_V13_GY/verified/V13-GY-G1930DPQV1HB-ZY-0507-V0102/V13-GY-G1930DPQV1HB-ZY-0507-V0102_signed_verified_target_files.zip</defaultValue>
+          <defaultValue>ftp://upload.droi.com/202108/H983A1_F20/verified/SHB1.F20.YUN.V11/SHB1.F20.YUN.V11_signed_verified_target_files.zip</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>after_ftp_username</name>
           <description>目标包登录用户名</description>
-          <defaultValue>hongxiangyuan</defaultValue>
+          <defaultValue>mengbo</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.PasswordParameterDefinition>
           <name>after_ftp_passwd</name>
           <description>目标包登录密码</description>
-          <defaultValue>{AQAAABAAAAAQe0GWBJ40qY+lv9148RqXTCPyHEvuBX4/3GA1Xv9Pj6s=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQuABYvTmBkOO8UOyHjGB++TwFw94B6V3AytR2f5bK1/M=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_terrace</name>
           <description>签名平台</description>
-          <defaultValue>MTK_mt6758n_hongxiangyuan</defaultValue>
+          <defaultValue>SPRD_9832r_mengbo_huazhuo</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>ota_factory_host_ip</name>
           <description>do not edit</description>
-          <defaultValue>192.168.151.217</defaultValue>
+          <defaultValue>192.168.48.113</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -69,7 +69,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>ota_factory_host_pwd</name>
           <description>do not edit</description>
-          <defaultValue>{AQAAABAAAAAQi7zSxTQ9NCogoax2rrxv41rVAkz1zvlQHzEd9Jfj+s8=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQhGYEFwuiNpdy+0b5/b8PQmQQ93ktpNn4DebqyGJxiio=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>ota_factory_host_path</name>
@@ -80,7 +80,6 @@
         <hudson.model.StringParameterDefinition>
           <name>id</name>
           <description>devops task id</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
@@ -120,7 +119,7 @@ cd $ota_factory_host_path
 pwd
 
 [ -f otadiff.py ] &amp;&amp; ( python3 otadiff.py --bfile=&quot;$before_target_file&quot; --buser=&quot;$before_ftp_username&quot; \
-	--bpasswd=&quot;$before_ftp_passwd&quot; --afile=&quot;$after_target_file&quot; --auser=&quot;$after_ftp_username&quot; \
+    --bpasswd=&quot;$before_ftp_passwd&quot; --afile=&quot;$after_target_file&quot; --auser=&quot;$after_ftp_username&quot; \
     --apasswd=&quot;$after_ftp_passwd&quot; --terrace=&quot;$sv_platform_terrace&quot; --id=&quot;$id&quot; || echo &quot;exit 0&quot; )
 
 EOF
