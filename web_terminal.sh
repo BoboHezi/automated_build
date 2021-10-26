@@ -27,7 +27,7 @@ function get_random_port {
 }
 
 function http_notify {
-    url='http://192.168.48.113:8082/jeecg-boot/server/devopsServer/jenkinsRequestServer'
+    url="$devops_url/jeecg-boot/server/devopsServer/jenkinsRequestServer"
     full_url=$url"?id=$1&status=$2&ServerDir=$3"
     echo "full_url: $full_url"
     curl -H X-Access-Token:"$DEVOPS_TOKEN" -X GET $full_url
@@ -42,6 +42,7 @@ stop_terminal=$2
 ttyd_file=$3
 id=$4
 ip=$5
+devops_url=$(python3 -c "import utils; print(utils.DEVOPS_HTTP_URL_BE)")
 
 echo -e "\n*******web terminal*******\n"
 

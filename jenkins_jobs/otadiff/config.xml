@@ -4,13 +4,13 @@
   <description>创建OTA</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.20">
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.22">
       <gitLabConnection></gitLabConnection>
       <jobCredentialId></jobCredentialId>
       <useAlternativeCredential>false</useAlternativeCredential>
     </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
-    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.5">
-      <giteeConnection>Gitee</giteeConnection>
+    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.7">
+      <giteeConnection></giteeConnection>
     </com.gitee.jenkins.connection.GiteeConnectionProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
@@ -29,7 +29,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>before_ftp_passwd</name>
           <description>起始包登录密码</description>
-          <defaultValue>{AQAAABAAAAAQYx928/QXyWSFoBsDKm0XAOUwe066dycYSVXwtQf9XiY=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQGhMHxxS0p8KOuJAa2f7XQ995eOUac4kJJTOIZU827V8=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>after_target_file</name>
@@ -46,7 +46,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>after_ftp_passwd</name>
           <description>目标包登录密码</description>
-          <defaultValue>{AQAAABAAAAAQBOaby77ckTan9aXH9oSFZQmZ2Sm7NSjQVLc7ZdNmTmo=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQh1wdiOUTsMBL9wWDdMX6bhcoH0EfUBlcfoi04kRdsE8=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_terrace</name>
@@ -57,7 +57,7 @@
         <hudson.model.StringParameterDefinition>
           <name>ota_factory_host_ip</name>
           <description>do not edit</description>
-          <defaultValue>192.168.151.217</defaultValue>
+          <defaultValue>192.168.1.15</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -69,7 +69,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>ota_factory_host_pwd</name>
           <description>do not edit</description>
-          <defaultValue>{AQAAABAAAAAQS/A91WMPTTIVlzGUXB/Hbs3GPemCKaVeYCxin/00VZ8=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQSiV4AVx5Zdkgp90mZRmXZ8/lj1niGtMV+6dxkKKD6xw=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>ota_factory_host_path</name>
@@ -80,7 +80,6 @@
         <hudson.model.StringParameterDefinition>
           <name>id</name>
           <description>devops task id</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
@@ -120,7 +119,7 @@ cd $ota_factory_host_path
 pwd
 
 [ -f otadiff.py ] &amp;&amp; ( python3 otadiff.py --bfile=&quot;$before_target_file&quot; --buser=&quot;$before_ftp_username&quot; \
-	--bpasswd=&quot;$before_ftp_passwd&quot; --afile=&quot;$after_target_file&quot; --auser=&quot;$after_ftp_username&quot; \
+    --bpasswd=&quot;$before_ftp_passwd&quot; --afile=&quot;$after_target_file&quot; --auser=&quot;$after_ftp_username&quot; \
     --apasswd=&quot;$after_ftp_passwd&quot; --terrace=&quot;$sv_platform_terrace&quot; --id=&quot;$id&quot; || echo &quot;exit 0&quot; )
 
 EOF
@@ -130,7 +129,8 @@ rst=$?
 echo &quot;rst: $rst&quot;
 
 if [[ $rst != 0 ]]; then
-	url=&quot;http://192.168.48.2:8082/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id=$id&amp;status=7&amp;otaDir=&amp;otaLogUrl=$BUILD_URL/console&quot;
+	cd $LOCAL_SCRIPT_PATH
+	url=$(python3 -c &quot;import utils; print(utils.DEVOPS_HTTP_URL_BE)&quot;)&quot;/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id=$id&amp;status=7&amp;otaDir=&amp;otaLogUrl=$BUILD_URL/console&quot;
 	echo &quot;url: $url&quot;
 	curl -H X-Access-Token:&quot;$devops_token&quot; -X GET $url
 fi

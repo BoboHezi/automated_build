@@ -4,32 +4,30 @@
   <description>停止编译任务</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.20">
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.22">
       <gitLabConnection></gitLabConnection>
       <jobCredentialId></jobCredentialId>
       <useAlternativeCredential>false</useAlternativeCredential>
     </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
-    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.5">
-      <giteeConnection>Gitee</giteeConnection>
+    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.7">
+      <giteeConnection></giteeConnection>
     </com.gitee.jenkins.connection.GiteeConnectionProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>job_name_extra</name>
-          <description></description>
           <defaultValue>build-line</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>job_id</name>
-          <description></description>
           <defaultValue>1</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.PasswordParameterDefinition>
           <name>admin_token</name>
           <description>do not edit</description>
-          <defaultValue>{AQAAABAAAAAwmpSXmKAGy+Re1zRA69+85X4AfxwgwKg9voMPMdzGgjIXiaCjSiVtZvaYRe3icMUNTSDkfNwPt4wCc5wnjUPWYQ==}</defaultValue>
+          <defaultValue>{AQAAABAAAAAwcJuvKiMDYfoQNVHmjYKnLKEEBqH+PlXMclytmca71ARSFJ7D+AMm6PKV63E0IQsz4L8DiyKLtQitmYZAo36wJQ==}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>jenkins_user</name>

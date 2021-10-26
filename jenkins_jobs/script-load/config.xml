@@ -4,21 +4,21 @@
   <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.20">
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.22">
       <gitLabConnection></gitLabConnection>
       <jobCredentialId></jobCredentialId>
       <useAlternativeCredential>false</useAlternativeCredential>
     </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
-    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.5">
-      <giteeConnection>Gitee</giteeConnection>
+    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.7">
+      <giteeConnection></giteeConnection>
     </com.gitee.jenkins.connection.GiteeConnectionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.7.1">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.9.0">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
         <url>https://gitee.com/eliChang/automated_build.git</url>
-        <credentialsId>gitee-eli-up</credentialsId>
+        <credentialsId>gitee-eli</credentialsId>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>

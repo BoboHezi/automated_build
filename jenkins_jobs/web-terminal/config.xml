@@ -4,13 +4,13 @@
   <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.20">
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.22">
       <gitLabConnection></gitLabConnection>
       <jobCredentialId></jobCredentialId>
       <useAlternativeCredential>false</useAlternativeCredential>
     </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
-    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.5">
-      <giteeConnection>Gitee</giteeConnection>
+    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.7">
+      <giteeConnection></giteeConnection>
     </com.gitee.jenkins.connection.GiteeConnectionProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
@@ -29,7 +29,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>server_passwd</name>
           <description>终端主机用户密码</description>
-          <defaultValue>{AQAAABAAAAAQOjDAfAffLJQBkBaZ1h/2V2h3rXMgsD1ZYGUthMeoqhQ=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQoUAFn4CKbAWMUEhCVgqJiyIAN+3Tw+wmnBuLrvG4UHU=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>code_dir</name>
@@ -45,7 +45,6 @@
         <hudson.model.StringParameterDefinition>
           <name>id</name>
           <description>need by http request</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -57,7 +56,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>jenkins_user_token</name>
           <description>do not edit</description>
-          <defaultValue>{AQAAABAAAAAwrQRzZXcN6p7A+z8hj8AhfSWITp5+OS+7eL9XUSI0aVaWvt0ddOWF9OEIjYIL2yLvXLIwBc5jtNISbzi08J02pw==}</defaultValue>
+          <defaultValue>{AQAAABAAAAAwv19ITkPyMyy2G/DtVSoBKXOYilCT1quJKfE6/JDlauXe93LZKNR/o9f+aPouTPlEpjC3hEUvAgKoPkLQFkHhig==}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>

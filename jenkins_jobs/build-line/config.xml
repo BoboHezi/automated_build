@@ -1,8 +1,8 @@
 <?xml version='1.1' encoding='UTF-8'?>
-<flow-definition plugin="workflow-job@2.40">
+<flow-definition plugin="workflow-job@2.42">
   <actions>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.8.4"/>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.8.4">
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.9.2"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.9.2">
       <jobProperties/>
       <triggers/>
       <parameters/>
@@ -12,13 +12,13 @@
   <description>编译线</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.20">
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.22">
       <gitLabConnection></gitLabConnection>
       <jobCredentialId></jobCredentialId>
       <useAlternativeCredential>false</useAlternativeCredential>
     </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
-    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.5">
-      <giteeConnection>Gitee</giteeConnection>
+    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.7">
+      <giteeConnection></giteeConnection>
     </com.gitee.jenkins.connection.GiteeConnectionProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
@@ -49,7 +49,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>server_passwd</name>
           <description>编译服务器，SSH密码</description>
-          <defaultValue>{AQAAABAAAAAQ5pw93DNtTXAnh/GGikbDLFlD5fUXrD8jqFmhYRRrykM=}</defaultValue>
+          <defaultValue>{AQAAABAAAAAQGhyMxDImeanWVSvNzS1CQLYH86UXug61g552d8bL/2k=}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>build_variant</name>
@@ -65,7 +65,6 @@
         <hudson.model.StringParameterDefinition>
           <name>cherry_picks</name>
           <description>cherry-pick命令</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
@@ -136,7 +135,7 @@
         <hudson.model.PasswordParameterDefinition>
           <name>sign_ftp_upload_passwd</name>
           <description>签名包上传用户密码</description>
-          <defaultValue>{AQAAABAAAAAgL5ZcOCzLL1ddb+3P8wijuJwb6EI5mi5sbD9G0jBnTcj9Z933VdNKNcWKqi5kLAGX}</defaultValue>
+          <defaultValue>{AQAAABAAAAAgGwE6ysbxM2PWrTwFSQJtvxdMyDrhpyu52F7uYSqy7WAM24aFqYVfb3203Beb9HEf}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_url</name>
@@ -153,42 +152,36 @@
         <hudson.model.PasswordParameterDefinition>
           <name>sv_platform_passwd</name>
           <description>签名验收后台登录用户密码</description>
-          <defaultValue>{AQAAABAAAAAgP/lMaSV+qJ3jQ0SUZrlUoy4YjNAoQtyu/1IG3ELIfSwdSI6vp5+rvJ9SfscPBJtH}</defaultValue>
+          <defaultValue>{AQAAABAAAAAgh5O9WuWWnrRQSay2JGk0QEwJ8UyTaQp2jmR3B77cUXnT+OSaJ/Fj1+KXV29E40C+}</defaultValue>
         </hudson.model.PasswordParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_terrace</name>
           <description>签名平台，eg:SPRD_T310p_hongxiangyuan</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_board</name>
           <description>主板（用与验收包释放路径），若为空，则使用大写的项目名</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_model</name>
           <description>机型，若为空，则使用大写的项目名</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_brand</name>
           <description>品牌商，若为空，则使用项目客户号</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_odm</name>
           <description>方案商，若为空，则使用项目渠道号最后一段（eg:HONGXIANGYUAN_HONGXIANGYUAN）</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sv_platform_cclist</name>
           <description>CC list</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
@@ -225,7 +218,7 @@
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.90">
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.94">
     <script>
 def devops_token_extra = &apos;&apos;
 def prepare_rst = &apos;&apos;
