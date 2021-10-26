@@ -65,7 +65,7 @@ def http_notify(id, status, otaDir):
     build_url = os.getenv('BUILD_URL')
     if not utils.isempty(token):
         url = '%s%s?id=%s&status=%s&otaDir=%s&otaLogUrl=%s' % \
-              (utils.DEVOPS_HTTP_URL, utils.OTA_STATUS_PATH, id, status, otaDir, '%sconsole' % build_url)
+              (utils.DEVOPS_HTTP_URL_BE, utils.OTA_STATUS_PATH, id, status, otaDir, '%sconsole' % build_url)
         print('\notadiff url: %s' % url)
         headers = {
             'X-Access-Token': token
@@ -292,6 +292,7 @@ def main(argv):
         return 6, None
     chdir(platform)
     print('\notadiff now in %s' % getcwd())
+    return 0, None
 
     # found cmd
     cmd = PLATFORM_CMD[platform] if platform in PLATFORM_CMD else None

@@ -49,7 +49,7 @@ STATUS_CODE = {
     'prepare_failed': 13,
 }
 
-SET_STATUS_URL = '%s%s' % (utils.DEVOPS_HTTP_URL, utils.COMPILE_STATUS_PATH)
+SET_STATUS_URL = '%s%s' % (utils.DEVOPS_HTTP_URL_BE, utils.COMPILE_STATUS_PATH)
 
 
 def main(argv):

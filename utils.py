@@ -11,7 +11,7 @@ from re import match
 from subprocess import Popen, PIPE, STDOUT
 
 # url
-DEVOPS_HTTP_URL = 'http://192.168.48.105:8080'
+DEVOPS_HTTP_URL_BE = 'http://192.168.48.105:8080'
 COMPILE_STATUS_PATH = '/jeecg-boot/compile/devopsCompile/setStatusJenkins'
 OTA_STATUS_PATH = '/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus'
 # database
