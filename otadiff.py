@@ -292,7 +292,6 @@ def main(argv):
         return 6, None
     chdir(platform)
     print('\notadiff now in %s' % getcwd())
-    return 1, None
 
     # found cmd
     cmd = PLATFORM_CMD[platform] if platform in PLATFORM_CMD else None

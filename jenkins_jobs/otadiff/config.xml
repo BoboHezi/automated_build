@@ -130,7 +130,8 @@ rst=$?
 echo &quot;rst: $rst&quot;
 
 if [[ $rst != 0 ]]; then
-	url=&quot;http://192.168.48.105:8080/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id=$id&amp;status=7&amp;otaDir=&amp;otaLogUrl=$BUILD_URL/console&quot;
+	cd $LOCAL_SCRIPT_PATH
+	url=$(python3 -c &quot;import utils; print(utils.DEVOPS_HTTP_URL_BE)&quot;)&quot;/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus?id=$id&amp;status=7&amp;otaDir=&amp;otaLogUrl=$BUILD_URL/console&quot;
 	echo &quot;url: $url&quot;
 	curl -H X-Access-Token:&quot;$devops_token&quot; -X GET $url
 fi
