@@ -148,15 +148,27 @@ passwd=utils.DB_PASSWORD,
 database=utils.DB_DATABASE
 )
 cursor = db_connect.cursor()
-cursor.execute('select compile_platform_id,compile_save_vmlinux from devops_compile where id=$devops_compile_id')
+cursor.execute('select compile_platform_id,compile_save_vmlinux,compile_variant,compile_action,compile_is_sign,compile_is_verify from devops_compile where id=$devops_compile_id')
 result = cursor.fetchall()
-print(result[0][0]+' '+result[0][1]) if len(result) > 0 else None
+print(' '.join(result[0])) if len(result) > 0 else None
 cursor.close()
 db_connect.close()
 """)
 ary=($query_rst)
 COMPILE_PLATFORM_ID=${ary[0]}
 COMPILE_SAVE_VMLINUX=${ary[1]}
+COMPILE_VARIANT=${ary[2]}
+COMPILE_ACTION=${ary[3]}
+COMPILE_IS_SIGN=${ary[4]}
+COMPILE_IS_VERIFY=${ary[5]}
+COMPILE_SAVE_SYMBOLS="N"
+
+# FORMAL compile, save vmlinux & symbols
+if [[ "$COMPILE_VARIANT" == "u" && "$COMPILE_ACTION" == "ota" && "$COMPILE_IS_SIGN" == "Y" && "$COMPILE_IS_VERIFY" == "Y" ]]; then
+    echo -e "upload_files FORMAL compile, save vmlinux & symbols"
+    COMPILE_SAVE_VMLINUX="Y"
+    COMPILE_SAVE_SYMBOLS="Y"
+fi
 
 # define avalible cache hosts
 CACHE_HOSTS=($(python3 -c """
@@ -234,6 +246,15 @@ if [[ "$COMPILE_SAVE_VMLINUX" == "Y" ]]; then
     if [[ -f $vmlinux_file ]]; then
         echo -e "\nupload_files preserve vmlinux: $vmlinux_file"
         zip -j -q $cache_folder/vmlinux.zip $vmlinux_file
+    fi
+fi
+
+# copy symbols to $cache_folder
+if [[ "$COMPILE_SAVE_SYMBOLS" == "Y" ]]; then
+    symbols_path="$out_product/symbols"
+    if [[ -d $symbols_path ]]; then
+        echo -e "\nupload_files preserve symbols: $symbols_path"
+        zip -qr $cache_folder/symbols.zip $symbols_path
     fi
 fi
 
