@@ -4,12 +4,12 @@
   <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.19">
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.20">
       <gitLabConnection></gitLabConnection>
       <jobCredentialId></jobCredentialId>
       <useAlternativeCredential>false</useAlternativeCredential>
     </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
-    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.5">
+    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.7">
       <giteeConnection>Gitee</giteeConnection>
     </com.gitee.jenkins.connection.GiteeConnectionProperty>
     <hudson.model.ParametersDefinitionProperty>
@@ -45,7 +45,6 @@
         <hudson.model.StringParameterDefinition>
           <name>id</name>
           <description>need by http request</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -86,7 +85,7 @@ pwd
 EOF
 
 # scp file to target host
-sshpass -p &quot;$server_passwd&quot; scp &quot;$LOCAL_SCRIPT_PATH/ttyd_x86_64.sh&quot; &quot;$LOCAL_SCRIPT_PATH/web_terminal.sh&quot; &quot;$server_hostname@$server_ip_address:$REMOTE_SCRIPT_PATH&quot; &gt; /dev/null 2&gt;&amp;1
+sshpass -p &quot;$server_passwd&quot; scp &quot;$LOCAL_SCRIPT_PATH/ttyd_x86_64.sh&quot; &quot;$LOCAL_SCRIPT_PATH/web_terminal.sh&quot; &quot;$LOCAL_SCRIPT_PATH/utils.py&quot; &quot;$server_hostname@$server_ip_address:$REMOTE_SCRIPT_PATH&quot; &gt; /dev/null 2&gt;&amp;1
 
 # connect &amp; start/stop ttyd
 sshpass -p &quot;$server_passwd&quot; ssh -o StrictHostKeyChecking=no &quot;$server_hostname@$server_ip_address&quot; &lt;&lt; EOF
