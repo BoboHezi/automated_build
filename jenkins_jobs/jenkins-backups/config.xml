@@ -1,0 +1,246 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Jenkins自动备份工具</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.22">
+      <gitLabConnection></gitLabConnection>
+      <jobCredentialId></jobCredentialId>
+      <useAlternativeCredential>false</useAlternativeCredential>
+    </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+    <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.7">
+      <giteeConnection></giteeConnection>
+    </com.gitee.jenkins.connection.GiteeConnectionProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>JENKINS_USER</name>
+          <description>better not edit</description>
+          <defaultValue>admin</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.PasswordParameterDefinition>
+          <name>JENKINS_USER_TOKEN</name>
+          <description>better not edit</description>
+          <defaultValue>{AQAAABAAAAAwjZeKGqm5Pdbw27zbQQqLM/fqgQ+yWXpwxcE99y/VuGJe57X8sG46VD7RBSiCe+6d9kLEhjTYaFvh6BHIu1DxGg==}</defaultValue>
+        </hudson.model.PasswordParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.9.0">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name>origin</name>
+        <url>https://gitee.com/eliChang/imp_jenkins_backups.git</url>
+        <credentialsId>gitee-eli</credentialsId>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/production</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="empty-list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>H 5 H */2 *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!python3
+import json
+import os
+import requests
+import sys
+import time
+from re import search, match
+from six.moves.urllib.parse import urlparse
+
+
+JENKINS_USER = None
+JENKINS_USER_TOKEN = None
+JENKINS_URL = None
+THIS_BUILD_URL = None
+JENKINS_HOME = None
+BACKUPS_GIT_PATH = None
+
+REMOTE = &apos;https://gitee.com/eliChang/imp_jenkins_backups.git&apos;
+REMOTE_BRANCH = &apos;production&apos;
+LOCAL_USER_EMAIL = &apos;eliflichang@gmail.com&apos;
+LOCAL_USER_NAME = &apos;eliChang&apos;
+
+BACKUPS = (
+    &apos;fingerprints/&apos;,
+    &apos;jobs/&apos;,
+    &apos;nodes/&apos;,
+    &apos;plugins/&apos;,
+    &apos;secrets/&apos;,
+    &apos;updates/&apos;,
+    &apos;users/&apos;,
+    &apos;userContent/&apos;,
+    &apos;*.xml&apos;,
+    &apos;*.key*&apos;,
+    &apos;dhuerki&apos;,
+)
+
+BACKUPS_EXCLUDES = (
+    &apos;jobs/*/builds/&apos;,
+    &apos;jobs/*/nextBuildNumber&apos;,
+)
+
+
+def auth_get(url, user, token):
+    try:
+        r = requests.get(url, auth=(user, token))
+        return r.status_code, json.loads(r.text)
+    except Exception as e:
+        print(&apos;auth_get Exception: %s&apos; % e)
+        return 0, None
+
+
+def get_node_info(depth=2):
+    full_url = JENKINS_URL + &apos;/computer/%28master%29/api/json?depth=&apos;
+    code, rst = auth_get(full_url + str(depth), JENKINS_USER, JENKINS_USER_TOKEN)
+    return rst if code == 200 else None
+
+
+def get_running_builds():
+    info = get_node_info()
+
+    if info and &apos;executors&apos; in info and len(info[&apos;executors&apos;]) &gt; 0 \
+        and &apos;currentExecutable&apos; not in info[&apos;executors&apos;][0]:
+        info = get_node_info(0)
+
+    builds = []
+    for executor in info[&apos;executors&apos;]:
+        executable = executor[&apos;currentExecutable&apos;]
+        if executable and &apos;number&apos; in executable:
+            executor_number = executor[&apos;number&apos;]
+            build_number = executable[&apos;number&apos;]
+            url = executable[&apos;url&apos;]
+            m = search(r&apos;/job/([^/]+)/.*&apos;, urlparse(url).path)
+            job_name = m.group(1)
+            builds.append({&apos;name&apos;: job_name,
+                &apos;number&apos;: build_number,
+                &apos;url&apos;: url,
+                &apos;node&apos;: &apos;(master)&apos;,
+                &apos;executor&apos;: executor_number})
+    return builds
+
+
+def backups():
+    print(&apos;backups start backups&apos;)
+    import git
+    repo = git.Repo(&apos;.&apos;)
+    if not repo:
+        return None
+
+    local_script_path = os.environ[&apos;LOCAL_SCRIPT_PATH&apos;]
+    sys.path.append(local_script_path)
+    from utils import execute
+
+    # remove everything
+    execute(&apos;ls | grep -v &quot;README.md&quot; | xargs rm -rf&apos;)
+
+    os.chdir(JENKINS_HOME)
+    # cp backups
+    for item in BACKUPS:
+        if item.endswith(&apos;/&apos;):
+            # folder
+            print(&apos;backups cp -pr --parents %s %s&apos; % (item, BACKUPS_GIT_PATH))
+            execute(&apos;cp -pr --parents %s %s&apos; % (item, BACKUPS_GIT_PATH))
+        else:
+            # file
+            print(&apos;backups cp -p %s %s&apos; % (item, BACKUPS_GIT_PATH))
+            file_ptn = item.split(&apos;/&apos;)[-1]
+            folder = item[0:item.index(file_ptn)]
+            execute(&apos;find %s -maxdepth 1 -name &quot;%s&quot; | xargs -i cp -p --parents {} %s&apos; % (folder, file_ptn, BACKUPS_GIT_PATH))
+    # remove excludes
+    for item in BACKUPS_EXCLUDES:
+        print(&apos;backups rm %s&apos; % item)
+        execute(&apos;rm -rf %s/%s&apos; % (BACKUPS_GIT_PATH, item))
+    # return
+
+    # commit &amp; push
+    if repo.is_dirty() or len(repo.untracked_files) &gt; 0:
+        commit_msg = &apos;backups on %s&apos; % time.strftime(&apos;%Y-%m-%d %H:%M&apos;, time.localtime())
+        print(&apos;backups create commit: %s&apos; % commit_msg)
+        repo.git.config(&apos;--local&apos;, &apos;user.email&apos;, LOCAL_USER_EMAIL)
+        repo.git.config(&apos;--local&apos;, &apos;user.name&apos;, LOCAL_USER_NAME)
+        repo.git.add(&apos;-A&apos;)
+        repo.git.commit(&apos;-m&apos;, commit_msg)
+
+
+def main():
+    global JENKINS_URL, JENKINS_USER, JENKINS_USER_TOKEN, THIS_BUILD_URL, JENKINS_HOME, BACKUPS_GIT_PATH
+    JENKINS_URL = os.environ[&apos;JENKINS_URL&apos;]
+    JENKINS_USER = os.environ[&apos;JENKINS_USER&apos;]
+    JENKINS_USER_TOKEN = os.environ[&apos;JENKINS_USER_TOKEN&apos;]
+    THIS_BUILD_URL = os.environ[&apos;BUILD_URL&apos;]
+    JENKINS_HOME = os.environ[&apos;JENKINS_HOME&apos;]
+    BACKUPS_GIT_PATH = os.getcwd()
+
+    print(&quot;&quot;&quot;
+        JENKINS_URL:        %s
+        JENKINS_USER:       %s
+        THIS_BUILD_URL:     %s
+        JENKINS_HOME:       %s
+        &quot;&quot;&quot; % (JENKINS_URL, JENKINS_USER, THIS_BUILD_URL, JENKINS_HOME))
+
+    attemt_times = 5
+    while attemt_times &gt; 0:
+        attemt_times -= 1
+
+        builds = get_running_builds()
+        wait = False
+        for build in builds:
+            print(build)
+            if build[&apos;url&apos;] != THIS_BUILD_URL:
+                # another job working
+                wait = True
+                break
+
+        if wait:
+            print(&apos;backups another job working, wait 10 minutes.&apos;)
+            time.sleep(10 * 60)
+            continue
+        else:
+            # backups
+            backups()
+            break
+
+
+if __name__ == &apos;__main__&apos;:
+    main()
+</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.plugins.git.GitPublisher plugin="git@4.9.0">
+      <configVersion>2</configVersion>
+      <pushMerge>false</pushMerge>
+      <pushOnlyIfSuccess>true</pushOnlyIfSuccess>
+      <forcePush>false</forcePush>
+      <branchesToPush>
+        <hudson.plugins.git.GitPublisher_-BranchToPush>
+          <targetRepoName>origin</targetRepoName>
+          <branchName>production</branchName>
+          <rebaseBeforePush>true</rebaseBeforePush>
+        </hudson.plugins.git.GitPublisher_-BranchToPush>
+      </branchesToPush>
+    </hudson.plugins.git.GitPublisher>
+  </publishers>
+  <buildWrappers/>
+</project>
