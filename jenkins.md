@@ -19,9 +19,9 @@
 4. Manage Jenkins -> System Configuration -> global attributes -> Environment variable， 添加属性
 
 ```
-DEVOPS_TOKEN_FILE: /home/server/.jenkins/dhuerki
-LOCAL_SCRIPT_PATH: /home/server/.jenkins/script/
-REMOTE_SCRIPT_PATH: /home/server/.jenkins/script/
+DEVOPS_TOKEN_FILE: /tmp/.jenkins/dhuerki
+LOCAL_SCRIPT_PATH: /tmp/.jenkins/script/
+REMOTE_SCRIPT_PATH: /tmp/.jenkins/script/
 python3: /usr/bin/python3
 ```
 

@@ -10,7 +10,7 @@
       <useAlternativeCredential>false</useAlternativeCredential>
     </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
     <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.7">
-      <giteeConnection>Gitee</giteeConnection>
+      <giteeConnection></giteeConnection>
     </com.gitee.jenkins.connection.GiteeConnectionProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
