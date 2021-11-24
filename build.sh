@@ -120,7 +120,7 @@ echo -e "\nmanifest_tag_file: $manifest_tag_file\n"
 
 echo -e "\n---------------------cherry pick---------------------\n"
 # cherry pick
-python3 repo_handler.py -p $script_base/cps ; cp_rst=$?
+python3 repo_handler.py -p ~/.jenkins/script/cps ; cp_rst=$?
 if test $cp_rst != "0"; then
     echo -e "\ncherry-pick failed, exit\n"
     # status: cp_failed failed(9)
