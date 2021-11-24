@@ -10,7 +10,7 @@
       <useAlternativeCredential>false</useAlternativeCredential>
     </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
     <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.7">
-      <giteeConnection>Gitee</giteeConnection>
+      <giteeConnection></giteeConnection>
     </com.gitee.jenkins.connection.GiteeConnectionProperty>
   </properties>
   <scm class="hudson.scm.NullSCM"/>
@@ -275,7 +275,7 @@ for item in clean_folders:
             continue
         func = None
         if file_type.startswith(&apos;-&apos;):
-            if match(&apos;.*vmlinux.zip$&apos;, file_name):
+            if match(&apos;.*(vmlinux|symbols).zip$&apos;, file_name):
                 del_folder_flag = False
             else:
                 func = ftp.delete
