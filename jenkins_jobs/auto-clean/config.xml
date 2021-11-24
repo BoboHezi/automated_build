@@ -1,15 +1,16 @@
-<?xml version="1.1" encoding="UTF-8"?><project>
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
   <actions/>
   <description>清理垃圾文件</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.22">
-      <gitLabConnection/>
-      <jobCredentialId/>
+      <gitLabConnection></gitLabConnection>
+      <jobCredentialId></jobCredentialId>
       <useAlternativeCredential>false</useAlternativeCredential>
     </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
     <com.gitee.jenkins.connection.GiteeConnectionProperty plugin="gitee@1.2.7">
-      <giteeConnection/>
+      <giteeConnection></giteeConnection>
     </com.gitee.jenkins.connection.GiteeConnectionProperty>
   </properties>
   <scm class="hudson.scm.NullSCM"/>
@@ -30,118 +31,118 @@
 LOCAL_SCRIPT_PATH=$(eval echo -n ${LOCAL_SCRIPT_PATH})
 
 function db_query() {
-    [ "$1" = "" ] &amp;&amp; return
+    [ &quot;$1&quot; = &quot;&quot; ] &amp;&amp; return
     local sql=$1
-    local query_rst=$(python3 -c """
+    local query_rst=$(python3 -c &quot;&quot;&quot;
 import os
-os.chdir('$LOCAL_SCRIPT_PATH')
+os.chdir(&apos;$LOCAL_SCRIPT_PATH&apos;)
 import utils,mysql.connector
 db_connect = mysql.connector.connect(
 host=utils.DB_HOST,port=utils.DB_PORT,
 user=utils.DB_USER,passwd=utils.DB_PASSWORD,
 database=utils.DB_DATABASE)
 cursor = db_connect.cursor()
-cursor.execute('$sql')
+cursor.execute(&apos;$sql&apos;)
 result = cursor.fetchall()
 print(result) if len(result) &gt; 0 else None
 cursor.close()
-db_connect.close()""")
+db_connect.close()&quot;&quot;&quot;)
     query_rst=${query_rst//[/}
     query_rst=${query_rst//]/}
-    query_rst=${query_rst//\'/}
+    query_rst=${query_rst//\&apos;/}
     query_rst=${query_rst//, /,}
     query_rst=${query_rst//\),\(/\) \(}
     echo $query_rst
 }
 
 function db_execute() {
-    [ "$1" = "" ] &amp;&amp; return
+    [ &quot;$1&quot; = &quot;&quot; ] &amp;&amp; return
     local sql=$1
-    local query_rst=$(python3 -c """
+    local query_rst=$(python3 -c &quot;&quot;&quot;
 import os
-os.chdir('$LOCAL_SCRIPT_PATH')
+os.chdir(&apos;$LOCAL_SCRIPT_PATH&apos;)
 import utils,mysql.connector
 db_connect = mysql.connector.connect(
 host=utils.DB_HOST,port=utils.DB_PORT,
 user=utils.DB_USER,passwd=utils.DB_PASSWORD,
 database=utils.DB_DATABASE)
 cursor = db_connect.cursor()
-cursor.execute('$sql')
+cursor.execute(&apos;$sql&apos;)
 db_connect.commit()
 print(cursor.rowcount)
 cursor.close()
-db_connect.close()""")
+db_connect.close()&quot;&quot;&quot;)
     echo $query_rst
 }
 
 function ssh_execute() {
-    [[ "$1" = "" || "$2" = "" || "$3" = "" || "$4" = "" ]] &amp;&amp; return
+    [[ &quot;$1&quot; = &quot;&quot; || &quot;$2&quot; = &quot;&quot; || &quot;$3&quot; = &quot;&quot; || &quot;$4&quot; = &quot;&quot; ]] &amp;&amp; return
     local ip=$1
     local user=$2
     local pwd=$3
     local cmd=$4
 
-    sshpass -p "${pwd}" ssh -o StrictHostKeyChecking=no "${user}@${ip}" "eval ${cmd}"
+    sshpass -p &quot;${pwd}&quot; ssh -o StrictHostKeyChecking=no &quot;${user}@${ip}&quot; &quot;eval ${cmd}&quot;
 }
 
 function check_host_status() {
-    [ "$1" = "" ] &amp;&amp; return
+    [ &quot;$1&quot; = &quot;&quot; ] &amp;&amp; return
     local id=$1
-    local rst=$(db_query "select server_status from devops_server where id=$id")
+    local rst=$(db_query &quot;select server_status from devops_server where id=$id&quot;)
     rst=${rst//\(/}
-    echo $rst | awk -F, '{print $1}'
+    echo $rst | awk -F, &apos;{print $1}&apos;
 }
 
 function cmd_base() {
-    echo """
+    echo &quot;&quot;&quot;
     # base cmd
     [ ! -d $REMOTE_SCRIPT_PATH ] &amp;&amp; exit;
     cd $REMOTE_SCRIPT_PATH;
-    echo -n 'now in ';
-    ip a | grep \"\(192.168\)\|\(10.20\)\" | awk '{print \$2}' | awk -F/ '{print \$1}';
+    echo -n &apos;now in &apos;;
+    ip a | grep \&quot;\(192.168\)\|\(10.20\)\&quot; | awk &apos;{print \$2}&apos; | awk -F/ &apos;{print \$1}&apos;;
 
     function clean_overdue() {
-        [ -n \"\$1\" ] &amp;&amp; files=\"\$1\" || return
-        [ -n \"\$2\" ] &amp;&amp; delay=\"\$2\" || delay=7
+        [ -n \&quot;\$1\&quot; ] &amp;&amp; files=\&quot;\$1\&quot; || return
+        [ -n \&quot;\$2\&quot; ] &amp;&amp; delay=\&quot;\$2\&quot; || delay=7
 
         now=\`date +%s\`
         overdue=\`expr \$now - \$delay \\* 24 \\* 60 \\* 60\`
         for f in \$files; do
             t=\`date +%s -r \$f\`
             echo -n \$f\(\$t\)
-            [ \$t -lt \$overdue ] &amp;&amp; echo ' overdue' &amp;&amp; rm -rf \$f || echo;
+            [ \$t -lt \$overdue ] &amp;&amp; echo &apos; overdue&apos; &amp;&amp; rm -rf \$f || echo;
         done
     }
     
     function print_location() {
         echo
-        echo -n 'now in ';
+        echo -n &apos;now in &apos;;
         pwd;
     }
-    """
+    &quot;&quot;&quot;
 }
 
 function cmd_clean_script() {
-    echo """
+    echo &quot;&quot;&quot;
     cd $REMOTE_SCRIPT_PATH
     print_location
     # clean tag file 7 days ago
-    echo -e \"\nclean manifest tag files\"
-    tag_files=\`find -type f -regex '^./tag_[0-9]*_[0-9]*.xml'\`
-    clean_overdue \"\$tag_files\" \"7\"
+    echo -e \&quot;\nclean manifest tag files\&quot;
+    tag_files=\`find -type f -regex &apos;^./tag_[0-9]*_[0-9]*.xml&apos;\`
+    clean_overdue \&quot;\$tag_files\&quot; \&quot;7\&quot;
 
     # clean script
-    echo -e \"\nclean script files\"
-    script_files=\`find -maxdepth 1 -type f -regex '.*\.sh\|.*\.py'\`
-    clean_overdue \"\$script_files\" \"0\" || echo
-    """
+    echo -e \&quot;\nclean script files\&quot;
+    script_files=\`find -maxdepth 1 -type f -regex &apos;.*\.sh\|.*\.py&apos;\`
+    clean_overdue \&quot;\$script_files\&quot; \&quot;0\&quot; || echo
+    &quot;&quot;&quot;
 }
 
 function cmd_clean_code() {
-    [ "$1" = "" ] &amp;&amp; return
-    echo """
+    [ &quot;$1&quot; = &quot;&quot; ] &amp;&amp; return
+    echo &quot;&quot;&quot;
     # clean code
-    codes=\"$1\";
+    codes=\&quot;$1\&quot;;
     for code in \${codes[@]}; do
         code=\${code//,/ };
         code=\${code//(/};
@@ -153,26 +154,26 @@ function cmd_clean_code() {
         script_path=\$(eval echo -n $REMOTE_SCRIPT_PATH)
 
         # clean jenkins link file
-        echo -e \"\nclean script link files\"
-        script_links=\$(for i in \`find -maxdepth 1 -type l\`; do l=\`ls -l \$i | awk '{print \$NF}'\`; echo \$l | grep \$script_path &gt; /dev/null &amp;&amp; echo \$i; done)
-        clean_overdue \"\$script_links\" \"0\"
+        echo -e \&quot;\nclean script link files\&quot;
+        script_links=\$(for i in \`find -maxdepth 1 -type l\`; do l=\`ls -l \$i | awk &apos;{print \$NF}&apos;\`; echo \$l | grep \$script_path &gt; /dev/null &amp;&amp; echo \$i; done)
+        clean_overdue \&quot;\$script_links\&quot; \&quot;0\&quot;
         
         # clean log file 3 days ago
-        echo -e \"\nclean log files\"
-        log_files=\`find -maxdepth 1 -type f -name \"*.log\"\`
-        clean_overdue \"\$log_files\" \"3\"
+        echo -e \&quot;\nclean log files\&quot;
+        log_files=\`find -maxdepth 1 -type f -name \&quot;*.log\&quot;\`
+        clean_overdue \&quot;\$log_files\&quot; \&quot;3\&quot;
 
         # clean publish files 7 days ago
-        echo -e \"\nclean publish files\"
+        echo -e \&quot;\nclean publish files\&quot;
         publish_files=\`[ -d droi/out ] &amp;&amp; find droi/out -mindepth 1 -maxdepth 1\`
-        clean_overdue \"\$publish_files\" \"7\"
+        clean_overdue \&quot;\$publish_files\&quot; \&quot;7\&quot;
     done
     cd $REMOTE_SCRIPT_PATH;
-    """
+    &quot;&quot;&quot;
 }
 
 function clean() {
-    [ "$1" = "" ] &amp;&amp; return
+    [ &quot;$1&quot; = &quot;&quot; ] &amp;&amp; return
     local compile_hosts=$1
     for host in ${compile_hosts[@]}; do
         host=${host//,/ }
@@ -180,35 +181,35 @@ function clean() {
         host=${host//)/}
         host=($host)
         status=$(check_host_status ${host[0]})
-        echo "id: ${host[0]}, ip: ${host[1]}, user: ${host[2]}, status: $status"
+        echo &quot;id: ${host[0]}, ip: ${host[1]}, user: ${host[2]}, status: $status&quot;
 
         if [[ $status == 0 ]]; then
             # mark server shutdown first
-            db_execute "update devops_server set server_status=2 where id=${host[0]}"
+            db_execute &quot;update devops_server set server_status=2 where id=${host[0]}&quot;
 
             # generate remote cmd
-            local cmd="$(cmd_base)"
+            local cmd=&quot;$(cmd_base)&quot;
             # dump codes
-            local codes=$(db_query "select code_dir from devops_code where code_server_id=${host[0]} and code_status=2")
-            cmd="$cmd""$(cmd_clean_code "$codes")"
-            cmd="$cmd""$(cmd_clean_script)"
+            local codes=$(db_query &quot;select code_dir from devops_code where code_server_id=${host[0]} and code_status=2&quot;)
+            cmd=&quot;$cmd&quot;&quot;$(cmd_clean_code &quot;$codes&quot;)&quot;
+            cmd=&quot;$cmd&quot;&quot;$(cmd_clean_script)&quot;
 
             # execute by ssh
-            ssh_execute "${host[1]}" "${host[2]}" "${host[3]}" "$cmd"
+            ssh_execute &quot;${host[1]}&quot; &quot;${host[2]}&quot; &quot;${host[3]}&quot; &quot;$cmd&quot;
 
             # mark server normal
-            db_execute "update devops_server set server_status=0 where id=${host[0]}"
+            db_execute &quot;update devops_server set server_status=0 where id=${host[0]}&quot;
         fi
     done
 }
 
 # main, start...
 
-COMPILE_HOSTS=$(db_query 'select id,server_ip,server_host,server_password from devops_server where server_use_flag="compile"')
-# COMPILE_HOSTS=$(db_query 'select id,server_ip,server_host,server_password from devops_server where id in (1412653247472128001,1410057686470430722)')
+COMPILE_HOSTS=$(db_query &apos;select id,server_ip,server_host,server_password from devops_server where server_use_flag=&quot;compile&quot;&apos;)
+# COMPILE_HOSTS=$(db_query &apos;select id,server_ip,server_host,server_password from devops_server where id in (1412653247472128001,1410057686470430722)&apos;)
 
 # clean superfluous manifest tag
-clean "$COMPILE_HOSTS"
+clean &quot;$COMPILE_HOSTS&quot;
 </command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
@@ -218,15 +219,15 @@ from ftplib import FTP
 from time import time, strftime, strptime, localtime, mktime
 from re import match
 
-BASE_FOLDER = '/IMP_jenkins_cache'
+BASE_FOLDER = &apos;/IMP_jenkins_cache&apos;
 
 # dump current
 current = time()
-year = int(strftime('%Y', localtime(current)))
-month = int(strftime('%m', localtime(current)))
-day = int(strftime('%d', localtime(current)))
-format_time = strftime('%H:%M:%S', localtime(current))
-print('today is %s-%s-%s' % (year, month, day))
+year = int(strftime(&apos;%Y&apos;, localtime(current)))
+month = int(strftime(&apos;%m&apos;, localtime(current)))
+day = int(strftime(&apos;%d&apos;, localtime(current)))
+format_time = strftime(&apos;%H:%M:%S&apos;, localtime(current))
+print(&apos;today is %s-%s-%s&apos; % (year, month, day))
 # calculate three month ago
 total = month + 9
 month = total % 12
@@ -235,65 +236,65 @@ if month == 0:
     month = 12
     year -= 1
 clean_month_folder = str(year * 100 + month)
-last_time_stamp = mktime(strptime('%d-%d-%d %s' % (year, month, day, format_time), '%Y-%m-%d %H:%M:%S'))
+last_time_stamp = mktime(strptime(&apos;%d-%d-%d %s&apos; % (year, month, day, format_time), &apos;%Y-%m-%d %H:%M:%S&apos;))
 
 # ftp connect
 ftp = FTP()
-ftp.connect('ftp.droi.com', 21, 30)
+ftp.connect(&apos;ftp.droi.com&apos;, 21, 30)
 try:
-    ftp.login('FreemeImp', 'FImp0102ya')
-    ftp.cwd('%s/%s' % (BASE_FOLDER, clean_month_folder))
+    ftp.login(&apos;FreemeImp&apos;, &apos;FImp0102ya&apos;)
+    ftp.cwd(&apos;%s/%s&apos; % (BASE_FOLDER, clean_month_folder))
 except Exception as e:
-    print('Exception: %s' % e)
+    print(&apos;Exception: %s&apos; % e)
     ftp.quit()
     exit(1)
 
 # find clean folder
-print('\nclean folder %s' % clean_month_folder)
+print(&apos;\nclean folder %s&apos; % clean_month_folder)
 clean_folders = []
 inner_folders = []
 ftp.dir(inner_folders.append)
 for item in inner_folders:
     ary = item.split( )
-    if ary[0].startswith('d') and match('^cache_[\d]*_[\d]*_[\d]*$', ary[8]):
-        t_stamp = ary[8].split('_')[-1]
+    if ary[0].startswith(&apos;d&apos;) and match(&apos;^cache_[\d]*_[\d]*_[\d]*$&apos;, ary[8]):
+        t_stamp = ary[8].split(&apos;_&apos;)[-1]
         if int(t_stamp) &lt;= last_time_stamp:
             clean_folders.append(ary[8])
 # clean
 for item in clean_folders:
-    folder = '%s/%s/%s' % (BASE_FOLDER, clean_month_folder, item)
-    print('\nin %s' % folder)
+    folder = &apos;%s/%s/%s&apos; % (BASE_FOLDER, clean_month_folder, item)
+    print(&apos;\nin %s&apos; % folder)
     files = []
     ftp.dir(folder, files.append)
     del_folder_flag = True
     for file in files:
         ary = file.split( )
         file_type = ary[0]
-        file_name = '%s/%s/%s' % (ftp.pwd(), item, ary[8])
-        if file_type.startswith('d') and match('.*\.{1,}$', file_name):
+        file_name = &apos;%s/%s/%s&apos; % (ftp.pwd(), item, ary[8])
+        if file_type.startswith(&apos;d&apos;) and match(&apos;.*\.{1,}$&apos;, file_name):
             continue
         func = None
-        if file_type.startswith('-'):
-            if match('.*vmlinux.zip$', file_name):
+        if file_type.startswith(&apos;-&apos;):
+            if match(&apos;.*(vmlinux|symbols).zip$&apos;, file_name):
                 del_folder_flag = False
             else:
                 func = ftp.delete
-        elif file_type.startswith('d'):
+        elif file_type.startswith(&apos;d&apos;):
             func = ftp.rmd
         # delete child
         if func:
-            print('delete %s' % file_name)
+            print(&apos;delete %s&apos; % file_name)
             try:
                 func(file_name)
             except Exception as e:
-                print('  delete error: %s' % e)
+                print(&apos;  delete error: %s&apos; % e)
     # delete whole folder
     if del_folder_flag:
-        print('delete %s' % folder)
+        print(&apos;delete %s&apos; % folder)
         try:
             ftp.rmd(folder)
         except Exception as e:
-            print('  delete error: %s' % e)
+            print(&apos;  delete error: %s&apos; % e)
 ftp.quit()
 </command>
       <configuredLocalRules/>
