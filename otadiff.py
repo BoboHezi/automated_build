@@ -38,7 +38,7 @@ PLATFORM_CMD = {
     'MTK_mt6771r': 'build/tools/releasetools/ota_from_target_files --skip_compatibility_check -p android_out_host/linux-x86 --block -i $before $after update.zip',
     'MTK_mt6769r': 'build/tools/releasetools/ota_from_target_files --skip_compatibility_check -p android_out_host/linux-x86 --block -i $before $after update.zip',
     'SPRD_T310p': 'build/tools/releasetools/ota_from_target_files --block -i $before $after update.zip',
-    'SPRD_T7510p': 'build/tools/releasetools/ota_from_target_files --block -i $before $after update.zip',
+    'SPRD_T7510p': 'build/tools/releasetools/ota_from_target_files --block --board_compatible -i $before $after update.zip',
     'SPRD_7731m': 'build/tools/releasetools/ota_from_target_files -i $before $after update.zip',
     'SPRD_9830l': 'build/tools/releasetools/ota_from_target_files -i $before $after update.zip',
     'SPRD_9832m': 'build/tools/releasetools/ota_from_target_files -i $before $after update.zip',
