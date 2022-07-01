@@ -23,6 +23,7 @@ DEVOPS_OTA_TASK_ID = None
 PLATFORM_CMD = {
     'MTK_mt6737m': 'build/tools/releasetools/ota_from_target_files -s device/mediatek/build/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
     'MTK_mt6737n': 'build/tools/releasetools/ota_from_target_files -s device/mediatek/build/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
+    'MTK_mt6737o': 'build/tools/releasetools/ota_from_target_files -s vendor/mediatek/proprietary/scripts/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
     'MTK_mt6739n': 'build/tools/releasetools/ota_from_target_files -s device/mediatek/build/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
     'MTK_mt6750n': 'build/tools/releasetools/ota_from_target_files -s device/mediatek/build/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
     'MTK_mt6758n': 'build/tools/releasetools/ota_from_target_files -s device/mediatek/build/releasetools/mt_ota_from_target_files --block -i $before $after update.zip',
