@@ -99,7 +99,7 @@ esac
 
 echo -e "\n---------------------repo handler---------------------\n"
 repo abandon --all > /dev/null 2>&1 || echo
-repo sync > /dev/null 2>&1 || echo
+repo sync --force-sync > /dev/null 2>&1 || echo
 repo start --all master
 # 'clean code'
 if [[ "$build_action" != "r" ]]; then
