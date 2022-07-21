@@ -9,9 +9,9 @@ from re import search
 
 import utils
 
-FTP_HOST = 'ftp.droi.com'
-FTP_USER = 'FreemeImp'
-FTP_PWD = 'FImp0102ya'
+FTP_HOST = 'upload.droi.com'
+FTP_USER = 'jenkins'
+FTP_PWD = 'Freeme*@Jenkins'
 LOCAL_PATH = None
 REMOTE_PATH = None
 
