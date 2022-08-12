@@ -136,14 +136,14 @@ def main(argv):
     utils.removedirs(publish_out)
 
     # remove out if necessary
-    c, t = utils.execute('df $PWD')
-    if c == 0 and not utils.isempty(t):
-        match = search('[ ]+([0-9]+)[ ]+([0-9]+)[ ]+([0-9]+)[ ]+', t)
-        if match and match.group(3):
-            available = int(match.group(3))
-            if available < 200 * 1024 * 1024:
-                print('upload_sign_ftp df: %s' % t.split('\n')[1])
-                utils.async_command('[ -d out ] && rm -rf out')
+    # c, t = utils.execute('df $PWD')
+    # if c == 0 and not utils.isempty(t):
+    #     match = search('[ ]+([0-9]+)[ ]+([0-9]+)[ ]+([0-9]+)[ ]+[^ ]*[ ]([^ ]*)', t)
+    #     if match and match.group(3):
+    #         available = int(match.group(3))
+    #         if available < 200 * 1024 * 1024:
+    #             print('upload_sign_ftp df: %s' % t.split('\n')[1])
+    #             utils.async_command('[ -d out ] && rm -rf out')
 
     return 0, None
 

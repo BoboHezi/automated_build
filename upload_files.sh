@@ -404,3 +404,17 @@ if [[ "$build_sign" == "true" ]]; then
     python3 upload_sign_ftp.py -p "$project_name" -h "$sign_ftp_url" -u "$sign_ftp_upload_username" -c "$sign_ftp_upload_passwd"
 fi
 
+# check free space
+df=$(df -k $PWD --output=used,avail,target | grep "[0-9]\+")
+free=$(echo $df | awk '{print $2}')
+if [[ $free -lt `expr 200 \* 1024` ]]; then
+    partition=$(echo $df | awk '{print $3}')
+    echo -e "\nupload_files $partition remain $free kb, less than 200M"
+
+    url="$(python3 -c "import utils; print(utils.DEVOPS_HTTP_URL_BE)")/jeecg-boot/compile/devopsCompile/jenkinsServerDiskFull"
+    full_url=$url"?id=$devops_compile_id&partition=$partition&free=$(expr $free \* 1024)"
+    echo "\nupload_files full_url: $full_url"
+
+    curl -H X-Access-Token:"$DEVOPS_TOKEN" -X GET $full_url
+fi
+
