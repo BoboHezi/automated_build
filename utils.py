@@ -29,7 +29,7 @@ CACHE_HOSTS = (
 
 # cache ftp host
 CACHE_FTP = (
-    'FreemeImp,ftp.droi.com,FImp0102ya'
+    'jenkins,upload.droi.com,Freeme*@Jenkins'
 )
 
 common_headers = {
