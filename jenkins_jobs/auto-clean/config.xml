@@ -240,9 +240,9 @@ last_time_stamp = mktime(strptime(&apos;%d-%d-%d %s&apos; % (year, month, day, f
 
 # ftp connect
 ftp = FTP()
-ftp.connect(&apos;ftp.droi.com&apos;, 21, 30)
+ftp.connect(&apos;upload.droi.com&apos;, 21, 30)
 try:
-    ftp.login(&apos;FreemeImp&apos;, &apos;FImp0102ya&apos;)
+    ftp.login(&apos;jenkins&apos;, &apos;Freeme*@Jenkins&apos;)
     ftp.cwd(&apos;%s/%s&apos; % (BASE_FOLDER, clean_month_folder))
 except Exception as e:
     print(&apos;Exception: %s&apos; % e)

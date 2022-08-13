@@ -43,7 +43,7 @@ ORIGIN_WORK_DIRECTORY = os.getcwd()
 
 # repo sync
 def sync():
-    rst_code, text = execute('repo sync')
+    rst_code, text = execute('repo sync --force-sync')
     if rst_code != 0:
         sync_errors = {}
         for line in text.split('\n'):
@@ -325,7 +325,7 @@ def main(argv):
                     success = result if result != 0 else success
                 if success == 0:
                     print('\nmanifests cherry-pick success, repo sync')
-                    utils.execute('repo sync && repo start --all master')
+                    utils.execute('repo sync --force-sync && repo start --all master')
                 else:
                     print('\nmanifests cherry-pick failed, exit')
                     exit(3)

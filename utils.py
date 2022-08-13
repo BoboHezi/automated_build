@@ -18,7 +18,7 @@ OTA_STATUS_PATH = '/jeecg-boot/ota/devopsDiffOta/setJenkinsOtaStatus'
 DB_HOST = "192.168.48.35"
 DB_PORT = 3306
 DB_USER = "root"
-DB_PASSWORD = "yun764946"
+DB_PASSWORD = "root"
 DB_DATABASE = "jeecg-boot242"
 
 # cache host
